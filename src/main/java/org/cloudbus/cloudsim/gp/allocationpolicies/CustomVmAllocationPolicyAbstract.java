@@ -1,9 +1,11 @@
 package org.cloudbus.cloudsim.gp.allocationpolicies;
 
-import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
+import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicyAbstract;
 
-public abstract class CustomVmAllocationPolicyAbstract implements VmAllocationPolicy{
+public abstract class CustomVmAllocationPolicyAbstract extends VmAllocationPolicyAbstract{
 	
-	
+	public CustomVmAllocationPolicyAbstract () {
+		
+	}
 	
 }
