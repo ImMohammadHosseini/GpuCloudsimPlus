@@ -11,10 +11,11 @@ public interface GpuResourceProvisioner {
 	
 	GpuResourceProvisioner NULL = new GpuResourceProvisionerNull();
 	
-	boolean allocateResourceForVGpu (CustomVGpu vgpu, long newTotalVmResourceCapacity);
+	boolean allocateResourceForVGpu (CustomVGpu vgpu, long newTotalVGpuResourceCapacity);
 	
-	default boolean allocateResourceForVm (final CustomVGpu vgpu, final double newTotalVmResource) {
-        return allocateResourceForVm(vgpu, (long)newTotalVmResource);
+	default boolean allocateResourceForVGpu (final CustomVGpu vgpu, 
+			final double newTotalVGpuResource) {
+        return allocateResourceForVGpu(vgpu, (long)newTotalVGpuResource);
     }
 	
 	long getAllocatedResourceForVGpu (CustomVGpu vgpu);
@@ -29,7 +30,8 @@ public interface GpuResourceProvisioner {
 	
 	ResourceManageable getPGpuResource();
 	
-	void setResources(ResourceManageable pGpuResource, Function<CustomVGpu, ResourceManageable> vGpuResourceFunction);
+	void setResources(ResourceManageable pGpuResource, 
+			Function<CustomVGpu, ResourceManageable> vGpuResourceFunction);
 	
 	long getCapacity();
 	

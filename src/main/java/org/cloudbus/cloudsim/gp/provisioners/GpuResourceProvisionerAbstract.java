@@ -17,7 +17,8 @@ public abstract class GpuResourceProvisionerAbstract implements GpuResourceProvi
         this(ResourceManageable.NULL, vgpu -> ResourceManageable.NULL);
     }
 
-    public GpuResourceProvisionerAbstract(final ResourceManageable pGpuResource, final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
+    public GpuResourceProvisionerAbstract(final ResourceManageable pGpuResource, 
+    		final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
         setResources(pGpuResource, vGpuResourceFunction);
     }
     
@@ -33,7 +34,8 @@ public abstract class GpuResourceProvisionerAbstract implements GpuResourceProvi
     }
 
     @Override
-    public final void setResources(final ResourceManageable pGpuResource, final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
+    public final void setResources(final ResourceManageable pGpuResource, 
+    		final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
         this.pGpuResource = Objects.requireNonNull(pGpuResource);
         this.vGpuResourceFunction = Objects.requireNonNull(vGpuResourceFunction);
     }
@@ -53,5 +55,7 @@ public abstract class GpuResourceProvisionerAbstract implements GpuResourceProvi
         return pGpuResource.getAvailableResource();
     }
     
-    
+    protected Function<CustomVGpu, ResourceManageable> getVGpuResourceFunction() {
+        return vGpuResourceFunction;
+    }
 }
