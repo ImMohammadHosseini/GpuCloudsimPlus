@@ -11,7 +11,7 @@ import org.cloudbus.cloudsim.core.ChangeableId;
 import org.cloudbus.cloudsim.vms.Vm;
 
 
-public interface Gpu extends ChangeableId, ResourceManageable{
+public interface Gpu extends ChangeableId, ResourceManageable {
 	
     //Logger LOGGER = LoggerFactory.getLogger(Vm.class.getSimpleName());
 	
