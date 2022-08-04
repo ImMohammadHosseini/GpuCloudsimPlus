@@ -11,7 +11,7 @@ import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.resources.ResourceManageableAbstract;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisionerSimple;
-import org.cloudbus.cloudsim.gp.vms.vgpus.CustomVGpuSimple;
+
 
 
 public class GpuSimple implements Gpu {
@@ -73,7 +73,7 @@ public class GpuSimple implements Gpu {
 	@Override 
 	public Gpu setGpuGddramProvisioner (GpuResourceProvisioner gpuGddramProvisioner) {
 		this.gpuGddramProvisioner = requireNonNull(gpuGddramProvisioner);
-        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVgpuSimple)vgpu).getRam());
+        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVGpu)vgpu).getRam());
         return this;
 	}
 	
@@ -85,7 +85,7 @@ public class GpuSimple implements Gpu {
     @Override 
     public Gpu setGpuBwProvisioner (GpuResourceProvisioner gpuBwProvisioner) {
     	this.gpuBwProvisioner = requireNonNull(gpuBwProvisioner);
-        this.gpuBwProvisioner.setResources(bw, vgpu -> ((CustomVgpuSimple)vgpu).getBw());
+        this.gpuBwProvisioner.setResources(bw, vgpu -> ((CustomVGpu)vgpu).getBw());
     	return this;
     }
     

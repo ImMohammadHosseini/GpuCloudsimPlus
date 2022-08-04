@@ -2,7 +2,7 @@ package org.cloudbus.cloudsim.gp.provisioners;
 
 import java.util.function.Function;
 
-import org.cloudbus.cloudsim.gp.vms.vgpus.CustomVGpu;
+import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 
