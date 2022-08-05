@@ -35,8 +35,8 @@ public class GpuCloudletSimple extends CloudletSimple {
 	
 	protected void setGpuTask (GpuTask gpuTask) {
 		this.gpuTask = gpuTask;
-		if (gpuTask != null && gpuTask.getCloudlet() == null)
-			gpuTask.setCloudlet(this);
+		if (gpuTask != null && gpuTask.getGpuCloudlet() == null)
+			gpuTask.setGpuCloudlet(this);
 	}
 	
 	public GpuTask getGpuTask () {
