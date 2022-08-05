@@ -11,6 +11,8 @@ public class CustomVGpu {
 	
 	private long id;
 	private String type;
+	private String tenancy;
+	private boolean inMigration;
 	
 	private CustomGpuVmSimple gpuVm;
 	
