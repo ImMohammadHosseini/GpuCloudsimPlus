@@ -5,6 +5,8 @@ import org.cloudbus.cloudsim.resources.Ram;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.resources.Processor;
 
+import java.util.List;
+
 public class CustomVGpu {
 	
 	private long id;
@@ -16,6 +18,7 @@ public class CustomVGpu {
 	private Ram gddram;
 	private Bandwidth bw;
 	
+	private final List<VGpuStateHistoryEntry> vGpuStateHistory;
 	
 	public CustomVGpu () {
 		
