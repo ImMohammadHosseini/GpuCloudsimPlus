@@ -26,6 +26,8 @@ public interface GpuTask {
         FAILED_RESOURCE_UNAVAILABLE
     }
 	
+	GpuTask NULL = new GpuTaskNull();
+	
 	int NOT_ASSIGNED = -1;
 	
 	GpuCloudletSimple getGpuCloudlet ();
