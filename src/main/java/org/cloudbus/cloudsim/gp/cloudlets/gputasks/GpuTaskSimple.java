@@ -21,7 +21,7 @@ public class GpuTaskSimple implements GpuTask {
     private Status status;
     //private boolean returnedToBroker;
     private double execStartTime;
-    //private int priority;
+    private int priority;
     ///private int netServiceLevel;
     private List<String> requiredFiles;
     private long fileSize;
@@ -37,7 +37,7 @@ public class GpuTaskSimple implements GpuTask {
 
     private double submissionDelay;
     private double lifeTime;
-    //private double arrivalTime;
+    private double arrivalTime;
     
     public GpuTaskSimple (final long id, final long blockLength, final long numberOfPes) {
     	
@@ -91,8 +91,115 @@ public class GpuTaskSimple implements GpuTask {
         this.setLastTriedDatacenter(Datacenter.NULL);
         return this;
     }
-
     
+    @Override
+    public final GpuTask setBlockLength (final long length) {
+    	if (length == 0) {
+            throw new IllegalArgumentException("GpuTask blockLength cannot be zero.");
+        }
+        this.blockLength = length;
+        return this;
+    }
+    
+    @Override
+    public long getBlockLength() {
+        return blockLength;
+    }
+    
+    @Override
+    public final GpuTask setNumberOfPes(final long numberOfPes) {
+        if (numberOfPes <= 0) {
+            throw new IllegalArgumentException("GpuTask number of PEs has to be greater than zero.");
+        }
+        this.numberOfPes = numberOfPes;
+        return this;
+    }
+
+    @Override
+    public long getNumberOfPes() {
+        return numberOfPes;
+    }
+    
+    @Override
+    public GpuTask setPriority (final int priority) {
+    	this.priority = priority;
+        return this;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+    
+    @Override
+    public double getWaitingTime () {
+    	return arrivalTime == -1 ? -1 : execStartTime - arrivalTime;
+    }
+    
+    @Override
+    public boolean addFinishedLengthSoFar (final long partialFinishedMI) {
+    	if (partialFinishedMI < 0.0 || arrivalTime == -1) {
+            return false;
+        }
+
+        final long maxLengthToAdd = getBlockLength() < 0 ?
+                                    partialFinishedMI :
+                                    Math.min(partialFinishedMI, absLength()-getFinishedLengthSoFar());
+        finishedLengthSoFar += maxLengthToAdd;
+        returnToBrokerIfFinished();//must be changed
+        return true;
+    }
+    
+    @Override
+    public long getFinishedLengthSoFar () {
+    	if(getBlockLength() > 0) 
+            return Math.min(finishedLengthSoFar, absLength());
+    	
+    	return finishedLengthSoFar;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return (getLifeTime() > 0 && getActualCpuTime() >= getLifeTime()) ||
+               (getLength() > 0 && getFinishedLengthSoFar() >= getLength());
+    }
+
+    @Override
+    public final GpuTask setFileSize(final long fileSize) {
+        if (fileSize <= 0) {
+            throw new IllegalArgumentException("GpuTask file size has to be greater than zero.");
+        }
+        this.fileSize = fileSize;
+        return this;
+    }
+    
+    @Override
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    @Override
+    public final GpuTask setOutputSize(final long outputSize) {
+        if (outputSize <= 0) {
+            throw new IllegalArgumentException("GpuTask output size has to be greater than zero.");
+        }
+        this.outputSize = outputSize;
+        return this;
+    }
+    
+    @Override
+    public long getOutputSize() {
+        return outputSize;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+
     
     protected final void setFinishTime(final double finishTime) {
         this.finishTime = finishTime;

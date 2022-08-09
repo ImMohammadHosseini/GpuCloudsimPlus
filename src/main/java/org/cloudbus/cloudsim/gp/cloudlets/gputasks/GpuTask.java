@@ -46,7 +46,7 @@ public interface GpuTask {
 
     double getArrivalTime ();
     
-    double getActualGpuTime ();
+    double getActualGpuTime ();hhh
 
     long getFileSize ();
 
@@ -99,7 +99,7 @@ public interface GpuTask {
     
     boolean isBoundToVm ();
 
-    //double getWaitingTime ();
+    double getWaitingTime ();
 
     boolean isFinished ();
 
