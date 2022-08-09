@@ -48,7 +48,7 @@ public class GpuTaskSimple implements GpuTask {
         this.setFileSize(1);
         this.setOutputSize(1);
         //this.setSubmissionDelay(0.0);
-        //this.setArrivalTime(-1);
+        this.setArrivalTime(-1);
 
         this.reset();
 
@@ -84,7 +84,7 @@ public class GpuTaskSimple implements GpuTask {
         setFinishTime(NOT_ASSIGNED); // meaning this Cloudlet hasn't finished yet
         this.gpuCloudlet = gpuCloudlet.NULL;//vm
         setExecStartTime(0.0);
-        //setArrivedTime(0);
+        setArrivalTime(0);
         setCreationTime(0);
         setLifeTime(-1);
 
@@ -192,6 +192,32 @@ public class GpuTaskSimple implements GpuTask {
         return outputSize;
     }
     
+    protected final void setArrivalTime(final double arrivalTime) {
+        if(arrivalTime < 0)
+            this.arrivalTime = -1;
+        else this.arrivalTime = arrivalTime;
+    }
+    
+    @Override
+    public double getArrivalTime() {
+        return arrivalTime;
+    }
+
+    @Override
+    public void setExecStartTime(final double clockTime) {
+        final boolean isStartingInSomeVm = this.execStartTime <= 0 && clockTime > 0 && vm != Vm.NULL && vm != null;
+        this.execStartTime = clockTime;
+        if(isStartingInSomeVm){
+            onStartListeners.forEach(listener -> listener.update(CloudletVmEventInfo.of(listener, clockTime, this)));
+        }
+    }
+    
+    @Override
+    public double getExecStartTime() {
+        return execStartTime;
+    }
+    
+
     
     
     
