@@ -46,7 +46,7 @@ public interface GpuTask {
 
     double getArrivalTime ();
     
-    double getActualGpuTime ();hhh
+    double getActualGpuTime ();
 
     long getFileSize ();
 
@@ -83,9 +83,9 @@ public interface GpuTask {
 
     UtilizationModel getUtilizationModelGddram ();
 
-    UtilizationModel getUtilizationModel (Class<? extends ResourceManageable> resourceClass);
+    //UtilizationModel getUtilizationModel (Class<? extends ResourceManageable> resourceClass);
     
-    //double getUtilizationOfGpu ();
+    double getUtilizationOfGpu ();
 
     double getUtilizationOfGpu (double time);
 
@@ -127,7 +127,7 @@ public interface GpuTask {
     
     GpuTask setBlockLength (long length);
 
-    //long getTotalLength ();
+    long getGpuTaskTotalLength ();
     
     long getFinishedLengthSoFar ();
 

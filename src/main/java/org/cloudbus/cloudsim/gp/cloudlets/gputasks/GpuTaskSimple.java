@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.LinkedList;
 import java.util.HashSet;
 
+import static java.util.Objects.requireNonNull;
+
 public class GpuTaskSimple implements GpuTask {
 	
     private long taskId;
@@ -160,7 +162,7 @@ public class GpuTaskSimple implements GpuTask {
 
     @Override
     public boolean isFinished() {
-        return (getLifeTime() > 0 && getActualCpuTime() >= getLifeTime()) ||
+        return (getLifeTime() > 0 && getActualGpuTime() >= getLifeTime()) ||
                (getLength() > 0 && getFinishedLengthSoFar() >= getLength());
     }
 
@@ -217,17 +219,146 @@ public class GpuTaskSimple implements GpuTask {
         return execStartTime;
     }
     
+    @Override
+    public boolean setStatus(final Status newStatus) {
+        if (this.status == newStatus) {
+            return false;
+        }
 
-    
-    
-    
-    
-    
-    
-    
+        if (newStatus == Status.SUCCESS) {
+            setFinishTime(getSimulation().clock());
+        }
 
+        this.status = newStatus;
+        return true;
+    }
+
+    @Override
+    public Status getStatus() {
+        return status;
+    }
+
+    @Override
+    public long getGpuTaskTotalLength() {
+        return getBlockLength() * getNumberOfPes();
+    }
+    
+    @Override
+    public double getActualGpuTime () {
+    	final double time = getFinishTime() == NOT_ASSIGNED ? getSimulation().clock() : finishTime;
+        return time - execStartTime;
+    }
     
     protected final void setFinishTime(final double finishTime) {
         this.finishTime = finishTime;
     }
+    
+    @Override
+    public double getFinishTime () {
+    	return finishTime;
+    }
+    
+    @Override
+    public void setTaskId (final long taskId) {
+    	this.taskId = taskId;
+    }
+    
+    @Override
+    public long getTaskId () {
+    	return taskId;
+    }
+    
+    @Override
+    public GpuCloudletSimple getGpuCloudlet () {
+    	return gpuCloudlet;
+    }
+    
+    @Override
+	public void setGpuCloudlet (GpuCloudletSimple gpuCloudlet) {
+		this.gpuCloudlet = gpuCloudlet;
+		
+		if (gpuCloudlet.getGpuTask() == null)
+			gpuCloudlet.setGpuTask(this);
+	}
+
+    @Override
+    public GpuTask setUtilizationModel (UtilizationModel utilizationModel) {
+    	setUtilizationModelBw(utilizationModel);
+        setUtilizationModelGddram(utilizationModel);
+        setUtilizationModelGpu(utilizationModel);
+        return this;
+    }
+
+    @Override
+    public GpuTask setUtilizationModelBw (UtilizationModel utilizationModelBw) {
+    	this.utilizationModelBw = requireNonNull(utilizationModelBw);
+        return this;
+    }
+    
+    @Override
+    public UtilizationModel getUtilizationModelBw() {
+        return utilizationModelBw;
+    }
+    
+    @Override
+    public double getUtilizationOfBw() {
+        return getUtilizationOfBw(getSimulation().clock());
+    }
+    
+    @Override
+    public double getUtilizationOfBw(final double time) {
+        return getUtilizationModelBw().getUtilization(time);
+    }
+
+    @Override
+    public GpuTask setUtilizationModelGpu (UtilizationModel utilizationModelGpu) {
+    	this.utilizationModelGpu = requireNonNull(utilizationModelGpu);
+        return this;
+    }
+    
+    @Override
+    public UtilizationModel getUtilizationModelGpu() {
+        return utilizationModelGpu;
+    }
+    
+    @Override
+    public double getUtilizationOfGpu() {
+        return getUtilizationOfCpu(getSimulation().clock());
+    }
+    
+    @Override
+    public double getUtilizationOfGpu(final double time) {
+        return getUtilizationModelGpu().getUtilization(time);
+    }
+
+    @Override
+    public GpuTask setUtilizationModelGddram (UtilizationModel utilizationModelGddram) {
+    	this.utilizationModelGddram = requireNonNull(utilizationModelGddram);
+        return this;
+    }
+    
+    @Override
+    public UtilizationModel getUtilizationModelGddram() {
+        return utilizationModelGddram;
+    }
+
+    @Override
+    public double getUtilizationOfGddram() {
+        return getUtilizationOfRam(getSimulation().clock());
+    }
+
+    @Override
+    public double getUtilizationOfGddram(final double time) {
+        return getUtilizationModelGddram().getUtilization(time);
+    }
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
 }
