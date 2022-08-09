@@ -6,6 +6,7 @@ import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
+import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface GpuTask {
 	
 	int NOT_ASSIGNED = -1;
 	
-	GpuCloudletSimple getGpuCloudlet ();
+	Cloudlet getGpuCloudlet ();
 	
 	void setGpuCloudlet (GpuCloudletSimple GpuCloudlet);
 	
