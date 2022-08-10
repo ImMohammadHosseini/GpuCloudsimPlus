@@ -1,9 +1,17 @@
 package org.cloudbus.cloudsim.gp.vms;
 
+import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudbus.cloudsim.core.CustomerEntityAbstract;
 
-public interface CustomGpuVm// extends CustomerEntityAbstract implements Vm 
-{
+public interface CustomGpuVm extends Vm {
 	
+	CustomGpuVm NULL = new CustomGpuVmNull();
+	
+	void setType (String type);
+	
+	String getType ();
+	
+	CustomGpuVmSimple setVGpu (CustomVGpu vgpu);
+	
+	CustomVGpu getVGpu ();
 }
