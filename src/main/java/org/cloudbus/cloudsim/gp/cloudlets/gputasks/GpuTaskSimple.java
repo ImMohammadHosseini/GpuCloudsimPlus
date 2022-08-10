@@ -77,6 +77,11 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
+    public String toString() {
+        return String.format("GpuCloudlet %d , GpuTask %d ", gpuCloudlet.getId(), getTaskId());
+    }
+    
+    @Override
     public final GpuTask reset() {
         //this.netServiceLevel = 0;
         this.execStartTime = 0.0;
@@ -84,7 +89,7 @@ public class GpuTaskSimple implements GpuTask {
         this.priority = 0;
         //setBroker(DatacenterBroker.NULL);
         setFinishTime(NOT_ASSIGNED); // meaning this Cloudlet hasn't finished yet
-        this.gpuCloudlet = gpuCloudlet.NULL;//vm
+        this.gpuCloudlet = (GpuCloudletSimple) GpuCloudletSimple.NULL;//vm
         setExecStartTime(0.0);
         setArrivalTime(0);
         setCreationTime(0);
