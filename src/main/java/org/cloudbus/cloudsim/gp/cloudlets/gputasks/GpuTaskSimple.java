@@ -49,7 +49,7 @@ public class GpuTaskSimple implements GpuTask {
         this.setBlockLength(blockLength);
         this.setFileSize(1);
         this.setOutputSize(1);
-        //this.setSubmissionDelay(0.0);
+        this.setSubmissionDelay(0.0);
         this.setArrivalTime(-1);
 
         this.reset();
@@ -81,7 +81,7 @@ public class GpuTaskSimple implements GpuTask {
         //this.netServiceLevel = 0;
         this.execStartTime = 0.0;
         this.status = Status.INSTANTIATED;
-        //this.priority = 0;
+        this.priority = 0;
         //setBroker(DatacenterBroker.NULL);
         setFinishTime(NOT_ASSIGNED); // meaning this Cloudlet hasn't finished yet
         this.gpuCloudlet = gpuCloudlet.NULL;//vm
