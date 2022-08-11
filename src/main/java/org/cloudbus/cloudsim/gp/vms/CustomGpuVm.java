@@ -11,7 +11,7 @@ public interface CustomGpuVm extends Vm {
 	
 	String getType ();
 	
-	CustomGpuVmSimple setVGpu (CustomVGpu vgpu);
+	CustomGpuVm setVGpu (CustomVGpu vgpu);
 	
 	CustomVGpu getVGpu ();
 }
