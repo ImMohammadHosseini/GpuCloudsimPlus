@@ -9,9 +9,22 @@ import org.cloudbus.cloudsim.resources.Processor;
 
 import java.util.List;
 
-public interface CustomVGpu {
+public class CustomVGpuSimple implements CustomVGpu {
+
+	private long id;
+	private String type;
+	private String tenancy;
+	private boolean inMigration;
 	
-	CustomVGpu NULL = new CustomVGpuNull();
+	private CustomGpuVmSimple gpuVm;
 	
+	private Processor vGpuProcessors;
+	private Ram gddram;
+	private Bandwidth bw;
 	
+	private final List<VGpuStateHistoryEntry> vGpuStateHistory;
+	
+	public CustomVGpu () {
+		
+	}
 }
