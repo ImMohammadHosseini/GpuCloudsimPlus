@@ -11,7 +11,47 @@ import java.util.List;
 
 public interface CustomVGpu {
 	
-	CustomVGpu NULL = new CustomVGpuNull();
+	CustomVGpu NULL = new CustomVGpuNull ();
+	
+	//updateProcessing
+	double updateGpuTaskProcessing (double currentTime, MipsShare mipsShare);
+	
+	MipsShare getCurrentRequestedMips ();
+	
+	//getTotalCpuMipsRequested
+	double getTotalMipsRequested ();
+	
+	//double getMaxMipsRequested ();
+	
+	long getCurrentRequestedBw();
+	
+	long getCurrentRequestedGddram();
+	
+	//utilization in vgpu need
+	
+	//long getId ();
+	
+	//void setId (long id);
+	
+	void setType (String type);
+	
+	String getType ();
+	
+	CustomVGpu setGpuVm (CustomGpuVm gpuVm);
+	
+	CustomGpuVm getGpuVm ();
+	
+	CustomVGpu setGpuTaskScheduler (GpuTaskScheduler gpuTaskScheduler);
+	
+	GpuTaskScheduler getGpuTaskScheduler ();
+	
+	int getPCIeBw ();
+	
+	void setPCIeBw (int PCIeBw);
+	
+	String getTenancy ();
+	
+	void setTenancy ();
 	
 	
 }
