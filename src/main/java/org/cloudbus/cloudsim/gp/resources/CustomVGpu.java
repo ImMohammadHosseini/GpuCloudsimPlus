@@ -53,5 +53,16 @@ public interface CustomVGpu {
 	
 	void setTenancy ();
 	
-	
+	///
+	//String getDescription();
+
+    //CustomVGpu setDescription(String description);
+
+    //VmGroup getGroup();
+
+    void addStateHistoryEntry(VGpuStateHistoryEntry entry);
+    
+    long getFreePesNumber();
+
+    long getExpectedFreePesNumber();
 }
