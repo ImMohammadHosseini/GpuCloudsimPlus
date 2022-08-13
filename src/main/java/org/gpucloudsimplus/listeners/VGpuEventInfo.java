@@ -5,5 +5,5 @@ import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 
 public interface VGpuEventInfo extends EventInfo {
 
-    CustomVGpu getVm();
+    CustomVGpu getVGpu();
 }
