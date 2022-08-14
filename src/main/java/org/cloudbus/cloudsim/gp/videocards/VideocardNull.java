@@ -1,6 +1,6 @@
 package org.cloudbus.cloudsim.gp.videocards;
 
-public interface VideocardNull extends Videocard {
+public class VideocardNull implements Videocard {
 	
 }
 
