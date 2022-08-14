@@ -18,7 +18,7 @@ public class VideocardBwProvisionerNull implements VideocardBwProvisioner {
         return false;
     }
     @Override public boolean isSuitableForGpu (Gpu gpu, Resource resource) { return false; }
-    @Override public ResourceManageable getvideocardBwResource () {
+    @Override public ResourceManageable getVideocardBwResource () {
         return ResourceManageable.NULL;
     }
     @Override public void setResources (ResourceManageable videocardBwResource, 

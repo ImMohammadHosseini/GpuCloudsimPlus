@@ -12,8 +12,8 @@ public interface VideocardBwProvisioner {
 	
 	boolean allocateBwForGpu (Gpu gpu, long bw);
 	
-	default boolean allocateResourceForVm (final Gpu gpu, final double bw){
-        return allocateResourceForVm (gpu, (long)bw);
+	default boolean allocateBwForGpu (final Gpu gpu, final double bw){
+        return allocateBwForGpu (gpu, (long)bw);
     }
 	
 	long getAllocatedBwForGpu (Gpu gpu);
@@ -26,7 +26,7 @@ public interface VideocardBwProvisioner {
 
     boolean isSuitableForGpu (Gpu gpu, Resource resource);
 
-    ResourceManageable getvideocardBwResource ();
+    ResourceManageable getVideocardBwResource ();
 
     void setResources (ResourceManageable videocardBwResource, 
     		Function<Gpu, ResourceManageable> gpuBwFunction);
