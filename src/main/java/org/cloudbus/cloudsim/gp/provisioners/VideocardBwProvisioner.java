@@ -28,7 +28,7 @@ public interface VideocardBwProvisioner {
 
     ResourceManageable getvideocardBwResource ();
 
-    void setResources(ResourceManageable videocardBwResource, 
+    void setResources (ResourceManageable videocardBwResource, 
     		Function<Gpu, ResourceManageable> gpuBwFunction);
     
     long getCapacity();
