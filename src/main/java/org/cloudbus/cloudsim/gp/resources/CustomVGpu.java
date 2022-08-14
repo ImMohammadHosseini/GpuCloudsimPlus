@@ -1,5 +1,6 @@
 package org.cloudbus.cloudsim.gp.resources;
 
+import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.vms.CustomGpuVm;
 import org.cloudbus.cloudsim.gp.vms.CustomGpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.CustomGpuVmSimple;
@@ -20,10 +21,12 @@ public interface CustomVGpu {
 	//updateProcessing
 	double updateGpuTaskProcessing (double currentTime, MipsShare mipsShare);
 	
+	double updateProcessing(MipsShare mipsShare);
+	
 	MipsShare getCurrentRequestedMips ();
 	
 	//getTotalCpuMipsRequested
-	double getTotalMipsRequested ();
+	double getTotalCpuMipsRequested ();
 	
 	//double getMaxMipsRequested ();
 	
@@ -101,14 +104,107 @@ public interface CustomVGpu {
     //boolean removeOnCreationFailureListener(EventListener<VmDatacenterEventInfo> listener);
 
     //@Override AbstractMachine
-    Resource getBw();
+    Resource getBw ();
 
     //@Override
-    Resource getRam();
+    Resource getRam ();
 
     //@Override
-    Resource getStorage();
+    Resource getStorage ();
     
-    List<VGpuStateHistoryEntry> getStateHistory();
+    List<VGpuStateHistoryEntry> getStateHistory ();
 
+    double getCpuPercentUtilization (double time);
+
+    double getCpuPercentUtilization ();
+    
+    double getCpuPercentRequested (double time);
+
+    double getCpuPercentRequested ();
+    
+    //void enableUtilizationStats ();
+
+    double getVideocardGddramUtilization (); // videocard or Gpu
+
+    double getVideocardBwUtilization (); // videocard or Gpu
+    
+    //videocard's total MIPS capacity
+    default double getVideocardCpuUtilization () {
+        return getHostCpuUtilization (getSimulation().clock());
+    }
+
+    double getVideocardCpuUtilization (double time);
+    
+    double getExpectedVideocardCpuUtilization (double vgpuCpuUtilizationPercent);
+    
+    double getTotalCpuMipsUtilization ();
+    
+    double getTotalCpuMipsUtilization (double time);
+    
+    //String getVmm ();
+    
+    boolean isCreated ();
+
+    boolean isSuitableForGpuTask (GpuTask cloudlet);
+
+    void setCreated (boolean created);
+    
+    boolean isInMigration ();
+
+    void setInMigration (boolean migrating);
+
+    CustomVGpu setBw (long bwCapacity);
+
+    CustomVGpu setVideocard (Videocard videocard);
+
+    CustomVGpu setGddram (long gddramCapacity);
+
+    //CustomVGpu setSize (long size); //storage
+    
+    void setFailed (boolean failed);
+
+    boolean isFailed ();
+
+    boolean isWorking ();
+    
+    //@Override
+    //default boolean isIdleEnough (final double time) {
+    //    return getCloudletScheduler().getCloudletExecList().isEmpty() && AbstractMachine.super.isIdleEnough(time);
+    //}
+    
+    //HorizontalVGpuScaling getHorizontalScaling ();
+
+    //CustomVGpu setHorizontalScaling (HorizontalVGpuScaling horizontalScaling) throws IllegalArgumentException;
+
+    //CustomVGpu setRamVerticalScaling (VerticalVmScaling ramVerticalScaling) throws IllegalArgumentException;
+
+    //Vm setBwVerticalScaling (VerticalVmScaling bwVerticalScaling) throws IllegalArgumentException;
+
+    //Vm setPeVerticalScaling (VerticalVmScaling peVerticalScaling) throws IllegalArgumentException;
+
+    //VerticalVmScaling getRamVerticalScaling ();
+    
+    //VerticalVmScaling getBwVerticalScaling ();
+ 
+    //VerticalVmScaling getPeVerticalScaling ();
+
+    //Processor getProcessor ();
+
+    //@Override
+    //DatacenterBroker getBroker ();
+
+    //@Override
+    //void setBroker (DatacenterBroker broker);
+    
+    double getStopTime ();
+    
+    double getTotalExecutionTime ();
+
+    CustomVGpu setStopTime (double stopTime);
+    
+    //@Override
+    //double getTimeZone();
+
+    //@Override
+    //Vm setTimeZone(double timeZone);
 }
