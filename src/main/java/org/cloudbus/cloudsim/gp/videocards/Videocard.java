@@ -1,5 +1,8 @@
 package org.cloudbus.cloudsim.gp.videocards;
 
+import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
+import org.cloudbus.cloudsim.gp.provisioners.VideocardBwProvisioner;
+
 public interface Videocard {
 	
 	Videocard NULL = new VideocardNull ();
