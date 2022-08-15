@@ -24,6 +24,7 @@ public class GpuSimple implements Gpu {
 	private GpuResourceProvisioner gpuGddramProvisioner;
 	private GpuResourceProvisioner gpuBwProvisioner;
 	
+	//need change the constructor and make it in 4 or 5 constructor
 	public GpuSimple (long id, String type, final long ram, final long bw,
 			final List<Pe> peList) {
 		this.setId(id);
@@ -32,7 +33,7 @@ public class GpuSimple implements Gpu {
 		this.ram = new Ram(ram);
 		this.bw = new Bandwidth(bw);
 		
-		this.setGpuGddramProvisioner(new GpuResourceProvisionerSimple());
+		//this.setGpuGddramProvisioner(new GpuResourceProvisionerSimple());
         this.setGpuBwProvisioner(new GpuResourceProvisionerSimple());
         this.setGpuPeList(peList);
 	}
@@ -86,6 +87,7 @@ public class GpuSimple implements Gpu {
     public Gpu setGpuBwProvisioner (GpuResourceProvisioner gpuBwProvisioner) {
     	this.gpuBwProvisioner = requireNonNull(gpuBwProvisioner);
         this.gpuBwProvisioner.setResources(bw, vgpu -> ((CustomVGpu)vgpu).getBw());
+        //must add set resource in gpurespro //has to
     	return this;
     }
     
