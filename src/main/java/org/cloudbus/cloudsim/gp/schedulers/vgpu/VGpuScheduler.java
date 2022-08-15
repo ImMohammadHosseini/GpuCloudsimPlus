@@ -5,4 +5,5 @@ import java.io.Serializable;
 
 public interface VGpuScheduler extends Serializable {
 	
+	VGpuScheduler NULL = new VGpuSchedulerNull();
 }
