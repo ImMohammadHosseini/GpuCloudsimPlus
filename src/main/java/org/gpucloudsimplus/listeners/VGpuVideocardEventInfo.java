@@ -15,7 +15,8 @@ public interface VGpuVideocardEventInfo extends VGpuEventInfo, VideocardEventInf
 			@Override public Videocard getVideocard() { return videocard; }
 			@Override public CustomVGpu getVGpu() { return vgpu; }
 			@Override public double getTime() { return time; }
-			@Override public EventListener<VGpuVideocardEventInfo> getListener() { return listener; }
+			@Override public EventListener<VGpuVideocardEventInfo> getListener() { 
+				return listener; }
 	        };
 	    }
 }

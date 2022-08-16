@@ -8,9 +8,12 @@ import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 
 import org.cloudbus.cloudsim.resources.Ram;
+import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.resources.Processor;
+import org.cloudbus.cloudsim.schedulers.MipsShare;
+
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
 
@@ -132,7 +135,7 @@ public interface CustomVGpu {
     
     //videocard's total MIPS capacity
     default double getVideocardCpuUtilization () {
-        return getHostCpuUtilization (getSimulation().clock());
+        return getVideocardCpuUtilization (getSimulation().clock());
     }
 
     double getVideocardCpuUtilization (double time);
@@ -209,4 +212,6 @@ public interface CustomVGpu {
 
     //@Override
     //Vm setTimeZone(double timeZone);
+    
+    Simulation getSimulation();
 }
