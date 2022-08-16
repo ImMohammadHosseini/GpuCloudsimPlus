@@ -1,10 +1,12 @@
 package org.cloudbus.cloudsim.gp.resources;
 
-import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.vms.CustomGpuVm;
 import org.cloudbus.cloudsim.gp.vms.CustomGpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.CustomGpuVmSimple;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
+import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
+
 import org.cloudbus.cloudsim.resources.Ram;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.Bandwidth;

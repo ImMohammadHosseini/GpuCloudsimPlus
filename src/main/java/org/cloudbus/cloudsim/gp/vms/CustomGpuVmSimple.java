@@ -58,7 +58,7 @@ public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 	@Override
 	public CustomGpuVmSimple setVGpu (CustomVGpu vgpu) {
 		this.vgpu = vgpu;
-		if (vgpu.getVm () == null)
+		if (vgpu.getGpuVm () == null)
 			vgpu.setGpuVm (this);
 		return this;
 	}
