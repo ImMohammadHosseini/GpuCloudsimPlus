@@ -24,6 +24,8 @@ public interface CustomVGpu {
 	CustomVGpu NULL = new CustomVGpuNull ();
 	
 	//updateProcessing
+	double updateGpuTaskProcessing (MipsShare mipsShare);
+	
 	double updateGpuTaskProcessing (double currentTime, MipsShare mipsShare);
 	
 	double updateProcessing(MipsShare mipsShare);
@@ -119,13 +121,13 @@ public interface CustomVGpu {
     
     List<VGpuStateHistoryEntry> getStateHistory ();
 
-    double getCpuPercentUtilization (double time);
+    double getCorePercentUtilization (double time);
 
-    double getCpuPercentUtilization ();
+    double getCorePercentUtilization ();
     
-    double getCpuPercentRequested (double time);
+    double getCorePercentRequested (double time);
 
-    double getCpuPercentRequested ();
+    double getCorePercentRequested ();
     
     //void enableUtilizationStats ();
 

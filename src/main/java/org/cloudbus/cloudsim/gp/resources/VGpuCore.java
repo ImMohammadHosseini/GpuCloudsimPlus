@@ -53,7 +53,7 @@ public final class VGpuCore extends ResourceManageableAbstract {
     @Override
     public boolean setCapacity(long numberOfPes) {
         if(numberOfPes <= 0){
-            throw new IllegalArgumentException("The Processor's number of PEs must be greater than 0.");
+            throw new IllegalArgumentException("The Core's number of PEs must be greater than 0.");
         }
         return super.setCapacity(numberOfPes);
     }
