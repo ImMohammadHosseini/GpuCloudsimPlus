@@ -202,5 +202,6 @@ public class CustomGpuVmNull implements CustomGpuVm {
     @Override public double getTimeZone() { return Integer.MAX_VALUE; }
     @Override public Vm setTimeZone(double timeZone) { return this; }
     @Override public List<ResourceManageable> getResources() { return Collections.emptyList(); }
+    @Override public boolean hasVGpu () { return false; }
 }
 
