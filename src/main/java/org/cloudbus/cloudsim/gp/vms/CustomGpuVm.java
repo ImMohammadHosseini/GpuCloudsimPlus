@@ -14,4 +14,6 @@ public interface CustomGpuVm extends Vm {
 	CustomGpuVm setVGpu (CustomVGpu vgpu);
 	
 	CustomVGpu getVGpu ();
+	
+	boolean hasVGpu ();
 }

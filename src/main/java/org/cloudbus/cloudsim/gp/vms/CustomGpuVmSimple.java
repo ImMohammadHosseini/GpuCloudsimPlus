@@ -68,7 +68,7 @@ public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 		return vgpu;
 	}
 	
-	
+	@Override
 	public boolean hasVGpu () {
 		return getVGpu() != null;
 	}
