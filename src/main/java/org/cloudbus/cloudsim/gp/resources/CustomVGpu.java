@@ -208,10 +208,10 @@ public interface CustomVGpu {
     CustomVGpu setStopTime (double stopTime);
     
     //@Override
-    //double getTimeZone();
+    //double getTimeZone ();
 
     //@Override
-    //Vm setTimeZone(double timeZone);
+    //CustomVGpu setTimeZone (double timeZone);
     
     Simulation getSimulation ();
     

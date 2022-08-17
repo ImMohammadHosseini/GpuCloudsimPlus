@@ -876,7 +876,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public Vm setTimeZone(final double timeZone) {
+    public CustomVGpu setTimeZone(final double timeZone) {
         this.timeZone = validateTimeZone(timeZone);
         return this;
     }*/
