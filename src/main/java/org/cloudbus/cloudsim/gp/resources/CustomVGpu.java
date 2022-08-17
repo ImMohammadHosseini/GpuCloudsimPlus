@@ -27,13 +27,11 @@ public interface CustomVGpu {
 	double updateGpuTaskProcessing (MipsShare mipsShare);
 	
 	double updateGpuTaskProcessing (double currentTime, MipsShare mipsShare);
-	
-	double updateProcessing(MipsShare mipsShare);
-	
+		
 	MipsShare getCurrentRequestedMips ();
 	
 	//getTotalCpuMipsRequested
-	double getTotalCpuMipsRequested ();
+	double getTotalCoreMipsRequested ();
 	
 	//double getMaxMipsRequested ();
 	
@@ -43,9 +41,9 @@ public interface CustomVGpu {
 	
 	//utilization in vgpu need
 	
-	//long getId ();
+	long getId ();
 	
-	//void setId (long id);
+	void setId (long id);
 	
 	void setType (String type);
 	
@@ -65,12 +63,12 @@ public interface CustomVGpu {
 	
 	String getTenancy ();
 	
-	void setTenancy ();
+	void setTenancy (String tenancy);
 	
 	///
-	//String getDescription ();
+	String getDescription ();
 
-    //CustomVGpu setDescription (String description);
+    CustomVGpu setDescription (String description);
 
     //VmGroup getGroup ();
 
@@ -86,7 +84,7 @@ public interface CustomVGpu {
     
     CustomVGpu addOnMigrationFinishListener (EventListener<VGpuVideocardEventInfo> listener);
 
-    CustomVGpu addOnHostDeallocationListener (EventListener<VGpuVideocardEventInfo> listener);
+    CustomVGpu addOnVideocardDeallocationListener (EventListener<VGpuVideocardEventInfo> listener);
     
     //CustomVGpu addOnCreationFailureListener (EventListener<VmDatacenterEventInfo> listener);
 
@@ -102,9 +100,9 @@ public interface CustomVGpu {
     
     boolean removeOnMigrationFinishListener (EventListener<VGpuVideocardEventInfo> listener);
     
-    boolean removeOnUpdateProcessingListener(EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnUpdateProcessingListener (EventListener<VGpuVideocardEventInfo> listener);
     
-    boolean removeOnVideocardtAllocationListener (EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnVideocardAllocationListener (EventListener<VGpuVideocardEventInfo> listener);
 
     boolean removeOnVideocardDeallocationListener(EventListener<VGpuVideocardEventInfo> listener);
 
@@ -114,10 +112,10 @@ public interface CustomVGpu {
     Resource getBw ();
 
     //@Override
-    Resource getRam ();
+    Resource getGddram ();
 
     //@Override
-    Resource getStorage ();
+    //Resource getStorage ();
     
     List<VGpuStateHistoryEntry> getStateHistory ();
 
@@ -136,23 +134,23 @@ public interface CustomVGpu {
     double getVideocardBwUtilization (); // videocard or Gpu
     
     //videocard's total MIPS capacity
-    default double getVideocardCpuUtilization () {
-        return getVideocardCpuUtilization (getSimulation().clock());
+    default double getVideocardCoreUtilization () {
+        return getVideocardCoreUtilization (getSimulation().clock());
     }
 
-    double getVideocardCpuUtilization (double time);
+    double getVideocardCoreUtilization (double time);
     
-    double getExpectedVideocardCpuUtilization (double vgpuCpuUtilizationPercent);
+    double getExpectedVideocardCoreUtilization (double vgpuCpuUtilizationPercent);
     
-    double getTotalCpuMipsUtilization ();
+    double getTotalCoreMipsUtilization ();
     
-    double getTotalCpuMipsUtilization (double time);
+    double getTotalCoreMipsUtilization (double time);
     
     //String getVmm ();
     
     boolean isCreated ();
 
-    boolean isSuitableForGpuTask (GpuTask cloudlet);
+    boolean isSuitableForGpuTask (GpuTask gpuTask);
 
     void setCreated (boolean created);
     
@@ -195,7 +193,7 @@ public interface CustomVGpu {
  
     //VerticalVmScaling getPeVerticalScaling ();
 
-    //Processor getProcessor ();
+    VGpuCore getVGpuCore ();
 
     //@Override
     //DatacenterBroker getBroker ();
@@ -215,5 +213,11 @@ public interface CustomVGpu {
     //@Override
     //Vm setTimeZone(double timeZone);
     
-    Simulation getSimulation();
+    Simulation getSimulation ();
+    
+    Videocard getVideocard ();
+        
+    double getMips ();
+    
+    long getNumberOfPes ();
 }
