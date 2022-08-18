@@ -7,6 +7,12 @@ import org.cloudbus.cloudsim.gp.videocards.Videocard;
 
 public interface VGpuVideocardEventInfo extends VGpuEventInfo, VideocardEventInfo {
 	
+	static VGpuVideocardEventInfo of(final EventListener<VGpuVideocardEventInfo> listener, 
+			final CustomVGpu vgpu) {
+        return of(listener, vgpu, vgpu.getVideocard());
+    }
+	
+	
 	static VGpuVideocardEventInfo of(final EventListener<VGpuVideocardEventInfo> listener,
 			final CustomVGpu vgpu, final Videocard videocard) {
 		

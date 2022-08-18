@@ -707,7 +707,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     public void notifyOnVideocardAllocationListeners () {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onVideocardAllocationListeners.size(); i++) {
-            final var listener = onVideocardAllocationListeners.get(i);
+            final EventListener listener = onVideocardAllocationListeners.get(i);
             listener.update(VGpuVideocardEventInfo.of(listener, this));
         }
     }
@@ -717,7 +717,7 @@ public class CustomVGpuSimple implements CustomVGpu {
         requireNonNull(deallocatedVideocard);
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onVideocardDeallocationListeners.size(); i++) {
-            final var listener = onVideocardDeallocationListeners.get(i);
+            final EventListener listener = onVideocardDeallocationListeners.get(i);
             listener.update(VGpuVideocardEventInfo.of(listener, this, deallocatedVideocard));
         }
     }
@@ -725,7 +725,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     public void notifyOnUpdateProcessingListeners () {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onUpdateProcessingListeners.size(); i++) {
-            final var listener = onUpdateProcessingListeners.get(i);
+            final EventListener listener = onUpdateProcessingListeners.get(i);
             listener.update(VGpuVideocardEventInfo.of(listener, this));
         }
     }
