@@ -1,6 +1,7 @@
 package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
 import org.cloudbus.cloudsim.util.Conversion;
+import org.cloudbus.cloudsim.core.Simulation;
 
 public class GpuTaskExecution {
 	
@@ -110,6 +111,146 @@ public class GpuTaskExecution {
         gpuTask.addFinishedLengthSoFar(finishedLengthMI - gpuTask.getFinishedLengthSoFar());
     }
 
+    public void updateProcessing (final double partialFinishedInstructions) {
+        final Simulation simulation = gpuTask.getSimulation();
+        setLastProcessingTime(simulation.clock());
+
+        final boolean terminate = simulation.isTimeToTerminateSimulationUnderRequest();
+        if(partialFinishedInstructions == 0 && !terminate){
+            return;
+        }
+
+        this.taskFinishedSoFar += partialFinishedInstructions;
+        final double partialFinishedMI = partialFinishedInstructions / Conversion.MILLION;
+        gpuTask.addFinishedLengthSoFar((long)partialFinishedMI);
+
+        
+        if(finishRequestTime <= 0 && terminate && gpuTask.getLength() < 0){
+            finishRequestTime = simulation.clock();
+            simulation.sendFirst(new CloudSimEvent(cloudlet.getBroker(), CloudSimTag.CLOUDLET_FINISH, cloudlet));
+        }
+    }
     
+    public double getCloudletArrivalTime() {
+        return arrivalTime;
+    }
     
+    public double getFinishTime() {
+        return finishedTime;
+    }
+    
+    public void setFinishTime (final double time) {
+        if (time < 0) {
+            return;
+        }
+
+        finishedTime = time;
+        ((GpuTaskSimple)this.gpuTask).notifyOnFinishListeners();
+    }
+    
+    public GpuTask getGpuTask () {
+        return gpuTask;
+    }
+    
+    public long getGpuTaskId(){
+        return gpuTask.getId();
+    }
+
+	public double getFileTransferTime() {
+		return fileTransferTime;
+	}
+    
+	public void setFileTransferTime(final double fileTransferTime) {
+		this.fileTransferTime = fileTransferTime;
+	}
+
+	public double getLastProcessingTime() {
+		return lastProcessingTime;
+	}
+
+	public void setLastProcessingTime (final double lastProcessingTime) {
+		this.lastProcessingTime = lastProcessingTime;
+        gpuTask.notifyOnUpdateProcessingListeners(lastProcessingTime);
+	}
+	
+	public double getVirtualRuntime (){
+        return virtualRuntime;
+    }
+
+    public double addVirtualRuntime (final double timeToAdd) {
+        if(timeToAdd >= 0) {
+            setVirtualRuntime(virtualRuntime + timeToAdd);
+        }
+        return virtualRuntime;
+
+    }
+    
+    public void setVirtualRuntime (final double virtualRuntime) {
+        this.virtualRuntime = virtualRuntime;
+    }
+
+    public double getTimeSlice () {
+        return timeSlice;
+    }
+
+    public void setTimeSlice (final double timeSlice) {
+        this.timeSlice = timeSlice;
+    }
+
+    /*@Override
+    public String toString() {
+        return String.format("Cloudlet %d", cloudlet.getId());
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj instanceof CloudletExecution that &&
+               that.cloudlet.getId() == this.cloudlet.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(cloudlet.getId());
+    }*/
+    
+    public double getLastAllocatedMips () {
+        return lastAllocatedMips;
+    }
+    
+    public void setLastAllocatedMips(final double lastAllocatedMips) {
+        if(lastAllocatedMips > 0) {
+            this.lastAllocatedMips = lastAllocatedMips;
+        }
+    }
+
+    public double getOverSubscriptionDelay() {
+        return overSubscriptionDelay;
+    }
+
+    public double getExpectedFinishTime() {
+        return getGpuTask().getActualCpuTime() - overSubscriptionDelay;
+    }
+    
+    public boolean hasOverSubscription(){
+        return overSubscriptionDelay > 0;
+    }
+
+    public void incOverSubscriptionDelay(final double newDelay) {
+        if(newDelay < 0)
+            throw new IllegalArgumentException("Over-subscription delay cannot be negative");
+
+        this.overSubscriptionDelay += newDelay;
+    }
+    
+    public double getRemainingLifeTime() {
+		if (gpuTask.getLifeTime() < 0) {
+			return Double.MAX_VALUE;
+		}
+
+		return Math.max(gpuTask.getLifeTime() - gpuTask.getActualCpuTime(), 0);
+	}
+
+    public double getWallClockTime() {
+        return wallClockTime;
+    }
 }
