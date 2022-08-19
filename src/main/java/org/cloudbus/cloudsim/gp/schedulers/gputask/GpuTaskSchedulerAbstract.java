@@ -1,7 +1,12 @@
 package org.cloudbus.cloudsim.gp.schedulers.gputask;
 
+import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTaskExecution;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+
+import org.cloudsimplus.listeners.EventListener;
+import org.gpucloudsimplus.listeners.GpuTaskResourceAllocationFailEventInfo;
+
 
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 import java.util.*;
@@ -9,11 +14,11 @@ import java.util.*;
 
 public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
 	
-	private final List<CloudletExecution> gpuTaskPausedList;
-    private final List<CloudletExecution> gpuTaskFinishedList;
-    private final List<CloudletExecution> gpuTaskFailedList;
-    private final List<CloudletExecution> gpuTaskExecList;
-    private final List<CloudletExecution> gpuTaskWaitingList;
+	private final List<GpuTaskExecution> gpuTaskPausedList;
+    private final List<GpuTaskExecution> gpuTaskFinishedList;
+    private final List<GpuTaskExecution> gpuTaskFailedList;
+    private final List<GpuTaskExecution> gpuTaskExecList;
+    private final List<GpuTaskExecution> gpuTaskWaitingList;
     
     private final List<GpuTask> gpuTaskSubmittedList;
     private final Set<GpuTask> gpuTaskReturnedList;
@@ -25,7 +30,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     
     private CustomVGpu vgpu;
     
-    private final List<EventListener<CloudletResourceAllocationFailEventInfo>> resourceAllocationFailListeners;
+    private final List<EventListener<GpuTaskResourceAllocationFailEventInfo>> resourceAllocationFailListeners;
 
     protected GpuTaskSchedulerAbstract() {
         setPreviousTime(0.0);
