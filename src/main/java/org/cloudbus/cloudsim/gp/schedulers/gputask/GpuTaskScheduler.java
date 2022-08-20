@@ -13,8 +13,8 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-public interface GpuTaskScheduler extends Serializable {
+//extends Serializable
+public interface GpuTaskScheduler {
 	Logger LOGGER = LoggerFactory.getLogger (GpuTaskScheduler.class.getSimpleName());
 	
 	GpuTaskScheduler NULL = new GpuTaskSchedulerNull();
@@ -59,7 +59,7 @@ public interface GpuTaskScheduler extends Serializable {
 
     double getAllocatedGpuPercent (double time);
     
-    boolean hasFinishedGpuTask ();
+    boolean hasFinishedGpuTasks ();
 ////////////////////////////////////////////////////////////
     /**
      * Gets the {@link CloudletTaskScheduler} that will be used by this CloudletScheduler to process
