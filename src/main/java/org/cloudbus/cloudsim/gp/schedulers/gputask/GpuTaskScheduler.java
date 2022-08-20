@@ -47,7 +47,7 @@ public interface GpuTaskScheduler {
 
     boolean isEmpty ();
     
-    void deallocatePesFromVGpu (long pesToRemove);
+    void deallocateCoresFromVGpu (long pcoreToRemove);
 
     double getCurrentRequestedBwPercentUtilization ();
 
@@ -97,9 +97,9 @@ public interface GpuTaskScheduler {
 
     void setVGpu (CustomVGpu vgpu);
     
-    long getUsedPes ();
+    long getUsedCores ();
 
-    long getFreePes ();
+    long getFreeCores ();
 
 	void addGpuTaskToReturnedList (GpuTask gpuTask);
 

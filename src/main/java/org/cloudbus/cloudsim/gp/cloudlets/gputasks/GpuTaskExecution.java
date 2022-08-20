@@ -131,7 +131,7 @@ public class GpuTaskExecution {
         }
     }
     
-    public double getCloudletArrivalTime() {
+    public double getGpuTaskArrivalTime() {
         return arrivalTime;
     }
     
