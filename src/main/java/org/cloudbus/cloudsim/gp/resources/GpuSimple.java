@@ -74,7 +74,7 @@ public class GpuSimple implements Gpu {
 	@Override 
 	public Gpu setGpuGddramProvisioner (GpuResourceProvisioner gpuGddramProvisioner) {
 		this.gpuGddramProvisioner = requireNonNull(gpuGddramProvisioner);
-        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVGpu)vgpu).getRam());
+        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVGpu)vgpu).getGddram());
         return this;
 	}
 	
