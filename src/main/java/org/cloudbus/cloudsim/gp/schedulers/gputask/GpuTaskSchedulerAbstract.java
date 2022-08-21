@@ -14,6 +14,10 @@ import org.cloudbus.cloudsim.util.Conversion;
 import org.cloudbus.cloudsim.resources.Ram;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.collectingAndThen;
+import static org.gpucloudsimplus.listeners.GpuTaskResourceAllocationFailEventInfo.of;
+
 import java.util.function.BiPredicate;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -36,7 +40,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     //private CloudletTaskScheduler taskScheduler;
     private double previousTime;
     private MipsShare currentMipsShare;
-    private boolean enableGpuTastSubmittedList;
+    private boolean enableGpuTaskSubmittedList;
     
     private CustomVGpu vgpu;
     
@@ -210,7 +214,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     		final List<GpuTaskExecution> list) {
     	
         return list.stream()
-            .filter(gte -> gte.getGpuTaskId() == gpuTask.getId())
+            .filter(gte -> gte.getGpuTaskId() == gpuTask.getTaskId())
             .findFirst();
     }
     
@@ -384,7 +388,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     private void updateGpuTaskProcessingAndPacketsDispatch (final GpuTaskExecution gte, 
     		final double currentTime) {
         long partialFinishedMI = 0;
-        if (taskScheduler.isTimeToUpdateCloudletProcessing(gte.getCloudlet())) {
+        if (taskScheduler.isTimeToUpdateCloudletProcessing(gte.getGpuTask())) {
             partialFinishedMI = updateGpuTaskProcessing(gte, currentTime);
         }
 
@@ -440,15 +444,15 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
             final ResourceManageable resource, final GpuTask gpuTask,
             final long requested, final long available) {
     	
-    for (int i = resourceAllocationFailListeners.size()-1; i >= 0; i--) {
-    	final EventListener<GpuTaskResourceAllocationFailEventInfo> listener = 
-    			resourceAllocationFailListeners.get(i);
-        listener.update(of(listener, gpuTask, resource.getClass(), requested, available, 
-        		vgpu.getSimulation().clock()));
+    	for (int i = resourceAllocationFailListeners.size()-1; i >= 0; i--) {
+    		final EventListener<GpuTaskResourceAllocationFailEventInfo> listener = 
+    				resourceAllocationFailListeners.get(i);
+    		listener.update(of(listener, gpuTask, resource.getClass(), requested, available, 
+    				vgpu.getSimulation().clock()));
         }
     }
     
-    @Override
+	@Override
     public GpuTaskScheduler addOnGpuTaskResourceAllocationFail (
     		final EventListener<GpuTaskResourceAllocationFailEventInfo> listener) {
         if(EventListener.NULL.equals(listener)){
@@ -575,7 +579,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
         removeGpuTaskFromExecList(gte);
     }
     
-    protected GpuTaskExecution removeCloudletFromExecList (final GpuTaskExecution gte) {
+    protected GpuTaskExecution removeGpuTaskFromExecList (final GpuTaskExecution gte) {
         removeUsedCores(gte.getNumberOfCores());
         return gpuTaskExecList.remove(gte) ? gte : GpuTaskExecution.NULL;
     }
@@ -712,7 +716,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     private double getAbsoluteGpuTaskGpuUtilizationForAllCores (final double time, 
     		final GpuTask gpuTask, final boolean requestedUtilization) {
         final double gpuTaskGpuUsageForOneCore =
-            getAbsoluteCloudletResourceUtilization(
+            getAbsoluteGpuTaskResourceUtilization(
             		gpuTask, gpuTask.getUtilizationModelGpu(), time, getAvailableMipsByCore(), "GPU", requestedUtilization);
 
         return gpuTaskGpuUsageForOneCore * gpuTask.getNumberOfPes();

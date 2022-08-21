@@ -23,14 +23,14 @@ public interface GpuTaskResourceAllocationFailEventInfo extends GpuTaskEventInfo
             final long availableAmount,
             final double time)
         {
-            return new GpuTaskResourceAllocationFailEventInfo () {
-                @Override public EventListener<GpuTaskResourceAllocationFailEventInfo> getListener() { return listener; }
-                @Override public GpuTask getGpuTask() { return gpuTask; }
-                @Override public Class<? extends ResourceManageable> getResourceClass() { return resourceClass; }
-                @Override public long getRequestedAmount() { return requestedAmount; }
-                @Override public long getAvailableAmount() { return availableAmount; }
-                @Override public double getTime() { return time; }
-            };
-        }
+    	return new GpuTaskResourceAllocationFailEventInfo () {
+    		@Override public EventListener<GpuTaskResourceAllocationFailEventInfo> getListener() { return listener; }
+            @Override public GpuTask getGpuTask() { return gpuTask; }
+            @Override public Class<? extends ResourceManageable> getResourceClass() { return resourceClass; }
+            @Override public long getRequestedAmount() { return requestedAmount; }
+            @Override public long getAvailableAmount() { return availableAmount; }
+            @Override public double getTime() { return time; }
+        };
+	}
 }
 

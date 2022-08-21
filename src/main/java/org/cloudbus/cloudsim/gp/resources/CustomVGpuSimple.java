@@ -217,7 +217,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	
 	@Override
 	public double getCorePercentUtilization (double time) {
-		return gpuTaskScheduler.getAllocatedCpuPercent(time);
+		return gpuTaskScheduler.getAllocatedGpuPercent(time);
 	}
 
 	@Override
@@ -227,7 +227,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	
 	@Override
 	public double getCorePercentRequested (double time) {
-		return gpuTaskScheduler.getRequestedCpuPercent(time);
+		return gpuTaskScheduler.getRequestedGpuPercent(time);
 	}
 
 	@Override
@@ -237,7 +237,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	
 	@Override
     public double getVideocardCoreUtilization (final double time) {
-        return videocard.getExpectedRelativeCpuUtilization(this, getCpuPercentUtilization(time));
+        return videocard.getExpectedRelativeCpuUtilization(this, getGpuPercentUtilization(time));
     }
 	
 	@Override
@@ -300,7 +300,7 @@ public class CustomVGpuSimple implements CustomVGpu {
             return gddram.getCapacity();
         }
 
-        return (long) (gpuTaskScheduler.getCurrentRequestedRamPercentUtilization() * 
+        return (long) (gpuTaskScheduler.getCurrentRequestedGddramPercentUtilization() * 
         		gddram.getCapacity());
     }
     
@@ -489,7 +489,8 @@ public class CustomVGpuSimple implements CustomVGpu {
     public void updateMigrationStartListeners (final Videocard targetVideocard) {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onMigrationStartListeners.size(); i++) {
-            final var listener = onMigrationStartListeners.get(i);
+            final EventListener<VGpuVideocardEventInfo> listener = 
+            		onMigrationStartListeners.get(i);
             listener.update(VGpuVideocardEventInfo.of(listener, this, targetVideocard));
         }
     }
@@ -497,7 +498,8 @@ public class CustomVGpuSimple implements CustomVGpu {
     public void updateMigrationFinishListeners (final Videocard targetVideocard) {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onMigrationFinishListeners.size(); i++) {
-            final var listener = onMigrationFinishListeners.get(i);
+            final EventListener<VGpuVideocardEventInfo> listener = 
+            		onMigrationFinishListeners.get(i);
             listener.update(VGpuVideocardEventInfo.of(listener, this, targetVideocard));
         }
     }
