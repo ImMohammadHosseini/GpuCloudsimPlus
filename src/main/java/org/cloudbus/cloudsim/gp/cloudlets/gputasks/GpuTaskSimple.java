@@ -1,10 +1,12 @@
 package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
-import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
+import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudletSimple;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
+import org.cloudbus.cloudsim.core.Simulation;
+
 
 import java.util.List;
 import java.util.Set;
@@ -19,7 +21,7 @@ public class GpuTaskSimple implements GpuTask {
     private GpuCloudletSimple gpuCloudlet;
     private long blockLength;
     private long finishedLengthSoFar;
-    private long numberOfPes;
+    private long numberOfCores;
     private Status status;
     //private boolean returnedToBroker;
     private double execStartTime;
@@ -45,7 +47,7 @@ public class GpuTaskSimple implements GpuTask {
     	
     	this.requiredFiles = new LinkedList<>();
         this.setTaskId(id);
-        this.setNumberOfPes(numberOfPes);
+        this.setNumberOfCores(numberOfPes);
         this.setBlockLength(blockLength);
         this.setFileSize(1);
         this.setOutputSize(1);
@@ -100,6 +102,11 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
+    public Simulation getSimulation () {
+    	gpuCloudlet.getSimulation();
+    }
+    
+    @Override
     public final GpuTask setBlockLength (final long length) {
     	if (length == 0) {
             throw new IllegalArgumentException("GpuTask blockLength cannot be zero.");
@@ -114,17 +121,17 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
-    public final GpuTask setNumberOfPes(final long numberOfPes) {
-        if (numberOfPes <= 0) {
+    public final GpuTask setNumberOfCores(final long numberOfCores) {
+        if (numberOfCores <= 0) {
             throw new IllegalArgumentException("GpuTask number of PEs has to be greater than zero.");
         }
-        this.numberOfPes = numberOfPes;
+        this.numberOfCores = numberOfCores;
         return this;
     }
 
     @Override
-    public long getNumberOfPes() {
-        return numberOfPes;
+    public long getNumberOfCores() {
+        return numberOfCores;
     }
     
     @Override
@@ -168,7 +175,7 @@ public class GpuTaskSimple implements GpuTask {
     @Override
     public boolean isFinished() {
         return (getLifeTime() > 0 && getActualGpuTime() >= getLifeTime()) ||
-               (getLength() > 0 && getFinishedLengthSoFar() >= getLength());
+               (getBlockLength() > 0 && getFinishedLengthSoFar() >= getBlockLength());
     }
 
     @Override
@@ -186,7 +193,7 @@ public class GpuTaskSimple implements GpuTask {
     }
 
     @Override
-    public final GpuTask setOutputSize(final long outputSize) {
+    public final GpuTask setOutputSize (final long outputSize) {
         if (outputSize <= 0) {
             throw new IllegalArgumentException("GpuTask output size has to be greater than zero.");
         }
@@ -211,7 +218,7 @@ public class GpuTaskSimple implements GpuTask {
     }
 
     @Override
-    public void setExecStartTime(final double clockTime) {
+    public void setExecStartTime (final double clockTime) {
         final boolean isStartingInSomeVm = this.execStartTime <= 0 && clockTime > 0 && vm != Vm.NULL && vm != null;
         this.execStartTime = clockTime;
         if(isStartingInSomeVm){
@@ -245,7 +252,7 @@ public class GpuTaskSimple implements GpuTask {
 
     @Override
     public long getGpuTaskTotalLength() {
-        return getBlockLength() * getNumberOfPes();
+        return getBlockLength() * getNumberOfCores();
     }
     
     @Override
@@ -328,7 +335,7 @@ public class GpuTaskSimple implements GpuTask {
     
     @Override
     public double getUtilizationOfGpu() {
-        return getUtilizationOfCpu(getSimulation().clock());
+        return getUtilizationOfGpu(getSimulation().clock());
     }
     
     @Override
@@ -349,7 +356,7 @@ public class GpuTaskSimple implements GpuTask {
 
     @Override
     public double getUtilizationOfGddram() {
-        return getUtilizationOfRam(getSimulation().clock());
+        return getUtilizationOfGddram(getSimulation().clock());
     }
 
     @Override
@@ -357,7 +364,9 @@ public class GpuTaskSimple implements GpuTask {
         return getUtilizationModelGddram().getUtilization(time);
     }
     
-    
+    protected long absLength () {
+        return Math.abs(getBlockLength());
+    }
     
     
     

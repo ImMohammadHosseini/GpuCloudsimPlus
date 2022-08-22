@@ -74,9 +74,9 @@ public interface CustomVGpu {
 
     void addStateHistoryEntry (VGpuStateHistoryEntry entry);
     
-    long getFreePesNumber ();
+    long getFreeCoresNumber ();
 
-    long getExpectedFreePesNumber ();
+    long getExpectedFreeCoresNumber ();
     
     CustomVGpu addOnVideocardAllocationListener (EventListener<VGpuVideocardEventInfo> listener);
 
@@ -219,5 +219,9 @@ public interface CustomVGpu {
         
     double getMips ();
     
-    long getNumberOfPes ();
+    long getNumberOfCores ();
+    
+    double getGpuPercentUtilization (double time);
+
+    double getGpuPercentUtilization ();
 }

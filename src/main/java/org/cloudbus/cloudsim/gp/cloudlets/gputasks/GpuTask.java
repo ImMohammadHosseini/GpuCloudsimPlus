@@ -7,6 +7,7 @@ import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
+import org.cloudbus.cloudsim.core.Simulation;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ public interface GpuTask {
 	int NOT_ASSIGNED = -1;
 	
 	Cloudlet getGpuCloudlet ();
+	
+	Simulation getSimulation ();
 	
 	void setGpuCloudlet (GpuCloudletSimple GpuCloudlet);
 	
@@ -76,7 +79,7 @@ public interface GpuTask {
 
     //int getNetServiceLevel ();
 
-    long getNumberOfPes ();
+    long getNumberOfCores ();
 
     UtilizationModel getUtilizationModelBw ();
     
@@ -114,7 +117,7 @@ public interface GpuTask {
     
     //void setNetServiceLevel (int netServiceLevel);
 
-    GpuTask setNumberOfPes (long numberOfPes);
+    GpuTask setNumberOfCores (long numberOfCores);
     
     GpuTask setUtilizationModel (UtilizationModel utilizationModel);
 

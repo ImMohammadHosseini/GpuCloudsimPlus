@@ -4,8 +4,9 @@ import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 //import org.cloudbus.cloudsim.cloudlets.Cloudlet;
+import org.cloudbus.cloudsim.core.Simulation;
 
-import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudletSimple;
+import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +62,7 @@ final class GpuTaskNull implements GpuTask {
     //@Override public int getNetServiceLevel () {
     //    return 0;
     //}
-    @Override public long getNumberOfPes () {
+    @Override public long getNumberOfCores () {
         return 0;
     }
     @Override public List<String> getRequiredFiles() {
@@ -99,8 +100,8 @@ final class GpuTaskNull implements GpuTask {
     @Override public double getUtilizationOfGddram (double time) {
         return 0.0;
     }
-    @Override public Cloudlet getGpuCloudlet () {
-        return Cloudlet.NULL;
+    @Override public GpuCloudletSimple getGpuCloudlet () {
+        return GpuCloudletSimple.NULL;
     }
     @Override public double getWaitingTime() {
         return 0.0;
@@ -126,7 +127,7 @@ final class GpuTaskNull implements GpuTask {
         return false;
     }
     //@Override public void setNetServiceLevel(int netServiceLevel) {/**/}
-    @Override public GpuTask setNumberOfPes(long numberOfPes) {
+    @Override public GpuTask setNumberOfCores(long numberOfPes) {
         return GpuTask.NULL;
     }
     //@Override public void setBroker(DatacenterBroker broker) {/**/}

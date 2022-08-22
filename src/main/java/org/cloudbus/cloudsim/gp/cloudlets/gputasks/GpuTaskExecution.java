@@ -125,7 +125,7 @@ public class GpuTaskExecution {
         gpuTask.addFinishedLengthSoFar((long)partialFinishedMI);
 
         
-        if(finishRequestTime <= 0 && terminate && gpuTask.getLength() < 0){
+        if(finishRequestTime <= 0 && terminate && gpuTask.getBlockLength() < 0){
             finishRequestTime = simulation.clock();
             simulation.sendFirst(new CloudSimEvent(cloudlet.getBroker(), CloudSimTag.CLOUDLET_FINISH, cloudlet));
         }
@@ -153,7 +153,7 @@ public class GpuTaskExecution {
     }
     
     public long getGpuTaskId(){
-        return gpuTask.getId();
+        return gpuTask.getTaskId();
     }
 
 	public double getFileTransferTime() {
@@ -228,7 +228,7 @@ public class GpuTaskExecution {
     }
 
     public double getExpectedFinishTime() {
-        return getGpuTask().getActualCpuTime() - overSubscriptionDelay;
+        return getGpuTask().getActualGpuTime() - overSubscriptionDelay;
     }
     
     public boolean hasOverSubscription(){
@@ -247,7 +247,7 @@ public class GpuTaskExecution {
 			return Double.MAX_VALUE;
 		}
 
-		return Math.max(gpuTask.getLifeTime() - gpuTask.getActualCpuTime(), 0);
+		return Math.max(gpuTask.getLifeTime() - gpuTask.getActualGpuTime(), 0);
 	}
 
     public double getWallClockTime() {

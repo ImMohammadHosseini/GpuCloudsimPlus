@@ -41,8 +41,8 @@ public class CustomVGpuSimple implements CustomVGpu {
 
 	private Videocard videocard;
 	
-	private long freePesNumber;
-    private long expectedFreePesNumber;
+	private long freeCoresNumber;
+    private long expectedFreeCoresNumber;
 	
 	private final List<VGpuStateHistoryEntry> vGpuStateHistory;
 	
@@ -81,30 +81,30 @@ public class CustomVGpuSimple implements CustomVGpu {
     private MipsShare requestedMips;
 	
     public CustomVGpuSimple(final CustomVGpu sourceVGpu) {
-        this(sourceVGpu.getMips(), sourceVGpu.getNumberOfPes());
+        this(sourceVGpu.getMips(), sourceVGpu.getNumberOfCores());
         this.setBw(sourceVGpu.getBw().getCapacity())
             .setGddram(sourceVGpu.getGddram().getCapacity());
             //.setSize(sourceVGpu.getStorage().getCapacity());
     }
     
-    public CustomVGpuSimple(final double mips, final long numberOfPes) {
-        this(-1, "", "", -1, (long)mips, numberOfPes);
+    public CustomVGpuSimple(final double mips, final long numberOfCores) {
+        this(-1, "", "", -1, (long)mips, numberOfCores);
     }
     
-    public CustomVGpuSimple(final double mips, final long numberOfPes, 
+    public CustomVGpuSimple(final double mips, final long numberOfCores, 
     		final GpuTaskScheduler gpuTaskScheduler) {
-        this(-1, "", "", -1, (long)mips, numberOfPes);
+        this(-1, "", "", -1, (long)mips, numberOfCores);
         setGpuTaskScheduler(gpuTaskScheduler);
     }
     
     public CustomVGpuSimple(final long id, final String type, final String tenancy, 
-			final int PCIeBw, final double mips, final long numberOfPes) {
-        this(id, type, tenancy, PCIeBw,(long)mips, numberOfPes);
+			final int PCIeBw, final double mips, final long numberOfCores) {
+        this(id, type, tenancy, PCIeBw,(long)mips, numberOfCores);
     }
     
     //gddram, bw, scheduler, 
 	public CustomVGpuSimple (final long id, final String type, final String tenancy, 
-			final int PCIeBw, final long mips, final long numberOfPes) {
+			final int PCIeBw, final long mips, final long numberOfCores) {
 		setId(id);
 		setType(type);
 		setTenancy(tenancy);
@@ -120,14 +120,14 @@ public class CustomVGpuSimple implements CustomVGpu {
         this.allocatedMips = new MipsShare();
         this.requestedMips = new MipsShare();
         
-        this.vGpuCore = new VGpuCore(this, mips, numberOfPes);
-        setMips(mips);
-        setNumberOfPes(numberOfPes);
+        this.vGpuCore = new VGpuCore(this, mips, numberOfCores);
+        setMips(mips);                           
+        setNumberOfCores(numberOfCores);
         
         mutableAttributesInit();
         
-        freePesNumber = numberOfPes;
-        expectedFreePesNumber = numberOfPes;
+        freeCoresNumber = numberOfCores;
+        expectedFreeCoresNumber = numberOfCores;
 	}
 	
 	private void mutableAttributesInit () {
@@ -182,36 +182,36 @@ public class CustomVGpuSimple implements CustomVGpu {
 	}
 	
 	@Override
-    public long getFreePesNumber () {
-        return freePesNumber;
+    public long getFreeCoresNumber () {
+        return freeCoresNumber;
     }
 	
-	public CustomVGpu setFreePesNumber (long freePesNumber) {
-        if (freePesNumber < 0) {
-            freePesNumber = 0;
+	public CustomVGpu setFreeCoresNumber (long freeCoresNumber) {
+        if (freeCoresNumber < 0) {
+            freeCoresNumber = 0;
         }
-        this.freePesNumber = Math.min (freePesNumber, getNumberOfPes());
+        this.freeCoresNumber = Math.min (freeCoresNumber, getNumberOfCores());
         return this;
     }
 	
 	@Override
-    public long getExpectedFreePesNumber () {
-        return expectedFreePesNumber;
+    public long getExpectedFreeCoresNumber () {
+        return expectedFreeCoresNumber;
     }
 	
-	public CustomVGpu addExpectedFreePesNumber (final long pesToAdd) {
-        return setExpectedFreePesNumber (expectedFreePesNumber + pesToAdd);
+	public CustomVGpu addExpectedFreeCoresNumber (final long coresToAdd) {
+        return setExpectedFreeCoresNumber (expectedFreeCoresNumber + coresToAdd);
     }
 	
-	public CustomVGpu removeExpectedFreePesNumber (final long pesToRemove) {
-        return setExpectedFreePesNumber (expectedFreePesNumber - pesToRemove);
+	public CustomVGpu removeExpectedFreeCoresNumber (final long coresToRemove) {
+        return setExpectedFreeCoresNumber (expectedFreeCoresNumber - coresToRemove);
     }
 	
-	private CustomVGpu setExpectedFreePesNumber(long expectedFreePes) {
-        if (expectedFreePes < 0) {
-            expectedFreePes = 0;
+	private CustomVGpu setExpectedFreeCoresNumber(long expectedFreeCores) {
+        if (expectedFreeCores < 0) {
+            expectedFreeCores = 0;
         }
-        this.expectedFreePesNumber = expectedFreePes;
+        this.expectedFreeCoresNumber = expectedFreeCores;
         return this;
     }
 	
@@ -237,7 +237,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	
 	@Override
     public double getVideocardCoreUtilization (final double time) {
-        return videocard.getExpectedRelativeCpuUtilization(this, getGpuPercentUtilization(time));
+        return videocard.getExpectedRelativeGpuUtilization(this, getGpuPercentUtilization(time));
     }
 	
 	@Override
@@ -291,7 +291,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     
     //@Override
     public double getTotalMipsCapacity () {
-        return getMips() * getNumberOfPes();
+        return getMips() * getNumberOfCores();
     }
     
     @Override
@@ -367,12 +367,12 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public long getNumberOfPes () {
+    public long getNumberOfCores () {
         return vGpuCore.getCapacity();
     }
     
-    private void setNumberOfPes (final long numberOfPes) {
-    	vGpuCore.setCapacity(numberOfPes);
+    private void setNumberOfCores (final long numberOfCores) {
+    	vGpuCore.setCapacity(numberOfCores);
     }
 
     @Override
@@ -511,7 +511,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     
     @Override
     public boolean isSuitableForGpuTask (final GpuTask gpuTask) {
-        return getNumberOfPes() >= gpuTask.getNumberOfPes() &&
+        return getNumberOfCores() >= gpuTask.getNumberOfCores() &&
             storage.getAvailableResource() >= gpuTask.getFileSize();
     }
     
@@ -958,5 +958,15 @@ public class CustomVGpuSimple implements CustomVGpu {
     @Override
     public Simulation getSimulation () {
     	return gpuVm.getSimulation();
+    }
+    
+    @Override
+    public double getGpuPercentUtilization (double time) {
+    	return gpuTaskScheduler.getAllocatedGpuPercent(time);
+    }
+
+    @Override
+    public double getGpuPercentUtilization () {
+    	return getGpuPercentUtilization(getSimulation().clock());
     }
 }
