@@ -5,7 +5,7 @@ import org.cloudbus.cloudsim.vms.VmSimple;
 import org.cloudbus.cloudsim.core.CustomerEntityAbstract;
 
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
-
+import org.cloudbus.cloudsim.gp.schedulers.gpucloudlet.GpuCloudletScheduler;
 
 public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 	
@@ -26,7 +26,7 @@ public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 	}
 	
 	public CustomGpuVmSimple (final double mipsCapacity, final long numberOfPes, 
-			final CloudletScheduler cloudletScheduler, String type) {
+			final GpuCloudletScheduler cloudletScheduler, String type) {
         super (mipsCapacity, numberOfPes, cloudletScheduler);
         setCloudletScheduler (cloudletScheduler);
         setType (type);
