@@ -2,7 +2,7 @@ package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
-import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudletSimple;
+import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.Simulation;
@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 public class GpuTaskSimple implements GpuTask {
 	
     private long taskId;
-    private GpuCloudletSimple gpuCloudlet;
+    private GpuCloudlet gpuCloudlet;
     private long blockLength;
     private long finishedLengthSoFar;
     private long numberOfCores;
@@ -91,7 +91,7 @@ public class GpuTaskSimple implements GpuTask {
         this.priority = 0;
         //setBroker(DatacenterBroker.NULL);
         setFinishTime(NOT_ASSIGNED); // meaning this Cloudlet hasn't finished yet
-        this.gpuCloudlet = (GpuCloudletSimple) GpuCloudletSimple.NULL;//vm
+        this.gpuCloudlet = GpuCloudlet.NULL;//vm
         setExecStartTime(0.0);
         setArrivalTime(0);
         setCreationTime(0);
@@ -281,12 +281,12 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
-    public GpuCloudletSimple getGpuCloudlet () {
+    public GpuCloudlet getGpuCloudlet () {
     	return gpuCloudlet;
     }
     
     @Override
-	public void setGpuCloudlet (GpuCloudletSimple gpuCloudlet) {
+	public void setGpuCloudlet (GpuCloudlet gpuCloudlet) {
 		this.gpuCloudlet = gpuCloudlet;
 		
 		if (gpuCloudlet.getGpuTask() == null)

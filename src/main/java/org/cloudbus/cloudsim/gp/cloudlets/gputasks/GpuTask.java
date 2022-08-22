@@ -1,6 +1,6 @@
 package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
-import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudletSimple;
+import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
@@ -36,7 +36,7 @@ public interface GpuTask {
 	
 	Simulation getSimulation ();
 	
-	void setGpuCloudlet (GpuCloudletSimple GpuCloudlet);
+	void setGpuCloudlet (GpuCloudlet GpuCloudlet);
 	
 	boolean addRequiredFile (String fileName);
 
