@@ -7,7 +7,7 @@ import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 
 import java.util.Objects;
 
-public class GpuCloudletSimple extends CloudletSimple {
+public class GpuCloudletSimple extends CloudletSimple implements GpuCloudlet {
 	
 	private GpuTask gpuTask;
 	
@@ -33,12 +33,15 @@ public class GpuCloudletSimple extends CloudletSimple {
         setGpuTask (gpuTask);
     }
 	
-	public void setGpuTask (GpuTask gpuTask) {
+	@Override
+	public GpuCloudlet setGpuTask (GpuTask gpuTask) {
 		this.gpuTask = gpuTask;
 		if (gpuTask != null && gpuTask.getGpuCloudlet() == null)
 			gpuTask.setGpuCloudlet(this);
+		return this;
 	}
 	
+	@Override
 	public GpuTask getGpuTask () {
 		return gpuTask;
 	}
