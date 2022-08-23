@@ -1,15 +1,12 @@
 package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
-import org.cloudsimplus.listeners.CloudletVmEventInfo;
+import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
-//import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.Simulation;
 
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-
-import java.util.Collections;
-import java.util.List;
+import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 
 final class GpuTaskNull implements GpuTask {
 	
@@ -18,7 +15,7 @@ final class GpuTaskNull implements GpuTask {
         return -1;
     }
     
-    @Override public boolean addRequiredFile (String fileName) {
+    /*@Override public boolean addRequiredFile (String fileName) {
         return false;
     }
     
@@ -28,7 +25,7 @@ final class GpuTaskNull implements GpuTask {
     
     @Override public boolean deleteRequiredFile (String filename) {
         return false;
-    }
+    }*/
     
     @Override public double getArrivalTime () { return -1; }
     
@@ -65,9 +62,9 @@ final class GpuTaskNull implements GpuTask {
     @Override public long getNumberOfCores () {
         return 0;
     }
-    @Override public List<String> getRequiredFiles() {
+    /*@Override public List<String> getRequiredFiles() {
         return Collections.emptyList ();
-    }
+    }*/
     @Override public Status getStatus () {
         return Status.FAILED;
     }
@@ -100,8 +97,8 @@ final class GpuTaskNull implements GpuTask {
     @Override public double getUtilizationOfGddram (double time) {
         return 0.0;
     }
-    @Override public GpuCloudletSimple getGpuCloudlet () {
-        return GpuCloudletSimple.NULL;
+    @Override public GpuCloudlet getGpuCloudlet () {
+        return GpuCloudlet.NULL;
     }
     @Override public double getWaitingTime() {
         return 0.0;
@@ -109,9 +106,9 @@ final class GpuTaskNull implements GpuTask {
     @Override public boolean isFinished() {
         return false;
     }
-    @Override public boolean hasRequiresFiles() {
+    /*@Override public boolean hasRequiresFiles() {
         return false;
-    }
+    }*/
     @Override public GpuTask setPriority(int priority) { return this; }
     @Override public GpuTask setBlockLength(long length) {
         return GpuTask.NULL;
@@ -134,58 +131,55 @@ final class GpuTaskNull implements GpuTask {
     //@Override public DatacenterBroker getBroker() {
     //    return DatacenterBroker.NULL;
     //}
-    @Override public GpuTask setUtilizationModel(UtilizationModel utilizationModel) {
+    @Override public GpuTask setUtilizationModel (UtilizationModel utilizationModel) {
         return GpuTask.NULL;
     }
-    @Override public GpuTask setUtilizationModelBw(UtilizationModel utilizationModelBw) {
+    @Override public GpuTask setUtilizationModelBw (UtilizationModel utilizationModelBw) {
         return GpuTask.NULL;
     }
-    @Override public GpuTask setUtilizationModelGpu(UtilizationModel utilizationModelCpu) {
+    @Override public GpuTask setUtilizationModelGpu (UtilizationModel utilizationModelCpu) {
         return GpuTask.NULL;
     }
-    @Override public GpuTask setUtilizationModelGddram(UtilizationModel utilizationModelRam) {
+    @Override public GpuTask setUtilizationModelGddram (UtilizationModel utilizationModelRam) {
         return GpuTask.NULL;
     }
-    @Override public void setGpuCloudlet (GpuCloudletSimple GpuCloudlet) {/**/}
-    @Override public boolean removeOnFinishListener(EventListener<CloudletVmEventInfo> listener) { 
+    @Override public void setGpuCloudlet (GpuCloudlet GpuCloudlet) {/**/}
+    @Override public boolean removeOnFinishListener (EventListener<GpuTaskVGpuEventInfo> listener) { 
     	return false; }
-    @Override public GpuTask addOnFinishListener(EventListener<CloudletVmEventInfo> listener) { 
+    @Override public GpuTask addOnFinishListener (EventListener<GpuTaskVGpuEventInfo> listener) { 
     	return GpuTask.NULL; }
     @Override public void notifyOnUpdateProcessingListeners(double time) {/**/}
     @Override public Simulation getSimulation() {
         return Simulation.NULL;
     }
-    @Override public void setLastTriedDatacenter(Datacenter lastTriedDatacenter) {/**/}
-    @Override public Datacenter getLastTriedDatacenter() { return Datacenter.NULL; }
-    @Override public double getArrivedTime() { return 0; }
-    @Override public CustomerEntity setArrivedTime(double time) { return this; }
-    @Override public double getCreationTime() { return 0; }
-    @Override public double getWaitTime() { return 0; }
-    @Override public boolean removeOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> listener) { return false; }
-    @Override public GpuTask addOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> listener) { return Cloudlet.NULL; }
+    @Override public boolean removeOnUpdateProcessingListener (
+    		EventListener<GpuTaskVGpuEventInfo> listener) { return false; }
+    @Override public GpuTask addOnUpdateProcessingListener (
+    		EventListener<GpuTaskVGpuEventInfo> listener) { return GpuTask.NULL; }
     //@Override public double getSubmissionDelay() { return 0; }
-    @Override public boolean isDelayed() { return false; }
     //@Override public void setSubmissionDelay(double submissionDelay) {/**/}
-    @Override public boolean isBoundToVm() { return false; }
-    @Override public int compareTo(Cloudlet cloudlet) {
-        return 0;
-    }
-    @Override public String toString() {
+    //@Override public boolean isBoundToVGpu() { return false; }
+    @Override public int compareTo(GpuTask gpuTask) { return 0; }
+    @Override public String toString () {
         return "Cloudlet.NULL";
     }
-    @Override public boolean addFinishedLengthSoFar(long partialFinishedMI) {
+    @Override public boolean addFinishedLengthSoFar (long partialFinishedMI) {
         return false;
     }
-    @Override public void setExecStartTime(double clockTime) {/**/}
-    @Override public GpuTask addOnStartListener(EventListener<CloudletVmEventInfo> listener) { 
+    @Override public void setExecStartTime (double clockTime) {/**/}
+    @Override public GpuTask addOnStartListener (EventListener<GpuTaskVGpuEventInfo> listener) { 
     	return this; }
-    @Override public boolean removeOnStartListener(EventListener<CloudletVmEventInfo> listener) { 
+    @Override public boolean removeOnStartListener (EventListener<GpuTaskVGpuEventInfo> listener) { 
     	return false; }
     //@Override public double registerArrivalInDatacenter() {
     //    return -1;
     //}
-    @Override public GpuTask reset() { return this; }
-    @Override public GpuTask setLifeTime(final double lifeTime) { return this; }
-    @Override public double getLifeTime() { return -1; }
+    @Override public GpuTask reset () { return this; }
+    @Override public GpuTask setLifeTime (final double lifeTime) { return this; }
+    @Override public double getLifeTime () { return -1; }
+	@Override public double registerArrivalInVideocard () { return 0; }
+	@Override public CustomVGpu getVGpu () { return CustomVGpu.NULL; }
+	@Override public GpuTask setVGpu(CustomVGpu vgpu) { return this; }
+	@Override public double getSubmissionDelay () { return 0; }
 
 }

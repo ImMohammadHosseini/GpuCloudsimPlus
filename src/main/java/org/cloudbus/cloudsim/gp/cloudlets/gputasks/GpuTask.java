@@ -1,18 +1,16 @@
 package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
+import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
+import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
-import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.Simulation;
 
-import java.util.List;
 
-
-public interface GpuTask {
+public interface GpuTask extends Comparable<GpuTask> {
 	
 	enum Status {
         INSTANTIATED,
@@ -38,15 +36,15 @@ public interface GpuTask {
 	
 	void setGpuCloudlet (GpuCloudlet GpuCloudlet);
 	
-	boolean addRequiredFile (String fileName);
+	//boolean addRequiredFile (String fileName);
 
-    boolean addRequiredFiles (List<String> fileNames);
+    //boolean addRequiredFiles (List<String> fileNames);
 
-    boolean deleteRequiredFile (String filename);
+    //boolean deleteRequiredFile (String filename);
 
-    boolean hasRequiresFiles ();
+    //boolean hasRequiresFiles ();
 
-    List<String> getRequiredFiles ();
+    //List<String> getRequiredFiles ();
 
     double getArrivalTime ();
     
@@ -63,7 +61,7 @@ public interface GpuTask {
 
     //boolean isReturnedToBroker ();
 
-    //double registerArrivalInDatacenter ();
+    double registerArrivalInVideocard ();
     
     double getExecStartTime ();
 
@@ -101,7 +99,7 @@ public interface GpuTask {
 
     double getUtilizationOfBw (double time);
     
-    boolean isBoundToVm ();
+    //boolean isBoundToVGpu ();
 
     double getWaitingTime ();
 
@@ -139,17 +137,17 @@ public interface GpuTask {
 
     void setExecStartTime (double clockTime);
     
-    GpuTask addOnStartListener (EventListener<CloudletVmEventInfo> listener);
+    GpuTask addOnStartListener (EventListener<GpuTaskVGpuEventInfo> listener);
 
-    boolean removeOnStartListener (EventListener<CloudletVmEventInfo> listener);
+    boolean removeOnStartListener (EventListener<GpuTaskVGpuEventInfo> listener);
 
-    GpuTask addOnUpdateProcessingListener (EventListener<CloudletVmEventInfo> listener);
+    GpuTask addOnUpdateProcessingListener (EventListener<GpuTaskVGpuEventInfo> listener);
 
-    boolean removeOnUpdateProcessingListener (EventListener<CloudletVmEventInfo> listener);
+    boolean removeOnUpdateProcessingListener (EventListener<GpuTaskVGpuEventInfo> listener);
     
-    GpuTask addOnFinishListener (EventListener<CloudletVmEventInfo> listener);
+    GpuTask addOnFinishListener (EventListener<GpuTaskVGpuEventInfo> listener);
 
-    boolean removeOnFinishListener (EventListener<CloudletVmEventInfo> listener);
+    boolean removeOnFinishListener (EventListener<GpuTaskVGpuEventInfo> listener);
 
     void notifyOnUpdateProcessingListeners (double time);
 
@@ -164,4 +162,10 @@ public interface GpuTask {
     GpuTask setLifeTime (double lifeTime);
 
 	double getLifeTime ();
+	
+	CustomVGpu getVGpu ();
+	
+	GpuTask setVGpu(CustomVGpu vgpu);
+	
+	double getSubmissionDelay ();
 }

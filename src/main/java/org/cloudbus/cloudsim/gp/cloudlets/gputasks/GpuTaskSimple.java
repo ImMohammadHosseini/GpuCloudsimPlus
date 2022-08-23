@@ -2,16 +2,13 @@ package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
+import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-import org.cloudsimplus.listeners.CloudletVmEventInfo;
+import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.Simulation;
 
-
-import java.util.List;
-import java.util.Set;
-import java.util.LinkedList;
-import java.util.HashSet;
+import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
@@ -23,11 +20,12 @@ public class GpuTaskSimple implements GpuTask {
     private long finishedLengthSoFar;
     private long numberOfCores;
     private Status status;
-    //private boolean returnedToBroker;
+    //private boolean returned;
     private double execStartTime;
     private int priority;
     ///private int netServiceLevel;
-    private List<String> requiredFiles;
+    private CustomVGpu vgpu;
+    //private List<String> requiredFiles;
     private long fileSize;
     private long outputSize;
     private double finishTime;
@@ -35,9 +33,9 @@ public class GpuTaskSimple implements GpuTask {
     private UtilizationModel utilizationModelGddram;
     private UtilizationModel utilizationModelBw;
 
-    private final Set<EventListener<CloudletVmEventInfo>> onStartListeners;
-    private final Set<EventListener<CloudletVmEventInfo>> onFinishListeners;
-    private final Set<EventListener<CloudletVmEventInfo>> onUpdateProcessingListeners;
+    private final Set<EventListener<GpuTaskVGpuEventInfo>> onStartListeners;
+    private final Set<EventListener<GpuTaskVGpuEventInfo>> onFinishListeners;
+    private final Set<EventListener<GpuTaskVGpuEventInfo>> onUpdateProcessingListeners;
 
     private double submissionDelay;
     private double lifeTime;
@@ -45,7 +43,7 @@ public class GpuTaskSimple implements GpuTask {
     
     public GpuTaskSimple (final long id, final long blockLength, final long numberOfPes) {
     	
-    	this.requiredFiles = new LinkedList<>();
+    	//this.requiredFiles = new LinkedList<>();
         this.setTaskId(id);
         this.setNumberOfCores(numberOfPes);
         this.setBlockLength(blockLength);
@@ -90,20 +88,20 @@ public class GpuTaskSimple implements GpuTask {
         this.status = Status.INSTANTIATED;
         this.priority = 0;
         //setBroker(DatacenterBroker.NULL);
-        setFinishTime(NOT_ASSIGNED); // meaning this Cloudlet hasn't finished yet
-        this.gpuCloudlet = GpuCloudlet.NULL;//vm
+        setFinishTime(NOT_ASSIGNED); // meaning this GpuTask hasn't finished yet
+        this.vgpu = CustomVGpu.NULL;
         setExecStartTime(0.0);
         setArrivalTime(0);
-        setCreationTime(0);
+        //setCreationTime(0);
         setLifeTime(-1);
 
-        this.setLastTriedDatacenter(Datacenter.NULL);
+        //this.setLastTriedDatacenter(Datacenter.NULL);//setLastTriedPGpu
         return this;
     }
     
     @Override
     public Simulation getSimulation () {
-    	gpuCloudlet.getSimulation();
+    	return gpuCloudlet.getSimulation();
     }
     
     @Override
@@ -116,21 +114,21 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
-    public long getBlockLength() {
+    public long getBlockLength () {
         return blockLength;
     }
     
     @Override
-    public final GpuTask setNumberOfCores(final long numberOfCores) {
+    public final GpuTask setNumberOfCores (final long numberOfCores) {
         if (numberOfCores <= 0) {
-            throw new IllegalArgumentException("GpuTask number of PEs has to be greater than zero.");
+            throw new IllegalArgumentException("GpuTask number of Cores has to be greater than zero.");
         }
         this.numberOfCores = numberOfCores;
         return this;
     }
 
     @Override
-    public long getNumberOfCores() {
+    public long getNumberOfCores () {
         return numberOfCores;
     }
     
@@ -141,7 +139,7 @@ public class GpuTaskSimple implements GpuTask {
     }
 
     @Override
-    public int getPriority() {
+    public int getPriority () {
         return priority;
     }
     
@@ -160,9 +158,18 @@ public class GpuTaskSimple implements GpuTask {
                                     partialFinishedMI :
                                     Math.min(partialFinishedMI, absLength()-getFinishedLengthSoFar());
         finishedLengthSoFar += maxLengthToAdd;
-        returnToBrokerIfFinished();//must be changed
+        //returnToGpuCloudletIfFinished ();//returnToBrokerIfFinished
         return true;
     }
+    
+    /*private void returnToGpuCloudletIfFinished() {
+        if(isFinished() && !isReturned()){
+            returned = true;
+            final var targetEntity = getSimulation().getCloudInfoService();
+            getSimulation().sendNow(targetEntity, getBroker(), CloudSimTag.CLOUDLET_RETURN, this);
+            vm.getCloudletScheduler().addCloudletToReturnedList(this);
+        }
+    }*/
     
     @Override
     public long getFinishedLengthSoFar () {
@@ -173,13 +180,13 @@ public class GpuTaskSimple implements GpuTask {
     }
 
     @Override
-    public boolean isFinished() {
+    public boolean isFinished () {
         return (getLifeTime() > 0 && getActualGpuTime() >= getLifeTime()) ||
                (getBlockLength() > 0 && getFinishedLengthSoFar() >= getBlockLength());
     }
 
     @Override
-    public final GpuTask setFileSize(final long fileSize) {
+    public final GpuTask setFileSize (final long fileSize) {
         if (fileSize <= 0) {
             throw new IllegalArgumentException("GpuTask file size has to be greater than zero.");
         }
@@ -188,7 +195,7 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
-    public long getFileSize() {
+    public long getFileSize () {
         return fileSize;
     }
 
@@ -202,37 +209,39 @@ public class GpuTaskSimple implements GpuTask {
     }
     
     @Override
-    public long getOutputSize() {
+    public long getOutputSize () {
         return outputSize;
     }
     
-    protected final void setArrivalTime(final double arrivalTime) {
+    protected final void setArrivalTime (final double arrivalTime) {
         if(arrivalTime < 0)
             this.arrivalTime = -1;
         else this.arrivalTime = arrivalTime;
     }
     
     @Override
-    public double getArrivalTime() {
+    public double getArrivalTime () {
         return arrivalTime;
     }
 
     @Override
     public void setExecStartTime (final double clockTime) {
-        final boolean isStartingInSomeVm = this.execStartTime <= 0 && clockTime > 0 && vm != Vm.NULL && vm != null;
+        final boolean isStartingInVgpu = this.execStartTime <= 0 && clockTime > 0 && 
+        		vgpu != CustomVGpu.NULL && vgpu != null;
         this.execStartTime = clockTime;
-        if(isStartingInSomeVm){
-            onStartListeners.forEach(listener -> listener.update(CloudletVmEventInfo.of(listener, clockTime, this)));
+        if(isStartingInVgpu){
+            onStartListeners.forEach(listener -> listener.update(
+            		GpuTaskVGpuEventInfo.of(listener, clockTime, this)));
         }
     }
     
     @Override
-    public double getExecStartTime() {
+    public double getExecStartTime () {
         return execStartTime;
     }
     
     @Override
-    public boolean setStatus(final Status newStatus) {
+    public boolean setStatus (final Status newStatus) {
         if (this.status == newStatus) {
             return false;
         }
@@ -246,22 +255,23 @@ public class GpuTaskSimple implements GpuTask {
     }
 
     @Override
-    public Status getStatus() {
+    public Status getStatus () {
         return status;
     }
 
     @Override
-    public long getGpuTaskTotalLength() {
+    public long getGpuTaskTotalLength () {
         return getBlockLength() * getNumberOfCores();
     }
     
     @Override
     public double getActualGpuTime () {
-    	final double time = getFinishTime() == NOT_ASSIGNED ? getSimulation().clock() : finishTime;
+    	final double time = getFinishTime() == NOT_ASSIGNED ? getSimulation().clock() : 
+    		finishTime;
         return time - execStartTime;
     }
     
-    protected final void setFinishTime(final double finishTime) {
+    protected final void setFinishTime (final double finishTime) {
         this.finishTime = finishTime;
     }
     
@@ -367,12 +377,144 @@ public class GpuTaskSimple implements GpuTask {
     protected long absLength () {
         return Math.abs(getBlockLength());
     }
-    
-    
-    
-    
-    
 
+	/*@Override
+	public boolean addRequiredFile (String fileName) {
+		
+	}
+
+	@Override
+	public boolean addRequiredFiles(List<String> fileNames) {
+		
+	}
+
+	@Override
+	public boolean deleteRequiredFile(String filename) {
+		
+	}
+
+	@Override
+	public boolean hasRequiresFiles() {
+		
+	}
+
+	@Override
+	public List<String> getRequiredFiles() {
+		
+	}*/
+
+	@Override
+	public double registerArrivalInVideocard () {
+		setArrivalTime(getSimulation().clock());
+        return arrivalTime;
+	}
+
+	/*@Override
+	public boolean isBoundToVGpu () {
+	}*/
+
+	@Override
+	public GpuTask setSizes (long size) {
+		setFileSize(size);
+        setOutputSize(size);
+        return this;
+	}
+
+	@Override
+	public GpuTask addOnStartListener (EventListener<GpuTaskVGpuEventInfo> listener) {
+		this.onStartListeners.add(requireNonNull(listener));
+        return this;
+	}
+
+	@Override
+	public boolean removeOnStartListener (EventListener<GpuTaskVGpuEventInfo> listener) {
+		return onStartListeners.remove(listener);
+	}
+
+	@Override
+	public GpuTask addOnUpdateProcessingListener (EventListener<GpuTaskVGpuEventInfo> listener) {
+		this.onUpdateProcessingListeners.add(requireNonNull(listener));
+        return this;
+	}
+
+	@Override
+	public boolean removeOnUpdateProcessingListener (EventListener<GpuTaskVGpuEventInfo> listener) {
+		return this.onUpdateProcessingListeners.remove(listener);
+	}
+
+	@Override
+	public GpuTask addOnFinishListener (EventListener<GpuTaskVGpuEventInfo> listener) {
+		if(listener.equals(EventListener.NULL))
+            return this;
+		this.onFinishListeners.add(requireNonNull(listener));
+        return this;
+	}
+
+	@Override
+	public boolean removeOnFinishListener (EventListener<GpuTaskVGpuEventInfo> listener) {
+		return onFinishListeners.remove(listener);
+	}
+
+	@Override
+	public void notifyOnUpdateProcessingListeners (double time) {
+		onUpdateProcessingListeners.forEach(
+				listener -> listener.update(GpuTaskVGpuEventInfo.of(listener, time, this)));		
+	}
+
+	@Override
+	public GpuTask setLifeTime (double lifeTime) {
+		if (lifeTime == 0) 
+			throw new IllegalArgumentException("GpuTask lifeTime cannot be zero.");
+
+		this.lifeTime = lifeTime;
+		return this;
+	}
+
+	@Override
+	public double getLifeTime () {
+		return this.lifeTime;
+	}
+
+	@Override
+	public CustomVGpu getVGpu () {
+		return vgpu;
+	}
+
+	@Override
+	public GpuTask setVGpu (CustomVGpu vgpu) {
+		this.vgpu = vgpu;
+        return this;
+	}
+	
+	/*public boolean isDelayed() {
+        return submissionDelay > 0;
+    }*/
+	
+    @Override 
+    public int compareTo (GpuTask other) {
+    	if(this.equals(Objects.requireNonNull(other))) 
+            return 0;
+
+        return Double.compare(getBlockLength(), other.getBlockLength()) +
+            Long.compare(this.getTaskId(), other.getTaskId());
+            //this.getBroker().compareTo(other.getBroker());
+    }
     
+    @Override
+    public double getSubmissionDelay () {
+        return this.submissionDelay;
+    }
     
+    public final void setSubmissionDelay (final double submissionDelay) {
+        if (submissionDelay < 0)
+            return;
+        this.submissionDelay = submissionDelay;
+    }
+
+	
+	//@Override public void setLastTriedDatacenter(Datacenter lastTriedDatacenter) {/**/}
+    //@Override public Datacenter getLastTriedDatacenter() { return Datacenter.NULL; }
+    //@Override public double getArrivedTime() { return 0; }
+    //@Override public CustomerEntity setArrivedTime(double time) { return this; }
+    //@Override public double getCreationTime() { return 0; }
 }
