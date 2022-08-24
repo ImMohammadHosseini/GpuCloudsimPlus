@@ -20,7 +20,7 @@ public interface Gpu extends ChangeableId {
 	
 	Gpu NULL = new GpuNull ();
     
-	List<Pe> getGpuPeList ();
+	List<Pe> getGpuCoreList ();
 	
 	GpuResourceProvisioner getGpuGddramProvisioner ();
 	

@@ -16,11 +16,14 @@ import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisionerSimple;
 
 public class GpuSimple implements Gpu {
 	
+	private static long defaultRamCapacity = (long) BytesConversion.gigaToMega(10);
+    private static long defaultBwCapacity = 1000;
+    
 	private long id;
 	private String type;
 	private final Ram ram;
     private final Bandwidth bw;
-	private List<Pe> gpuPeList;
+	private List<Pe> gpuCoreList;
 	private GpuResourceProvisioner gpuGddramProvisioner;
 	private GpuResourceProvisioner gpuBwProvisioner;
 	
@@ -35,7 +38,7 @@ public class GpuSimple implements Gpu {
 		
 		//this.setGpuGddramProvisioner(new GpuResourceProvisionerSimple());
         this.setGpuBwProvisioner(new GpuResourceProvisionerSimple());
-        this.setGpuPeList(peList);
+        this.setGpuCoreList(peList);
 	}
 	
 	@Override 
@@ -55,26 +58,26 @@ public class GpuSimple implements Gpu {
 		return type;
 	}
 	
-	public void setGpuPeList (final List<Pe> peList) {
-		if(requireNonNull(peList).isEmpty()){
-            throw new IllegalArgumentException("The PE list for a Gpu cannot be empty");
+	public void setGpuCoreList (final List<Pe> coreList) {
+		if(requireNonNull(coreList).isEmpty()){
+            throw new IllegalArgumentException("The CORE list for a Gpu cannot be empty");
         }
 		
-		this.gpuPeList = peList;
+		this.gpuCoreList = coreList;
 		
 		//need to be complete
 	}
 
 	@Override 
-	public List<Pe> getGpuPeList () {
-		return gpuPeList;
+	public List<Pe> getGpuCoreList () {
+		return gpuCoreList;
     }
 	
 	
 	@Override 
 	public Gpu setGpuGddramProvisioner (GpuResourceProvisioner gpuGddramProvisioner) {
 		this.gpuGddramProvisioner = requireNonNull(gpuGddramProvisioner);
-        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVGpu)vgpu).getGddram());
+        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVGpuSimple)vgpu).getGddram());
         return this;
 	}
 	
@@ -86,7 +89,7 @@ public class GpuSimple implements Gpu {
     @Override 
     public Gpu setGpuBwProvisioner (GpuResourceProvisioner gpuBwProvisioner) {
     	this.gpuBwProvisioner = requireNonNull(gpuBwProvisioner);
-        this.gpuBwProvisioner.setResources(bw, vgpu -> ((CustomVGpu)vgpu).getBw());
+        this.gpuBwProvisioner.setResources(bw, vgpu -> ((CustomVGpuSimple)vgpu).getBw());
         //must add set resource in gpurespro //has to
     	return this;
     }
