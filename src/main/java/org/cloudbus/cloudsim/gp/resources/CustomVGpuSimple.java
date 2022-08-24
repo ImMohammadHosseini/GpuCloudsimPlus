@@ -381,7 +381,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public ResourceManageable getGddram () {
+    public Ram getGddram () {
         return gddram;
     }
     
@@ -400,7 +400,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public ResourceManageable getBw () {
+    public Bandwidth getBw () {
         return bw;
     }
     
