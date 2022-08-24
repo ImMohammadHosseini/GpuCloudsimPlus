@@ -511,7 +511,14 @@ public class GpuTaskSimple implements GpuTask {
         this.submissionDelay = submissionDelay;
     }
 
-	
+    void notifyOnFinishListeners() {
+        if (isFinished()) {
+            onFinishListeners.forEach(listener -> listener.update(
+            		GpuTaskVGpuEventInfo.of(listener, this)));
+            onFinishListeners.clear();
+        }
+    }
+    
 	//@Override public void setLastTriedDatacenter(Datacenter lastTriedDatacenter) {/**/}
     //@Override public Datacenter getLastTriedDatacenter() { return Datacenter.NULL; }
     //@Override public double getArrivedTime() { return 0; }

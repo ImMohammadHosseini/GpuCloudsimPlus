@@ -26,8 +26,8 @@ public class CustomVGpuNull implements CustomVGpu {
         return Resource.NULL;
     }
     @Override public GpuTaskScheduler getGpuTaskScheduler () { return GpuTaskScheduler.NULL; }
-    @Override public long getFreePesNumber () { return 0; }
-    @Override public long getExpectedFreePesNumber () { return 0; }
+    @Override public long getFreeCoresNumber () { return 0; }
+    @Override public long getExpectedFreeCoresNumber () { return 0; }
     @Override public long getCurrentRequestedBw () {
         return 0;
     }
@@ -46,7 +46,7 @@ public class CustomVGpuNull implements CustomVGpu {
     @Override public double getMips () {
         return 0;
     }
-    @Override public long getNumberOfPes () {
+    @Override public long getNumberOfCores () {
         return 0;
     }
     @Override public CustomVGpu addOnVideocardAllocationListener (
@@ -156,6 +156,8 @@ public class CustomVGpuNull implements CustomVGpu {
     @Override public void setPCIeBw (int PCIeBw) { /**/ } 
     @Override public String getTenancy () { return ""; } 
     @Override public void setTenancy (String tenancy) { /**/ }
+	@Override public double getGpuPercentUtilization(double time) { return 0; }
+	@Override public double getGpuPercentUtilization() { return 0; }
     
 }
 

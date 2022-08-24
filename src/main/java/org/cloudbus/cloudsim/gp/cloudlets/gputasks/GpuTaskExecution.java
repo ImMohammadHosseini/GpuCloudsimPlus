@@ -24,7 +24,7 @@ public class GpuTaskExecution {
     
     public GpuTaskExecution (final GpuTask gpuTask) {
         this.gpuTask = gpuTask;
-        this.arrivalTime = gpuTask.registerArrivalInDatacenter();
+        this.arrivalTime = gpuTask.registerArrivalInVideocard();
         this.finishedTime = gpuTask.NOT_ASSIGNED;
         this.lastProcessingTime = gpuTask.NOT_ASSIGNED;
         this.totalCompletionTime = 0.0;
