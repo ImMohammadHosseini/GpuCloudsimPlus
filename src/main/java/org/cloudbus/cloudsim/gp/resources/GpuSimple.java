@@ -1,13 +1,17 @@
 package org.cloudbus.cloudsim.gp.resources;
 
+import java.util.*;
 import static java.util.Objects.requireNonNull;
-import java.util.Collections;
-import java.util.List;
 
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.Ram;
-import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.resources.PeSimple;
+import org.cloudsimplus.listeners.EventListener;
+import org.cloudbus.cloudsim.resources.Bandwidth;
+import org.cloudbus.cloudsim.util.BytesConversion;
+import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.resources.ResourceManageable;
+import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.resources.ResourceManageableAbstract;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisionerSimple;
@@ -27,6 +31,45 @@ public class GpuSimple implements Gpu {
 	private GpuResourceProvisioner gpuGddramProvisioner;
 	private GpuResourceProvisioner gpuBwProvisioner;
 	
+    private final List<GpuStateHistoryEntry> stateHistory;
+
+    private boolean activateOnVideocardStartup;
+    private boolean failed;
+    private boolean active;
+    private boolean stateHistoryEnabled;
+    private double startTime = -1;
+    private double firstStartTime = -1;
+    private double shutdownTime;
+    private double totalUpTime;
+    private double lastBusyTime;
+    private double idleShutdownDeadline;
+    
+    private VGpuScheduler vgpuScheduler;
+    private final List<CustomVGpu> vgpuList = new ArrayList<>();
+
+    private final Set<CustomVGpu> vgpusMigratingIn;
+    private final Set<CustomVGpu> vgpusMigratingOut;
+    
+    private Videocard videocard;
+
+    private final Set<EventListener<HostUpdatesVmsProcessingEventInfo>> onUpdateProcessingListeners;
+    private final List<EventListener<GpuEventInfo>> onStartupListeners;
+    private final List<EventListener<GpuEventInfo>> onShutdownListeners;
+
+    private List<ResourceManageable> resources;
+
+    private List<GpuResourceProvisioner> provisioners;
+    private final List<CustomVGpu> vgpuCreatedList;
+    
+    private int freeCoresNumber;
+    private int busyCoresNumber;
+    private int workingCoresNumber;
+    private int failedCoresNumber;
+    private boolean lazySuitabilityEvaluation;
+	
+    
+    
+    
 	//need change the constructor and make it in 4 or 5 constructor
 	public GpuSimple (long id, String type, final long ram, final long bw,
 			final List<Pe> peList) {
