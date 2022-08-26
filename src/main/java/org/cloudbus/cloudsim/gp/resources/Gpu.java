@@ -39,7 +39,7 @@ public interface Gpu extends ChangeableId {
 	
     void setVideocard (Videocard videocard);
 
-    boolean isSuitableForVgpu (CustomVGpu vgpu);
+    boolean isSuitableForVGpu (CustomVGpu vgpu);
 
     GpuSuitability getSuitabilityFor (CustomVGpu vgpu);
 
@@ -49,19 +49,19 @@ public interface Gpu extends ChangeableId {
     
     Gpu setActive (boolean activate);
 
-    <T extends CustomVGpu> Set<T> getVgpusMigratingIn ();
+    <T extends CustomVGpu> Set<T> getVGpusMigratingIn ();
 
-    boolean hasMigratingVgpus ();
+    boolean hasMigratingVGpus ();
     
-    boolean addMigratingInVgpu (CustomVGpu vgpu);
+    boolean addMigratingInVGpu (CustomVGpu vgpu);
 
-    Set<CustomVGpu> getVgpusMigratingOut ();
+    Set<CustomVGpu> getVGpusMigratingOut ();
 
-    boolean addVgpuMigratingOut (CustomVGpu vgpu);
+    boolean addVGpuMigratingOut (CustomVGpu vgpu);
 
-    boolean removeVgpuMigratingOut (CustomVGpu vgpu);
+    boolean removeVGpuMigratingOut (CustomVGpu vgpu);
 
-    void reallocateMigratingInVgpus ();
+    void reallocateMigratingInVGpus ();
 
     //@Override
     double getTotalMipsCapacity ();
@@ -70,9 +70,9 @@ public interface Gpu extends ChangeableId {
 
     double getTotalAllocatedMips ();
 
-    double getTotalAllocatedMipsForVgpu (CustomVGpu vgpu);
+    double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu);
 
-    void removeMigratingInVgpu (CustomVGpu vgpu);
+    void removeMigratingInVGpu (CustomVGpu vgpu);
 
     List<Pe> getWorkingCoreList ();
 
@@ -94,13 +94,13 @@ public interface Gpu extends ChangeableId {
 
     //long getAvailableStorage();
 
-    <T extends CustomVGpu> List<T> getVgpuList ();
+    <T extends CustomVGpu> List<T> getVGpuList ();
 
-    <T extends CustomVGpu> List<T> getVgpuCreatedList ();
+    <T extends CustomVGpu> List<T> getVGpuCreatedList ();
 
-    VGpuScheduler getVgpuScheduler ();
+    VGpuScheduler getVGpuScheduler ();
 
-    Gpu setVgpuScheduler (VGpuScheduler vgpuScheduler);
+    Gpu setVGpuScheduler (VGpuScheduler vgpuScheduler);
 
     double getFirstStartTime ();
 
@@ -130,7 +130,7 @@ public interface Gpu extends ChangeableId {
 
     GpuSuitability createTemporaryVGpu (CustomVGpu vgpu);
 
-    void destroyTemporaryVm (CustomVGpu vgpu);
+    void destroyTemporaryVGpu (CustomVGpu vgpu);
 
     void destroyAllVGpus ();
 
