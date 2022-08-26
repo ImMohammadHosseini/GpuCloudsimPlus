@@ -41,7 +41,7 @@ public interface Gpu extends ChangeableId {
 
     boolean isSuitableForVgpu (CustomVGpu vgpu);
 
-    HostSuitability getSuitabilityFor (CustomVGpu vgpu);
+    GpuSuitability getSuitabilityFor (CustomVGpu vgpu);
 
     boolean isActive();
     
@@ -124,11 +124,11 @@ public interface Gpu extends ChangeableId {
 
     double updateProcessing (double currentTime);
 
-    HostSuitability createVGpu (CustomVGpu vgpu);
+    GpuSuitability createVGpu (CustomVGpu vgpu);
 
     void destroyVGpu (CustomVGpu vgpu);
 
-    HostSuitability createTemporaryVGpu (CustomVGpu vgpu);
+    GpuSuitability createTemporaryVGpu (CustomVGpu vgpu);
 
     void destroyTemporaryVm (CustomVGpu vgpu);
 
