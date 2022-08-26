@@ -9,11 +9,13 @@ import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.util.BytesConversion;
+import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.resources.ResourceManageableAbstract;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
+import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisionerSimple;
 
 
@@ -52,7 +54,7 @@ public class GpuSimple implements Gpu {
     
     private Videocard videocard;
 
-    private final Set<EventListener<HostUpdatesVmsProcessingEventInfo>> onUpdateProcessingListeners;
+    private final Set<EventListener<GpuUpdatesVgpusProcessingEventInfo>> onUpdateProcessingListeners;
     private final List<EventListener<GpuEventInfo>> onStartupListeners;
     private final List<EventListener<GpuEventInfo>> onShutdownListeners;
 
@@ -68,20 +70,59 @@ public class GpuSimple implements Gpu {
     private boolean lazySuitabilityEvaluation;
 	
     
-    
+    public GpuSimple (long id,
+    		final GpuResourceProvisioner gpuGddramProvisioner,
+            final GpuResourceProvisioner gpubwProvisioner,
+            final long storage,
+            final List<Pe> coreList) {
+    	
+    	this(id, "", gpuGddramProvisioner.getCapacity(), gpubwProvisioner.getCapacity(), coreList, 
+    			true);
+    	setGpuGddramProvisioner(gpuGddramProvisioner);
+    	setGpuBwProvisioner(gpubwProvisioner);
+	}
     
 	//need change the constructor and make it in 4 or 5 constructor
 	public GpuSimple (long id, String type, final long ram, final long bw,
-			final List<Pe> peList) {
+			final List<Pe> coreList, final boolean activate) {
 		this.setId(id);
 		this.setType(type);
 		
+		this.idleShutdownDeadline = DEF_IDLE_SHUTDOWN_DEADLINE;
+        this.lazySuitabilityEvaluation = true;
+
+        this.ram = new Ram(ram);
+        this.bw = new Bandwidth(bw);
+        
+        this.setGpuGddramProvisioner(new GpuResourceProvisionerSimple());
+        this.setGpuBwProvisioner(new GpuResourceProvisionerSimple());
+
+        this.setVgpuScheduler(new VGpuSchedulerSpaceShared());
+        this.setGpuCoreList(coreList);
+        this.setFailed(false);
+        this.shutdownTime = -1;
+        this.setVideocard(Videocard.NULL);
+
+        this.onUpdateProcessingListeners = new HashSet<>();
+        this.onStartupListeners = new ArrayList<>();
+        this.onShutdownListeners = new ArrayList<>();
+        //this.cpuUtilizationStats = GpuResourceStats.NULL;
+
+        this.resources = new ArrayList<>();
+        this.vgpuCreatedList = new ArrayList<>();
+        this.provisioners = new ArrayList<>();
+        this.vgpusMigratingIn = new HashSet<>();
+        this.vgpusMigratingOut = new HashSet<>();
+        //this.powerModel = PowerModelGpu.NULL;
+        this.stateHistory = new LinkedList<>();
+        this.activateOnVideocardStartup = activate;
+        
 		this.ram = new Ram(ram);
 		this.bw = new Bandwidth(bw);
 		
 		//this.setGpuGddramProvisioner(new GpuResourceProvisionerSimple());
         this.setGpuBwProvisioner(new GpuResourceProvisionerSimple());
-        this.setGpuCoreList(peList);
+        this.setGpuCoreList(coreList);
 	}
 	
 	@Override 
