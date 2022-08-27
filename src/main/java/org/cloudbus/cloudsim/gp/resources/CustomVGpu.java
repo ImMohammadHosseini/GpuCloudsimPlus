@@ -92,7 +92,7 @@ public interface CustomVGpu {
     
     void notifyOnVideocardAllocationListeners ();
 
-    void notifyOnVideocardDeallocationListeners (Videocard deallocatedVideocard);
+    void notifyOnGpuDeallocationListeners (Gpu deallocatedGpu);
     
     //void notifyOnCreationFailureListeners (Datacenter failedDatacenter);
 
@@ -160,7 +160,7 @@ public interface CustomVGpu {
 
     CustomVGpu setBw (long bwCapacity);
 
-    CustomVGpu setVideocard (Videocard videocard);
+    CustomVGpu setGpu (Gpu gpu);
 
     CustomVGpu setGddram (long gddramCapacity);
 
@@ -215,7 +215,7 @@ public interface CustomVGpu {
     
     Simulation getSimulation ();
     
-    Videocard getVideocard ();
+    Gpu getGpu ();
         
     double getMips ();
     
@@ -224,4 +224,6 @@ public interface CustomVGpu {
     double getGpuPercentUtilization (double time);
 
     double getGpuPercentUtilization ();
+    
+    CustomVGpu setStartTime (final double startTime);
 }
