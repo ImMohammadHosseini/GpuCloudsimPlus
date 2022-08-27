@@ -10,6 +10,7 @@ import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.ChangeableId;
+import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Pe; 
 
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
@@ -17,7 +18,7 @@ import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 
-public interface Gpu extends ChangeableId {
+public interface Gpu extends ChangeableId, Comparable<Gpu> {
 	//, ResourceManageable
     Logger LOGGER = LoggerFactory.getLogger(Gpu.class.getSimpleName());
 	
@@ -183,4 +184,12 @@ public interface Gpu extends ChangeableId {
     boolean isLazySuitabilityEvaluation ();
 
     Gpu setLazySuitabilityEvaluation (boolean lazySuitabilityEvaluation);
+    
+    Simulation getSimulation ();
+    
+    double getStartTime ();
+    
+    Gpu setStartTime (final double startTime);
+    
+    double getLastBusyTime ();
 }
