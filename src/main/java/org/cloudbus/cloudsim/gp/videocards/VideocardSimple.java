@@ -1,6 +1,7 @@
 package org.cloudbus.cloudsim.gp.videocards;
 
 import org.cloudbus.cloudsim.gp.provisioners.VideocardBwProvisioner;
+import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicySimple;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.gpucloudsimplus.listeners.VideocardVGpuMigrationEventInfo;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
@@ -46,6 +47,10 @@ public class VideocardSimple implements Videocard {
     
     private double lastUnderOrOverloadedDetection = -Double.MAX_VALUE;
 
+    public VideocardSimple (final List<? extends Gpu> gpuList) {
+    	this(gpuList, new VGpuAllocationPolicySimple());
+    }
+    
 	public VideocardSimple (final List<? extends Gpu> gpuList,
 	        final VGpuAllocationPolicy vgpuAllocationPolicy) {
 		
