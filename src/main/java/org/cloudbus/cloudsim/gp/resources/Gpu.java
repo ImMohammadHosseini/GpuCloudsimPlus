@@ -11,8 +11,8 @@ import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.ChangeableId;
 import org.cloudbus.cloudsim.core.Simulation;
-import org.cloudbus.cloudsim.resources.Pe; 
-
+import org.cloudbus.cloudsim.resources.Pe;
+import org.cloudbus.cloudsim.resources.Resource;
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
@@ -192,4 +192,8 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
     Gpu setStartTime (final double startTime);
     
     double getLastBusyTime ();
+    
+    Resource getBw ();
+    
+    Resource getGddram();
 }

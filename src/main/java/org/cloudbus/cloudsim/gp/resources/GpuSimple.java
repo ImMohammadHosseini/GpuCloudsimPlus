@@ -428,7 +428,7 @@ public class GpuSimple implements Gpu {
             return this;
         }
 
-        final CloudSimTag tag = activate ? CloudSimTag.HOST_POWER_ON : CloudSimTag.HOST_POWER_OFF;
+        final CloudSimTag tag = activate ? CloudSimTag.GPU_POWER_ON : CloudSimTag.GPU_POWER_OFF;
         final String msg = (activate ? "on" : "off") + " (expected time: {} seconds).";
         LOGGER.info("{}: {} is being powered " + msg, getSimulation().clockStr(), this, delay);
         datacenter.schedule(delay, tag, this);
@@ -592,12 +592,12 @@ public class GpuSimple implements Gpu {
         return vgpuScheduler.getTotalAllocatedMipsForVGpu(vgpu);
     }
 
-    //@Override
+    @Override
     public Resource getBw () {
         return gpuBwProvisioner.getPGpuResource();
     }
 
-    //@Override
+    @Override
     public Resource getGddram() {
         return gpuGddramProvisioner.getPGpuResource();
     }
