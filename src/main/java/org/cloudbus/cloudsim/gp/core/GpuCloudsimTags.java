@@ -3,17 +3,37 @@ package org.cloudbus.cloudsim.gp.core;
 
 public enum GpuCloudsimTags implements Comparable<GpuCloudsimTags> {
 	
-	GPUTASK_SUBMIT_ACK,
+	
 	
 	VGPU_MIGRATE,
+		
+	VGPU_DESTROY_ACK,
+	
+	VGPU_CREATE_ACK,
+	
+	VGPU_UPDATE_GPUTASK_PROCESSING,
+	
+	GPU_REMOVE,
+	
+	GPU_ADD,
 	
 	GPU_POWER_ON,
 	
 	GPU_POWER_OFF,
 	
-	GpuTask_RETURN,
+	GPUTASK_RETURN,
+		
+	GPUTASK_CANCEL,
 	
-	VGPU_UPDATE_GPUTASK_PROCESSING;
+	GPUTASK_PAUSE,
+	
+	GPUTASK_RESUME,
+	
+	GPUTASK_PAUSE_ACK,
+	
+	GPUTASK_RESUME_ACK,
+	
+	GPUTASK_SUBMIT_ACK;
 	
 	
 	private final int priority;
