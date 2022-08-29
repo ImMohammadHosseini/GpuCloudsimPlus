@@ -2,6 +2,12 @@ package org.cloudbus.cloudsim.gp.hosts;
 
 import org.cloudbus.cloudsim.hosts.Host;
 
+
+import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.stream.Stream;
+
 public interface GpuHost extends Host {
 	
 	Logger LOGGER = LoggerFactory.getLogger(GpuHost.class.getSimpleName());

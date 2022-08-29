@@ -44,7 +44,7 @@ public interface VGpuAllocationPolicy {
      *                is being requested to be scaled
      * @return true if the requested resource was scaled, false otherwise
      */
-    boolean scaleVmVertically (VerticalVmScaling scaling);
+    //boolean scaleVmVertically (VerticalVmScaling scaling);
 
     void deallocateGpuForVGpu (CustomVGpu vgpu);
 
