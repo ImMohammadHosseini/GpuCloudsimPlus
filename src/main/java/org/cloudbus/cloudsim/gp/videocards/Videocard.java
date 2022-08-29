@@ -8,6 +8,7 @@ import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 
 import java.util.*;
 import org.slf4j.Logger;
@@ -81,5 +82,7 @@ public interface Videocard {
     double getGpuSearchRetryDelay ();
 
     Videocard setGpuSearchRetryDelay (double delay);
+    
+    GpuHost getHost ();
 
 }

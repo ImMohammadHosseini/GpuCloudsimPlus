@@ -11,6 +11,7 @@ import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.gp.core.GpuCloudsimTags;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -127,7 +128,7 @@ public class VideocardSimple implements Videocard {
         */
         sendCloudletSubmitAckToBroker(gpuTask, ack);
 
-        sendNow(gpuTask.getBroker(), CloudSimTag.GPUTASK_RETURN, gpuTask);
+        sendNow(gpuTask.getBroker(), GpuCloudsimTags.GPUTASK_RETURN, gpuTask);
     }
 	
 	sarnakh :BROKER NAME
@@ -162,7 +163,7 @@ public class VideocardSimple implements Videocard {
 
         if (nextSimulationDelay != Double.MAX_VALUE) {
             nextSimulationDelay = getGpuTaskProcessingUpdateInterval (nextSimulationDelay);
-            schedule(nextSimulationDelay, CloudSimTag.VGPU_UPDATE_GPUTASK_PROCESSING);
+            schedule(nextSimulationDelay, GpuCloudsimTags.VGPU_UPDATE_GPUTASK_PROCESSING);
         }
         setLastProcessTime(clock());
 
@@ -239,7 +240,7 @@ public class VideocardSimple implements Videocard {
 
         if(targetGpu.addMigratingInVGpu(sourceVGpu)) {
             sourceGpu.addVGpuMigratingOut(sourceVGpu);
-            send(this, delay, CloudSimTag.VGPU_MIGRATE, new TreeMap.SimpleEntry<>(sourceVGpu, 
+            send(this, delay, GpuCloudsimTags.VGPU_MIGRATE, new TreeMap.SimpleEntry<>(sourceVGpu, 
             		targetGpu));
         }
     }
@@ -455,6 +456,11 @@ public class VideocardSimple implements Videocard {
 	@Override 
 	public VideocardBwProvisioner getPcieBwProvisioner () {
 		return pcieBwProvisioner;
+	}
+	
+	@Override
+	public GpuHost getHost () {
+		return host;
 	}
 	
 	@Override public Videocard setPcieBwProvisioner (VideocardBwProvisioner pcieBwProvisioner) {
