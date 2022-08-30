@@ -7,7 +7,7 @@ import org.cloudbus.cloudsim.core.CustomerEntityAbstract;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.gp.schedulers.gpucloudlet.GpuCloudletScheduler;
 
-public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
+public class GpuVmSimple extends VmSimple implements GpuVm {
 	
 	private String type;
 	
@@ -15,17 +15,17 @@ public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 	
 	//private double arrivalTime;
 	
-	public CustomGpuVmSimple (final Vm sourceVm, String type) {
+	public GpuVmSimple (final Vm sourceVm, String type) {
 		super (sourceVm);
 		setType (type);
 	}
 	
-	public CustomGpuVmSimple (final double mipsCapacity, final long numberOfPes, String type) {
+	public GpuVmSimple (final double mipsCapacity, final long numberOfPes, String type) {
 		super (mipsCapacity, numberOfPes);
 		setType (type);
 	}
 	
-	public CustomGpuVmSimple (final double mipsCapacity, final long numberOfPes, 
+	public GpuVmSimple (final double mipsCapacity, final long numberOfPes, 
 			final GpuCloudletScheduler cloudletScheduler, String type) {
         super (mipsCapacity, numberOfPes, cloudletScheduler);
         setCloudletScheduler (cloudletScheduler);
@@ -33,13 +33,13 @@ public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 	
 	}
 	
-	public CustomGpuVmSimple (final long id, final double mipsCapacity, final long numberOfPes, 
+	public GpuVmSimple (final long id, final double mipsCapacity, final long numberOfPes, 
 			String type) {
         super (id,  mipsCapacity, numberOfPes);
         setType (type);
 	}
 
-	public CustomGpuVmSimple (final long id, final long mipsCapacity, final long numberOfPes,
+	public GpuVmSimple (final long id, final long mipsCapacity, final long numberOfPes,
 			String type) {
 		super (id, mipsCapacity, numberOfPes);
         setType (type);
@@ -56,7 +56,7 @@ public class CustomGpuVmSimple extends VmSimple implements CustomGpuVm {
 	}
 	
 	@Override
-	public CustomGpuVmSimple setVGpu (CustomVGpu vgpu) {
+	public GpuVmSimple setVGpu (CustomVGpu vgpu) {
 		this.vgpu = vgpu;
 		if (vgpu.getGpuVm () == null)
 			vgpu.setGpuVm (this);

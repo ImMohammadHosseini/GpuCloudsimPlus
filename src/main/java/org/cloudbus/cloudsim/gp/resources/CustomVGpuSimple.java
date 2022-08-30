@@ -1,8 +1,8 @@
 package org.cloudbus.cloudsim.gp.resources;
 
-import org.cloudbus.cloudsim.gp.vms.CustomGpuVm;
-import org.cloudbus.cloudsim.gp.vms.CustomGpuVmNull;
-import org.cloudbus.cloudsim.gp.vms.CustomGpuVmSimple;
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.gp.vms.GpuVmNull;
+import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
@@ -33,7 +33,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	private String tenancy;
 	private int PCIeBw;
 	
-	private CustomGpuVm gpuVm;
+	private GpuVm gpuVm;
 	
 	private Ram gddram;
 	private Bandwidth bw;
@@ -923,12 +923,12 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public CustomGpuVm getGpuVm () {
+    public GpuVm getGpuVm () {
     	return gpuVm;
     }
     
     @Override
-    public CustomVGpu setGpuVm (CustomGpuVm gpuVm) {
+    public CustomVGpu setGpuVm (GpuVm gpuVm) {
     	this.gpuVm = gpuVm;
     	if (!gpuVm.hasVGpu())
     		gpuVm.setVGpu(this);

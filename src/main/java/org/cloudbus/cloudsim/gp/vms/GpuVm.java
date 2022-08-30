@@ -3,15 +3,15 @@ package org.cloudbus.cloudsim.gp.vms;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.vms.Vm;
 
-public interface CustomGpuVm extends Vm {
+public interface GpuVm extends Vm {
 	
-	CustomGpuVm NULL = new CustomGpuVmNull();
+	GpuVm NULL = new GpuVmNull();
 	
 	void setType (String type);
 	
 	String getType ();
 	
-	CustomGpuVm setVGpu (CustomVGpu vgpu);
+	GpuVm setVGpu (CustomVGpu vgpu);
 	
 	CustomVGpu getVGpu ();
 	

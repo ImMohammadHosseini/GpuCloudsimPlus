@@ -23,7 +23,7 @@ import org.cloudsimplus.listeners.VmHostEventInfo;
 import java.util.Collections;
 import java.util.List;
 
-public class CustomGpuVmNull implements CustomGpuVm {
+public class GpuVmNull implements GpuVm {
 	
 	@Override public void setType (String type) {/**/}
 	
@@ -31,7 +31,7 @@ public class CustomGpuVmNull implements CustomGpuVm {
 	public String getType () {return "";}
 	
 	@Override
-	public CustomGpuVm setVGpu (CustomVGpu vgpu) {return this;}
+	public GpuVm setVGpu (CustomVGpu vgpu) {return this;}
 	
 	@Override
 	public CustomVGpu getVGpu () {return CustomVGpu.NULL;}

@@ -1,7 +1,7 @@
 package org.cloudbus.cloudsim.gp.resources;
 
 
-import org.cloudbus.cloudsim.gp.vms.CustomGpuVm;
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
@@ -148,8 +148,8 @@ public class CustomVGpuNull implements CustomVGpu {
     @Override public CustomVGpu setDescription (String description) { return this; }
     @Override public String getType () { return ""; }
     @Override public void setType (String type) { /**/ }
-    @Override public CustomGpuVm getGpuVm () { return CustomGpuVm.NULL; } 
-    @Override public CustomVGpu setGpuVm (CustomGpuVm gpuVm) { return this; } 
+    @Override public GpuVm getGpuVm () { return GpuVm.NULL; } 
+    @Override public CustomVGpu setGpuVm (GpuVm gpuVm) { return this; } 
     @Override public int getPCIeBw () {
     	return -1;
     }
