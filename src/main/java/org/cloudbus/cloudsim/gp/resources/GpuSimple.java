@@ -333,7 +333,7 @@ public class GpuSimple implements Gpu {
         	return;
     	}
 
-    	final String migration = inMigration ? "VM Migration" : "VM Creation";
+    	final String migration = inMigration ? "VGpu Migration" : "VGpu Creation";
     	final String msg = gpuResource.getAvailableResource() > 0 ?
     					"just "+gpuResource.getAvailableResource()+" " + resourceUnit :
     					"no amount";

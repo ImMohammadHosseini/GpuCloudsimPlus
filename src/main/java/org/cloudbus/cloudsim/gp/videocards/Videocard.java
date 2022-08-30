@@ -21,7 +21,7 @@ public interface Videocard {
 
 	Videocard NULL = new VideocardNull ();
 	
-	double DEF_BW_PERCENT_FOR_MIGRATION = 0.5;
+	//double DEF_BW_PERCENT_FOR_MIGRATION = 0.5;
 	
 	/*long getId ();
 	
@@ -31,6 +31,9 @@ public interface Videocard {
 	
 	void setType (String type);*/
 	
+	void videocardProcess ();
+	
+	
 	VGpuAllocationPolicy getVGpuAllocationPolicy ();
 	
 	Videocard setVGpuAllocationPolicy (VGpuAllocationPolicy vgpuAllocationPolicy);
@@ -39,9 +42,9 @@ public interface Videocard {
 	
 	Videocard setPcieBwProvisioner (VideocardBwProvisioner pcieBwProvisioner);
 	
-	void requestVGpuMigration (CustomVGpu sourceVGpu, Gpu targetGpu);
+	//void requestVGpuMigration (CustomVGpu sourceVGpu, Gpu targetGpu);
 
-    void requestVGpuMigration (CustomVGpu sourceVGpu);
+    //void requestVGpuMigration (CustomVGpu sourceVGpu);
 
     <T extends Gpu> List<T> getGpuList ();
     
@@ -65,19 +68,19 @@ public interface Videocard {
 
     Videocard setSchedulingInterval (double schedulingInterval);
 
-    double getBandwidthPercentForMigration ();
+    //double getBandwidthPercentForMigration ();
 
-    void setBandwidthPercentForMigration (double bandwidthPercentForMigration);
+    //void setBandwidthPercentForMigration (double bandwidthPercentForMigration);
     
     Videocard addOnGpuAvailableListener (EventListener<GpuEventInfo> listener);
 
-    Videocard addOnVGpuMigrationFinishListener (EventListener<VideocardVGpuMigrationEventInfo> listener);
+    //Videocard addOnVGpuMigrationFinishListener (EventListener<VideocardVGpuMigrationEventInfo> listener);
 
     boolean isMigrationsEnabled ();
 
-    Videocard enableMigrations ();
+    //Videocard enableMigrations ();
 
-    Videocard disableMigrations ();
+    //Videocard disableMigrations ();
     
     double getGpuSearchRetryDelay ();
 
