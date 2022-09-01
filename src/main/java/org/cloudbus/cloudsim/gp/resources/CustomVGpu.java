@@ -15,7 +15,7 @@ import org.cloudbus.cloudsim.resources.Processor;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 
 import org.cloudsimplus.listeners.EventListener;
-import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
+import org.gpucloudsimplus.listeners.VGpuGpuEventInfo;
 
 import java.util.List;
 
@@ -78,33 +78,33 @@ public interface CustomVGpu {
 
     long getExpectedFreeCoresNumber ();
     
-    CustomVGpu addOnVideocardAllocationListener (EventListener<VGpuVideocardEventInfo> listener);
+    CustomVGpu addOnGpuAllocationListener (EventListener<VGpuGpuEventInfo> listener);
 
-    CustomVGpu addOnMigrationStartListener (EventListener<VGpuVideocardEventInfo> listener);
+    CustomVGpu addOnMigrationStartListener (EventListener<VGpuGpuEventInfo> listener);
     
-    CustomVGpu addOnMigrationFinishListener (EventListener<VGpuVideocardEventInfo> listener);
+    CustomVGpu addOnMigrationFinishListener (EventListener<VGpuGpuEventInfo> listener);
 
-    CustomVGpu addOnVideocardDeallocationListener (EventListener<VGpuVideocardEventInfo> listener);
+    CustomVGpu addOnGpuDeallocationListener (EventListener<VGpuGpuEventInfo> listener);
     
     //CustomVGpu addOnCreationFailureListener (EventListener<VmDatacenterEventInfo> listener);
 
-    CustomVGpu addOnUpdateProcessingListener (EventListener<VGpuVideocardEventInfo> listener);
+    CustomVGpu addOnUpdateProcessingListener (EventListener<VGpuGpuEventInfo> listener);
     
-    void notifyOnVideocardAllocationListeners ();
+    void notifyOnGpuAllocationListeners ();
 
     void notifyOnGpuDeallocationListeners (Gpu deallocatedGpu);
     
     //void notifyOnCreationFailureListeners (Datacenter failedDatacenter);
 
-    boolean removeOnMigrationStartListener (EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnMigrationStartListener (EventListener<VGpuGpuEventInfo> listener);
     
-    boolean removeOnMigrationFinishListener (EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnMigrationFinishListener (EventListener<VGpuGpuEventInfo> listener);
     
-    boolean removeOnUpdateProcessingListener (EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnUpdateProcessingListener (EventListener<VGpuGpuEventInfo> listener);
     
-    boolean removeOnVideocardAllocationListener (EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnGpuAllocationListener (EventListener<VGpuGpuEventInfo> listener);
 
-    boolean removeOnVideocardDeallocationListener(EventListener<VGpuVideocardEventInfo> listener);
+    boolean removeOnGpuDeallocationListener(EventListener<VGpuGpuEventInfo> listener);
 
     //boolean removeOnCreationFailureListener(EventListener<VmDatacenterEventInfo> listener);
 
@@ -129,18 +129,18 @@ public interface CustomVGpu {
     
     //void enableUtilizationStats ();
 
-    double getVideocardGddramUtilization (); // videocard or Gpu
+    double getGpuGddramUtilization (); // videocard or Gpu
 
-    double getVideocardBwUtilization (); // videocard or Gpu
+    double getGpuBwUtilization (); // videocard or Gpu
     
     //videocard's total MIPS capacity
-    default double getVideocardCoreUtilization () {
-        return getVideocardCoreUtilization (getSimulation().clock());
+    default double getGpuCoreUtilization () {
+        return getGpuCoreUtilization (getSimulation().clock());
     }
 
-    double getVideocardCoreUtilization (double time);
+    double getGpuCoreUtilization (double time);
     
-    double getExpectedVideocardCoreUtilization (double vgpuCpuUtilizationPercent);
+    double getExpectedGpuCoreUtilization (double vgpuCpuUtilizationPercent);
     
     double getTotalCoreMipsUtilization ();
     

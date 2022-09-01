@@ -4,6 +4,7 @@ package org.cloudbus.cloudsim.gp.core;
 public enum GpuCloudsimTags implements Comparable<GpuCloudsimTags> {
 	
 	
+	VGPU_DESTROY,
 	
 	VGPU_MIGRATE,
 		

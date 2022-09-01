@@ -1,5 +1,7 @@
 package org.cloudbus.cloudsim.gp.brokers;
 
+import java.util.List;
+
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
@@ -12,7 +14,10 @@ public interface GpuDatacenterBroker extends DatacenterBroker {
 
     GpuDatacenterBroker NULL = new GpuDatacenterBrokerNull();
     
+    double DEF_VGPU_DESTRUCTION_DELAY = -1.0;
+    
     boolean bindGpuTaskToVGpu (GpuTask gpuTask, CustomVGpu vgpu);
     
+    DatacenterBroker requestIdleVGpuDestruction(CustomVGpu vgpu);
     
 }
