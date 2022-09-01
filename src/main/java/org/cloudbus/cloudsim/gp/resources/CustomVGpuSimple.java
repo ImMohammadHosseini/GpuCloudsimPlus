@@ -9,7 +9,7 @@ import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskSchedulerTimeShared;
 
-import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
+import org.gpucloudsimplus.listeners.VGpuGpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
 import org.cloudbus.cloudsim.resources.Pe;
@@ -39,7 +39,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	private Bandwidth bw;
 	private VGpuCore vGpuCore;
 
-	private Videocard videocard;
+	private Gpu gpu;
 	
 	private long freeCoresNumber;
     private long expectedFreeCoresNumber;
@@ -59,11 +59,11 @@ public class CustomVGpuSimple implements CustomVGpu {
     
     //private double submissionDelay;
     
-    private final List<EventListener<VGpuVideocardEventInfo>> onMigrationStartListeners;
-    private final List<EventListener<VGpuVideocardEventInfo>> onMigrationFinishListeners;
-    private final List<EventListener<VGpuVideocardEventInfo>> onVideocardAllocationListeners;
-    private final List<EventListener<VGpuVideocardEventInfo>> onVideocardDeallocationListeners;
-    private final List<EventListener<VGpuVideocardEventInfo>> onUpdateProcessingListeners;
+    private final List<EventListener<VGpuGpuEventInfo>> onMigrationStartListeners;
+    private final List<EventListener<VGpuGpuEventInfo>> onMigrationFinishListeners;
+    private final List<EventListener<VGpuGpuEventInfo>> onGpuAllocationListeners;
+    private final List<EventListener<VGpuGpuEventInfo>> onGpuDeallocationListeners;
+    private final List<EventListener<VGpuGpuEventInfo>> onUpdateProcessingListeners;
     
     /*private final List<EventListener<VmDatacenterEventInfo>> onCreationFailureListeners;
 
@@ -112,8 +112,8 @@ public class CustomVGpuSimple implements CustomVGpu {
         this.resources = new ArrayList<>(4);
         this.onMigrationStartListeners = new ArrayList<>();
         this.onMigrationFinishListeners = new ArrayList<>();
-        this.onVideocardAllocationListeners = new ArrayList<>();
-        this.onVideocardDeallocationListeners = new ArrayList<>();
+        this.onGpuAllocationListeners = new ArrayList<>();
+        this.onGpuDeallocationListeners = new ArrayList<>();
         //this.onCreationFailureListeners = new ArrayList<>();
         this.onUpdateProcessingListeners = new ArrayList<>();
         this.vGpuStateHistory = new LinkedList<>();
@@ -140,7 +140,7 @@ public class CustomVGpuSimple implements CustomVGpu {
         //setVmm("Xen");
 
         setInMigration(false);
-        this.videocard = Videocard.NULL;
+        this.gpu = Gpu.NULL;
         setGpuTaskScheduler(new GpuTaskSchedulerTimeShared());
 
         //this.setHorizontalScaling(HorizontalVmScaling.NULL);
@@ -236,23 +236,23 @@ public class CustomVGpuSimple implements CustomVGpu {
 	}
 	
 	@Override
-    public double getVideocardCoreUtilization (final double time) {
-        return videocard.getExpectedRelativeGpuUtilization(this, getGpuPercentUtilization(time));
+    public double getGpuCoreUtilization (final double time) {
+        return gpu.getExpectedRelativeGpuUtilization(this, getGpuPercentUtilization(time));
     }
 	
 	@Override
-    public double getExpectedVideocardCoreUtilization (final double vgpuCoreUtilizationPercent) {
-        return videocard.getExpectedRelativeCpuUtilization(this, vgpuCoreUtilizationPercent);
+    public double getExpectedGpuCoreUtilization (final double vgpuCoreUtilizationPercent) {
+        return gpu.getExpectedRelativeCpuUtilization(this, vgpuCoreUtilizationPercent);
     }
 	
 	@Override
-    public double getVideocardGddramUtilization () {
-        return Videocard.getRelativeRamUtilization(this);
+    public double getGpuGddramUtilization () {
+        return gpu.getRelativeRamUtilization(this);
     }
 
     @Override
-    public double getVideocardBwUtilization () {
-        return videocard.getRelativeBwUtilization(this);
+    public double getGpuBwUtilization () {
+        return gpu.getRelativeBwUtilization(this);
     }
 
     @Override
@@ -273,7 +273,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     @Override
     public MipsShare getCurrentRequestedMips () {
         if (isCreated()) {
-            return videocard.getVGpuScheduler().getRequestedMips(this);
+            return gpu.getVGpuScheduler().getRequestedMips(this);
         }
 
         return new MipsShare(vGpuCore.getCapacity(), vGpuCore.getMips());
@@ -445,18 +445,18 @@ public class CustomVGpuSimple implements CustomVGpu {
     }*/
     
     @Override
-    public CustomVGpu setVideocard (final Videocard videocard) {
-        if (Videocard.NULL.equals(requireNonNull(videocard)))  {
+    public CustomVGpu setGpu (final Gpu gpu) {
+        if (Gpu.NULL.equals(requireNonNull(gpu)))  {
             setCreated(false);
         }
 
-        this.videocard = videocard;
+        this.gpu = gpu;
         return this;
     }
 
     @Override
-    public Videocard getVideocard () {
-        return videocard;
+    public Gpu getGpu () {
+        return gpu;
     }
     
     @Override
@@ -486,21 +486,21 @@ public class CustomVGpuSimple implements CustomVGpu {
         this.inMigration = migrating;
     }
     
-    public void updateMigrationStartListeners (final Videocard targetVideocard) {
+    public void updateMigrationStartListeners (final Gpu targetGpu) {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onMigrationStartListeners.size(); i++) {
-            final EventListener<VGpuVideocardEventInfo> listener = 
+            final EventListener<VGpuGpuEventInfo> listener = 
             		onMigrationStartListeners.get(i);
-            listener.update(VGpuVideocardEventInfo.of(listener, this, targetVideocard));
+            listener.update(VGpuGpuEventInfo.of(listener, this, targetGpu));
         }
     }
     
-    public void updateMigrationFinishListeners (final Videocard targetVideocard) {
+    public void updateMigrationFinishListeners (final Gpu targetGpu) {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onMigrationFinishListeners.size(); i++) {
-            final EventListener<VGpuVideocardEventInfo> listener = 
+            final EventListener<VGpuGpuEventInfo> listener = 
             		onMigrationFinishListeners.get(i);
-            listener.update(VGpuVideocardEventInfo.of(listener, this, targetVideocard));
+            listener.update(VGpuGpuEventInfo.of(listener, this, targetGpu));
         }
     }
     
@@ -567,34 +567,34 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public CustomVGpu addOnVideocardAllocationListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
-        this.onVideocardAllocationListeners.add(requireNonNull(listener));
+    public CustomVGpu addOnGpuAllocationListener(
+    		final EventListener<VGpuGpuEventInfo> listener) {
+        this.onGpuAllocationListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
     public CustomVGpu addOnMigrationStartListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    		final EventListener<VGpuGpuEventInfo> listener) {
         onMigrationStartListeners.add(requireNonNull(listener));
         return this;
     }
     
     @Override
     public CustomVGpu addOnMigrationFinishListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    		final EventListener<VGpuGpuEventInfo> listener) {
         onMigrationFinishListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
-    public CustomVGpu addOnVideocardDeallocationListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    public CustomVGpu addOnGpuDeallocationListener(
+    		final EventListener<VGpuGpuEventInfo> listener) {
         if (listener.equals(EventListener.NULL)) {
             return this;
         }
 
-        this.onVideocardDeallocationListeners.add(requireNonNull(listener));
+        this.onGpuDeallocationListeners.add(requireNonNull(listener));
         return this;
     }
     
@@ -610,7 +610,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     
     @Override
     public CustomVGpu addOnUpdateProcessingListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    		final EventListener<VGpuGpuEventInfo> listener) {
         if (listener.equals(EventListener.NULL)) {
             return this;
         }
@@ -626,20 +626,20 @@ public class CustomVGpuSimple implements CustomVGpu {
     
     @Override
     public boolean removeOnUpdateProcessingListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    		final EventListener<VGpuGpuEventInfo> listener) {
         return onUpdateProcessingListeners.remove(requireNonNull(listener));
     }
 
     @Override
-    public boolean removeOnVideocardAllocationListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
-        return onVideocardAllocationListeners.remove(requireNonNull(listener));
+    public boolean removeOnGpuAllocationListener(
+    		final EventListener<VGpuGpuEventInfo> listener) {
+        return onGpuAllocationListeners.remove(requireNonNull(listener));
     }
 
     @Override
-    public boolean removeOnVideocardDeallocationListener(
-    		final EventListener<VGpuVideocardEventInfo> listener) {
-        return onVideocardDeallocationListeners.remove(requireNonNull(listener));
+    public boolean removeOnGpuDeallocationListener(
+    		final EventListener<VGpuGpuEventInfo> listener) {
+        return onGpuDeallocationListeners.remove(requireNonNull(listener));
     }
 
     /*@Override
@@ -706,32 +706,32 @@ public class CustomVGpuSimple implements CustomVGpu {
     }*/
     
     @Override
-    public void notifyOnVideocardAllocationListeners () {
+    public void notifyOnGpuAllocationListeners () {
         //Uses indexed for to avoid ConcurrentModificationException
-        for (int i = 0; i < onVideocardAllocationListeners.size(); i++) {
-            final EventListener<VGpuVideocardEventInfo> listener = 
-            		onVideocardAllocationListeners.get(i);
-            listener.update(VGpuVideocardEventInfo.of(listener, this));
+        for (int i = 0; i < onGpuAllocationListeners.size(); i++) {
+            final EventListener<VGpuGpuEventInfo> listener = 
+            		onGpuAllocationListeners.get(i);
+            listener.update(VGpuGpuEventInfo.of(listener, this));
         }
     }
 
     @Override
-    public void notifyOnVideocardDeallocationListeners (final Videocard deallocatedVideocard) {
-        requireNonNull(deallocatedVideocard);
+    public void notifyOnGpuDeallocationListeners (final Gpu deallocatedGpu) {
+        requireNonNull(deallocatedGpu);
         //Uses indexed for to avoid ConcurrentModificationException
-        for (int i = 0; i < onVideocardDeallocationListeners.size(); i++) {
-            final EventListener<VGpuVideocardEventInfo> listener = 
-            		onVideocardDeallocationListeners.get(i);
-            listener.update(VGpuVideocardEventInfo.of(listener, this, deallocatedVideocard));
+        for (int i = 0; i < onGpuDeallocationListeners.size(); i++) {
+            final EventListener<VGpuGpuEventInfo> listener = 
+            		onGpuDeallocationListeners.get(i);
+            listener.update(VGpuGpuEventInfo.of(listener, this, deallocatedGpu));
         }
     }
     
     public void notifyOnUpdateProcessingListeners () {
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onUpdateProcessingListeners.size(); i++) {
-            final EventListener<VGpuVideocardEventInfo> listener = 
+            final EventListener<VGpuGpuEventInfo> listener = 
             		onUpdateProcessingListeners.get(i);
-            listener.update(VGpuVideocardEventInfo.of(listener, this));
+            listener.update(VGpuGpuEventInfo.of(listener, this));
         }
     }
     
@@ -747,13 +747,13 @@ public class CustomVGpuSimple implements CustomVGpu {
     
     @Override
     public boolean removeOnMigrationStartListener (
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    		final EventListener<VGpuGpuEventInfo> listener) {
         return onMigrationStartListeners.remove(requireNonNull(listener));
     }
 
     @Override
     public boolean removeOnMigrationFinishListener (
-    		final EventListener<VGpuVideocardEventInfo> listener) {
+    		final EventListener<VGpuGpuEventInfo> listener) {
         return onMigrationFinishListeners.remove(requireNonNull(listener));
     }
 
