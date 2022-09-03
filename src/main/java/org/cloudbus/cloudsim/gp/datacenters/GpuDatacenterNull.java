@@ -1,6 +1,6 @@
 package org.cloudbus.cloudsim.gp.datacenters;
 
 
-public interface GpuDatacenterNull implements GpuDatacenter {
+final class GpuDatacenterNull implements GpuDatacenter {
 	
 }

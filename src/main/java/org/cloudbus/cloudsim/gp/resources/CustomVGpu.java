@@ -16,6 +16,7 @@ import org.cloudbus.cloudsim.schedulers.MipsShare;
 
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.VGpuGpuEventInfo;
+import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
 
 import java.util.List;
 
@@ -86,7 +87,7 @@ public interface CustomVGpu {
 
     CustomVGpu addOnGpuDeallocationListener (EventListener<VGpuGpuEventInfo> listener);
     
-    //CustomVGpu addOnCreationFailureListener (EventListener<VmDatacenterEventInfo> listener);
+    CustomVGpu addOnCreationFailureListener (EventListener<VGpuVideocardEventInfo> listener);
 
     CustomVGpu addOnUpdateProcessingListener (EventListener<VGpuGpuEventInfo> listener);
     
@@ -94,7 +95,7 @@ public interface CustomVGpu {
 
     void notifyOnGpuDeallocationListeners (Gpu deallocatedGpu);
     
-    //void notifyOnCreationFailureListeners (Datacenter failedDatacenter);
+    void notifyOnCreationFailureListeners (Videocard failedVideocard);
 
     boolean removeOnMigrationStartListener (EventListener<VGpuGpuEventInfo> listener);
     
@@ -106,7 +107,7 @@ public interface CustomVGpu {
 
     boolean removeOnGpuDeallocationListener(EventListener<VGpuGpuEventInfo> listener);
 
-    //boolean removeOnCreationFailureListener(EventListener<VmDatacenterEventInfo> listener);
+    boolean removeOnCreationFailureListener(EventListener<VGpuVideocardEventInfo> listener);
 
     //@Override AbstractMachine
     Resource getBw ();

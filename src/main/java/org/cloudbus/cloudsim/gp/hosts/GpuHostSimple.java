@@ -18,8 +18,8 @@ import java.util.function.Predicate;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
-
-public class GpuHostSimple extends HostSimple implements GpuHost {
+//  extends HostSimple 
+public class GpuHostSimple implements GpuHost {
 	
 	private static long defaultRamCapacity = (long) BytesConversion.gigaToMega(10);
     private static long defaultBwCapacity = 1000;
@@ -65,5 +65,39 @@ public class GpuHostSimple extends HostSimple implements GpuHost {
     }
 
 
+    @Override
+    public GpuHost setActive (final boolean activate) {
+        if(!activate) {
+            activateOnGpuDatacenterStartup = false;
+        }
 
+        final double delay = activate ? powerModel.getStartupDelay() : powerModel.getShutDownDelay();
+        if(this.active == activate || delay > 0 && activationChangeInProgress){
+            return this;
+        }
+
+        if(isFailed() && activate){
+            throw new IllegalStateException("The Host is failed and cannot be activated.");
+        }
+
+        if (delay == 0) {
+           //If there is no delay, start up or shutdown the Host right away.
+           processActivation(activate);
+           return this;
+        }
+
+        /*If the simulation is not running and there is a startup delay,
+        * when the datacenter is started up, it will request such a Host activation. */
+        if(!simulation.isRunning()){
+            return this;
+        }
+
+        final CloudSimTag tag = activate ? CloudSimTag.HOST_POWER_ON : CloudSimTag.HOST_POWER_OFF;
+        final String msg = (activate ? "on" : "off") + " (expected time: {} seconds).";
+        LOGGER.info("{}: {} is being powered " + msg, getSimulation().clockStr(), this, delay);
+        datacenter.schedule(delay, tag, this);
+        activationChangeInProgress = true;
+
+        return this;
+    }
 }

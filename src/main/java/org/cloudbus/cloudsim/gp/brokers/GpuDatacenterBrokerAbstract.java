@@ -39,7 +39,7 @@ GpuDatacenterBroker {
 	
     private boolean selectClosestGpuDatacenter;
     private final List<EventListener<DatacenterBrokerEventInfo>> onGpuVmsCreatedListeners;
-    private final List<EventListener<DatacenterBrokerEventInfo>> onVGpusCreatedLIsttener;
+    private final List<EventListener<DatacenterBrokerEventInfo>> onVGpusCreatedListeners;
     private GpuVm lastSelectedGpuVm;
     private GpuDatacenter lastSelectedGpuDc;
     private double failedGpuVmsRetryDelay;
@@ -84,6 +84,7 @@ GpuDatacenterBroker {
         }
 
         this.onGpuVmsCreatedListeners = new ArrayList<>();
+        this.onVGpusCreatedListeners = new ArrayList<>();
         this.lastSubmittedGpuCloudlet = GpuCloudlet.NULL;
         this.lastSubmittedGpuVm = GpuVm.NULL;
         this.lastSelectedGpuVm = GpuVm.NULL;
@@ -345,23 +346,27 @@ GpuDatacenterBroker {
         if (vm.isCreated()) {
             processSuccessGpuVmCreationInGpuDatacenter(vm);
             vm.notifyOnHostAllocationListeners();
-            vm.getVGpu().notifyOnGpuAllocationListeners();
+            vm.getVGpu().notifyOnGpuAllocationListeners();//maybe in Datacenter
         } 
         else {
             vm.setFailed(true);
-            if(!isRetryFailedVms()){
-                vmWaitingList.remove(vm);
-                vmFailedList.add(vm);
-                LOGGER.warn("{}: {}: {} has been moved to the failed list because creation retry is not enabled.", getSimulation().clockStr(), getName(), vm);
+            vm.getVGpu().setFailed(true);
+            
+            if (!isRetryFailedVms()) {
+                gpuvmWaitingList.remove(vm);
+                gpuvmFailedList.add(vm);
+                LOGGER.warn("{}: {}: {} has been moved to the failed list because creation retry is "
+                		+ "not enabled.", getSimulation().clockStr(), getName(), vm);
             }
 
-            vm.notifyOnCreationFailureListeners(lastSelectedDc);
+            vm.notifyOnCreationFailureListeners(lastSelectedGpuDc);
+            vm.getVGpu().notifyOnCreationFailureListeners();//maybe in Datacenter
         }
 
         //Decreases to indicate an ack for the request was received (either if the VM was created or not)
-        vmCreationRequests--;
+        gpuvmCreationRequests--;
 
-        if(vmCreationRequests == 0 && !vmWaitingList.isEmpty()) {
+        if(gpuvmCreationRequests == 0 && !gpuvmWaitingList.isEmpty()) {
             requestCreationOfWaitingVmsToFallbackDatacenter();
         }
 
@@ -392,11 +397,12 @@ GpuDatacenterBroker {
         gpuvmWaitingList.remove(vm);
         gpuvmExecList.add(vm);
         gpuvmCreatedList.add(vm);
-        notifyOnVmsCreatedListeners();
+        notifyOnGpuVmsCreatedListeners();
+        notifyOnVGpusCreatedListeners();//maybe in Datacenter
     }
 
     @SuppressWarnings("ForLoopReplaceableByForEach")
-    private void notifyOnVmsCreatedListeners() {
+    private void notifyOnGpuVmsCreatedListeners () {
         if(!gpuvmWaitingList.isEmpty()) 
             return;
         
@@ -404,6 +410,23 @@ GpuDatacenterBroker {
             final var listener = onGpuVmsCreatedListeners.get(i);
             listener.update(DatacenterBrokerEventInfo.of(listener, this));
         }
+    }
+    
+    //maybe in Datacenter
+    @SuppressWarnings("ForLoopReplaceableByForEach")
+    private void notifyOnVGpusCreatedListeners () {
+        if(!gpuvmWaitingList.isEmpty()) 
+            return;
+        
+        for (int i = 0; i < onVGpusCreatedListeners.size(); i++) {
+            final var listener = onVGpusCreatedListeners.get(i);
+            listener.update(DatacenterBrokerEventInfo.of(listener, this));
+        }
+    }
+    
+    @Override
+    public boolean isRetryFailedVms () {
+        return failedGpuVmsRetryDelay > 0;
     }
     
     private boolean processGpuCloudletEvents (final SimEvent evt) {
