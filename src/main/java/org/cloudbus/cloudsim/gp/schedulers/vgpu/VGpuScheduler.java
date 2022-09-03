@@ -1,11 +1,8 @@
 package org.cloudbus.cloudsim.gp.schedulers.vgpu;
 
-import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
-
-import org.cloudbus.cloudsim.resources.Ram;
-import org.cloudbus.cloudsim.resources.Bandwidth;
+import org.cloudbus.cloudsim.gp.resources.Gpu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,33 +12,32 @@ public interface VGpuScheduler {
 
 	VGpuScheduler NULL = new VGpuSchedulerNull ();
 	
-	double getVGpuMigrationGpuOverhead ();
+	boolean allocateCoresForVGpu (CustomVGpu vgpu, MipsShare requestedMips);
 
-	Videocard getVideocard ();
+    boolean allocateCoresForVGpu (CustomVGpu vgpu);
 
-	VGpuScheduler setVideocard (Videocard videocard);
-	
-	boolean allocateGpuForVgpu (CustomVGpu vgpu, MipsShare requestedMips, 
-			Ram gddramShare, Bandwidth bwShar);
+    void deallocateCoresFromVGpu (CustomVGpu vgpu);
 
-    boolean allocateGpuForVgpu (CustomVGpu vgpu);
-
-    void deallocateGpuFromVgpu (CustomVGpu vgpu);
-
-    void deallocateGpuFromVgpu (CustomVGpu vgpu, int coresToRemove);
+    void deallocateCoresFromVGpu (CustomVGpu vgpu, int coresToRemove);
 
     MipsShare getAllocatedMips (CustomVGpu vgpu);
-    
+
     double getTotalAvailableMips ();
+
+	Gpu getGpu ();
+
+	VGpuScheduler setGpu (Gpu gpu);
 
     MipsShare getRequestedMips (CustomVGpu vgpu);
 
-    boolean isSuitableForVgpu (CustomVGpu vgpu);
+    boolean isSuitableForVGpu (CustomVGpu vgpu);
 
-    boolean isSuitableForVgpu (CustomVGpu vgpu, MipsShare requestedMips);
+    boolean isSuitableForVGpu (CustomVGpu vgpu, MipsShare requestedMips);
 
-    double getTotalAllocatedMipsForVgpu (CustomVGpu vgpu);
+    double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu);
 
-    double getMaxGpuUsagePercentDuringOutMigration ();
+    //double getMaxGpuUsagePercentDuringOutMigration ();
+
+	//double getVGpuMigrationGpuOverhead ();
 
 }
