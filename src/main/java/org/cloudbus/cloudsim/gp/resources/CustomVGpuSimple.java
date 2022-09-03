@@ -4,16 +4,17 @@ import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.vms.GpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
-import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskSchedulerTimeShared;
 
+import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
 import org.gpucloudsimplus.listeners.VGpuGpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.Ram;
+import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 //import org.cloudbus.cloudsim.resources.Processor;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
@@ -65,9 +66,9 @@ public class CustomVGpuSimple implements CustomVGpu {
     private final List<EventListener<VGpuGpuEventInfo>> onGpuDeallocationListeners;
     private final List<EventListener<VGpuGpuEventInfo>> onUpdateProcessingListeners;
     
-    /*private final List<EventListener<VmDatacenterEventInfo>> onCreationFailureListeners;
+    private final List<EventListener<VGpuVideocardEventInfo>> onCreationFailureListeners;
 
-    private VerticalVmScaling ramVerticalScaling;
+    /*private VerticalVmScaling ramVerticalScaling;
     private VerticalVmScaling bwVerticalScaling;
     private VerticalVmScaling peVerticalScaling;*/
 
@@ -114,7 +115,7 @@ public class CustomVGpuSimple implements CustomVGpu {
         this.onMigrationFinishListeners = new ArrayList<>();
         this.onGpuAllocationListeners = new ArrayList<>();
         this.onGpuDeallocationListeners = new ArrayList<>();
-        //this.onCreationFailureListeners = new ArrayList<>();
+        this.onCreationFailureListeners = new ArrayList<>();
         this.onUpdateProcessingListeners = new ArrayList<>();
         this.vGpuStateHistory = new LinkedList<>();
         this.allocatedMips = new MipsShare();
@@ -598,15 +599,15 @@ public class CustomVGpuSimple implements CustomVGpu {
         return this;
     }
     
-    /*@Override
-    public CustomVGpu addOnCreationFailureListener(final EventListener<VmDatacenterEventInfo> listener) {
+    @Override
+    public CustomVGpu addOnCreationFailureListener(final EventListener<VGpuVideocardEventInfo> listener) {
         if (listener.equals(EventListener.NULL)) {
             return this;
         }
 
         this.onCreationFailureListeners.add(requireNonNull(listener));
         return this;
-    }*/
+    }
     
     @Override
     public CustomVGpu addOnUpdateProcessingListener(
@@ -735,15 +736,15 @@ public class CustomVGpuSimple implements CustomVGpu {
         }
     }
     
-    /*@Override
-    public void notifyOnCreationFailureListeners (final Datacenter failedDatacenter) {
-        requireNonNull(failedDatacenter);
+    @Override
+    public void notifyOnCreationFailureListeners (final Videocard failedVideocard) {
+        requireNonNull(failedVideocard);
         //Uses indexed for to avoid ConcurrentModificationException
         for (int i = 0; i < onCreationFailureListeners.size(); i++) {
             final var listener = onCreationFailureListeners.get(i);
-            listener.update(VmDatacenterEventInfo.of(listener, this, failedDatacenter));
+            listener.update(VGpuVideocardEventInfo.of(listener, this, failedVideocard));
         }
-    }*/
+    }
     
     @Override
     public boolean removeOnMigrationStartListener (
@@ -968,5 +969,10 @@ public class CustomVGpuSimple implements CustomVGpu {
     @Override
     public double getGpuPercentUtilization () {
     	return getGpuPercentUtilization(getSimulation().clock());
+    }
+
+    @Override
+    public boolean removeOnCreationFailureListener(final EventListener<VGpuVideocardEventInfo> listener) {
+        return onCreationFailureListeners.remove(requireNonNull(listener));
     }
 }
