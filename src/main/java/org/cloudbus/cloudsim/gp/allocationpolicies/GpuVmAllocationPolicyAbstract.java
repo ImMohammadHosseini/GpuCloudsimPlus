@@ -27,6 +27,7 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
 	public GpuVmAllocationPolicyAbstract () {
 		this(null);
 	}
+	
 	public GpuVmAllocationPolicyAbstract (
 			final BiFunction<GpuVmAllocationPolicy, GpuVm, Optional<GpuHost>> 
 					findGpuHostForGpuVmFunction) {
