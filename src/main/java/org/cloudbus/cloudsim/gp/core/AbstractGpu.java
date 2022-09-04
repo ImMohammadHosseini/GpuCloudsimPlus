@@ -9,7 +9,8 @@ import org.cloudbus.cloudsim.resources.Resourceful;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
 
-public interface AbstractGpu <T extends Resource> extends ChangeableId, Resourceful {
+//  <T extends Resource>
+public interface AbstractGpu extends ChangeableId, Resourceful {
     
     AbstractGpu NULL = new AbstractGpuNull();
 
