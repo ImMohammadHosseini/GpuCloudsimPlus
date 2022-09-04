@@ -1,9 +1,12 @@
 package org.cloudbus.cloudsim.gp.resources;
 
+import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.gp.core.AbstractGpu;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.resources.Pe;
+import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
@@ -125,4 +128,28 @@ final class GpuNull implements Gpu {
 	@Override public Gpu setLazySuitabilityEvaluation (boolean lazySuitabilityEvaluation) { 
 		return this;
 	}
+	@Override public int compareTo (Gpu gpu) { return 0; }
+	@Override public Resource getBw () { return Resource.NULL; }
+	@Override public Resource getGddram () { return Resource.NULL; }
+	@Override public long getNumberOfCores () { return 0; }
+	@Override public double getMips () { return 0.0; }
+	@Override public Simulation getSimulation () { return Simulation.NULL; }
+	@Override public double getStartTime () { return 0.0; }
+	@Override public AbstractGpu setStartTime (double startTime) { return this; }
+	@Override public double getLastBusyTime () { return 0.0; }
+	@Override public List<ResourceManageable> getResources () { 
+		return Collections.emptyList();
+	}
+	@Override
+	public GpuResourceStats getGpuUtilizationStats () { 
+		return new GpuResourceStats(this, host -> 0.0); 
+	}
+	@Override
+	public double getUpTime () { return 0.0; }
+	@Override public double getUpTimeHours () { return 0.0; }
+	@Override public double getTotalUpTime () { return 0.0; }
+	@Override public double getTotalUpTimeHours () { return 0.0; }
+	@Override public double getGpuPercentUtilization () { return 0.0; }
+	@Override public double getGpuPercentRequested () { return 0.0; }
+	@Override public double getGpuMipsUtilization () { return 0.0; }
 }

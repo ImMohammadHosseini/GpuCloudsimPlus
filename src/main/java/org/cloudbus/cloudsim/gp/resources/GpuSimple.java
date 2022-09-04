@@ -24,13 +24,13 @@ import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.gp.resources.GpuResourceStats;
 import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
+import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuSchedulerSpaceShared;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisionerSimple;
-
-
 
 public class GpuSimple implements Gpu {
 	
@@ -44,8 +44,8 @@ public class GpuSimple implements Gpu {
 	private List<Pe> gpuCoreList;
 	private GpuResourceProvisioner gpuGddramProvisioner;
 	private GpuResourceProvisioner gpuBwProvisioner;
-	protected GputResourceStats gpuUtilizationStats;
-	
+	protected GpuResourceStats gpuUtilizationStats;
+	 
     private final List<GpuStateHistoryEntry> stateHistory;
 
     private boolean activateOnVideocardStartup;
@@ -250,7 +250,7 @@ public class GpuSimple implements Gpu {
         return nextSimulationDelay;
     }
     
-    public boolean isIdleEnough (final double time) {
+    /*public boolean isIdleEnough (final double time) {
         if(time < 0) {
             return false;
         }
@@ -260,7 +260,7 @@ public class GpuSimple implements Gpu {
 
     public double getIdleInterval() {
         return getSimulation().clock() - getLastBusyTime();
-    }
+    }*/
 
     protected double updateVGpuProcessing (final CustomVGpu vgpu, final double currentTime, 
     		final double nextSimulationDelay) {
@@ -562,7 +562,7 @@ public class GpuSimple implements Gpu {
         return onShutdownListeners.remove(listener);
     }
 
-    //@Override
+    @Override
     public long getNumberOfCores () {
         return gpuCoreList.size();
     }
@@ -571,7 +571,7 @@ public class GpuSimple implements Gpu {
         return vgpuScheduler.getAllocatedMips(vgpu);
     }
 
-    //@Override
+    @Override
     public double getMips () {
         return gpuCoreList.stream().mapToDouble(Pe::getCapacity).findFirst().orElse(0);
     }
@@ -1017,11 +1017,11 @@ public class GpuSimple implements Gpu {
 
     @Override
     public double getGpuCoreMipsUtilization () {
-        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalCpuMipsUtilization).sum();
+        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsUtilization).sum();
     }
 
     private double getGpuCoreMipsRequested () {
-        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalCpuMipsRequested).sum();
+        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsRequested).sum();
     }
 
     @Override
@@ -1052,7 +1052,7 @@ public class GpuSimple implements Gpu {
             		+ "VGPUs on {} could not be performed because it doesn't have VGPUs yet. "
             		+ "You need to enable it for each VGPU created.", gpu);
         }
-        else vgpuList.forEach(ResourceStatsComputer::enableUtilizationStats);
+        else vgpuList.forEach(GpuResourceStatsComputer::enableUtilizationStats);
     }
     
     /*@Override

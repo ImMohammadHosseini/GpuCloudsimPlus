@@ -1,6 +1,4 @@
-
 package org.cloudbus.cloudsim.gp.resources;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,17 +6,18 @@ import java.util.*;
 
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
+import org.cloudbus.cloudsim.gp.core.AbstractGpu;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.ChangeableId;
-import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Pe;
-import org.cloudbus.cloudsim.resources.Resource;
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
+import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 
-public interface Gpu extends ChangeableId, Comparable<Gpu> {
+public interface Gpu extends ChangeableId, Comparable<Gpu>, AbstractGpu, 
+GpuResourceStatsComputer<GpuResourceStats> {
 	//, ResourceManageable
     Logger LOGGER = LoggerFactory.getLogger(Gpu.class.getSimpleName());
 	
@@ -64,7 +63,7 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
 
     void reallocateMigratingInVGpus ();
 
-    //@Override
+    @Override
     double getTotalMipsCapacity ();
 
     double getTotalAvailableMips ();
@@ -157,7 +156,7 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
 
     double getGpuCorePercentRequested ();
 
-    void enableUtilizationStats ();
+    //void enableUtilizationStats ();
 
     double getGpuCoreMipsUtilization ();
 
@@ -185,23 +184,23 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
 
     Gpu setLazySuitabilityEvaluation (boolean lazySuitabilityEvaluation);
     
-    Simulation getSimulation ();
+    //Simulation getSimulation ();
     
-    double getStartTime ();
+    //double getStartTime ();
     
-    Gpu setStartTime (final double startTime);
+    //Gpu setStartTime (final double startTime);
     
-    double getLastBusyTime ();
+    //double getLastBusyTime ();
     
-    Resource getBw ();
+    //Resource getBw ();
     
-    Resource getGddram ();
+    //Resource getGddram ();
     
     double getGpuPercentUtilization ();
     
     double getGpuPercentRequested ();
     
-    GpuResourceStats getGpuUtilizationStats ();
+    //GpuResourceStats getGpuUtilizationStats ();
     
     double getGpuMipsUtilization ();
     
