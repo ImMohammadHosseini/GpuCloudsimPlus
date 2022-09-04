@@ -1,5 +1,6 @@
 package org.cloudbus.cloudsim.gp.videocards;
 
+import org.cloudbus.cloudsim.core.Simulation;
 //import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.gpucloudsimplus.listeners.VideocardVGpuMigrationEventInfo;
@@ -88,4 +89,5 @@ public interface Videocard {
     
     GpuHost getHost ();
 
+    Simulation getSimulation ();
 }

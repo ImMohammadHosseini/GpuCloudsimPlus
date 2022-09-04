@@ -139,7 +139,7 @@ public class VideocardSimple implements Videocard {
         return gpuList.stream().filter(Gpu::isActive);
     }
 
-	//@Override
+	@Override
 	public Simulation getSimulation () {
 		return host.getSimulation();
 	}

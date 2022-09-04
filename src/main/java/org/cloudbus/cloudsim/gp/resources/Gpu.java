@@ -109,11 +109,13 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
 
     void setShutdownTime (double shutdownTime);
 
-    //double getUpTime ();
+    double getUpTime ();
 
-    //double getUpTimeHours ();
+    double getUpTimeHours ();
 
-    //double getTotalUpTimeHours ();
+    double getTotalUpTime();
+    
+    double getTotalUpTimeHours ();
 
     double getIdleShutdownDeadline ();
 
@@ -155,8 +157,6 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
 
     double getGpuCorePercentRequested ();
 
-    //HostResourceStats getCpuUtilizationStats();
-
     void enableUtilizationStats ();
 
     double getGpuCoreMipsUtilization ();
@@ -195,5 +195,15 @@ public interface Gpu extends ChangeableId, Comparable<Gpu> {
     
     Resource getBw ();
     
-    Resource getGddram();
+    Resource getGddram ();
+    
+    double getGpuPercentUtilization ();
+    
+    double getGpuPercentRequested ();
+    
+    GpuResourceStats getGpuUtilizationStats ();
+    
+    double getGpuMipsUtilization ();
+    
+    
 }
