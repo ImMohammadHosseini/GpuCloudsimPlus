@@ -290,7 +290,7 @@ public class CustomVGpuSimple implements CustomVGpu {
         		bw.getCapacity());
     }
     
-    //@Override
+    @Override
     public double getTotalMipsCapacity () {
         return getMips() * getNumberOfCores();
     }
@@ -305,12 +305,12 @@ public class CustomVGpuSimple implements CustomVGpu {
         		gddram.getCapacity());
     }
     
-    //@Override
+    @Override
     public double getStartTime () {
         return this.startTime;
     }
     
-    //@Override
+    @Override
     public CustomVGpu setStartTime (final double startTime) {
         if (startTime < 0) {
             return this;
@@ -332,7 +332,7 @@ public class CustomVGpuSimple implements CustomVGpu {
         return this;
     }
 
-    //@Override
+    @Override
     public double getLastBusyTime () {
         return this.lastBusyTime;
     }

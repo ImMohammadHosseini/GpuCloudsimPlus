@@ -3,8 +3,10 @@ package org.cloudbus.cloudsim.gp.resources;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.vms.GpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
+import org.cloudbus.cloudsim.gp.core.AbstractGpu;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
+import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 
 import org.cloudbus.cloudsim.resources.Ram;
@@ -20,7 +22,8 @@ import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
 
 import java.util.List;
 
-public interface CustomVGpu {
+public interface CustomVGpu extends AbstractGpu, Comparable<CustomVGpu>, 
+GpuResourceStatsComputer<VGpuResourceStats> {
 	
 	CustomVGpu NULL = new CustomVGpuNull ();
 	
@@ -109,10 +112,10 @@ public interface CustomVGpu {
 
     boolean removeOnCreationFailureListener(EventListener<VGpuVideocardEventInfo> listener);
 
-    //@Override AbstractMachine
+    @Override 
     Resource getBw ();
 
-    //@Override
+    @Override
     Resource getGddram ();
 
     //@Override
@@ -214,13 +217,14 @@ public interface CustomVGpu {
     //@Override
     //CustomVGpu setTimeZone (double timeZone);
     
+    @Override
     Simulation getSimulation ();
     
     Gpu getGpu ();
         
-    double getMips ();
+    //getSimulationdouble getMips ();
     
-    long getNumberOfCores ();
+    //long getNumberOfCores ();
     
     double getGpuPercentUtilization (double time);
 
