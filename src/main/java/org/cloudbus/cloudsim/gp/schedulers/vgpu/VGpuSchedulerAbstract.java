@@ -16,22 +16,22 @@ import static java.util.stream.Collectors.toList;
 public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
 	
 	private Gpu gpu;
-    //private final double vgpuMigrationGpuOverhead;//vgpuMigrationCpuOverhead
+    private final double vgpuMigrationGpuOverhead;//vgpuMigrationCpuOverhead
     
-    public VGpuSchedulerAbstract () {
-    	//final double vgpuMigrationGpuOverhead
-        /*if(vgpuMigrationGpuOverhead < 0 || vgpuMigrationGpuOverhead >= 1){
-            throw new IllegalArgumentException("vgpuMigrationGpuOverhead must be a percentage value between [0 and 1[");
-        }*/
+    public VGpuSchedulerAbstract (final double vgpuMigrationGpuOverhead) {
+        if(vgpuMigrationGpuOverhead < 0 || vgpuMigrationGpuOverhead >= 1){
+            throw new IllegalArgumentException("vgpuMigrationGpuOverhead must be a "
+            		+ "percentage value between [0 and 1[");
+        }
 
         setGpu(Gpu.NULL);
-        //this.vgpuMigrationGpuOverhead = vgpuMigrationGpuOverhead;
+        this.vgpuMigrationGpuOverhead = vgpuMigrationGpuOverhead;
     }
     
-    /*@Override
+    @Override
     public double getVGpuMigrationGpuOverhead () {
     	return vgpuMigrationGpuOverhead;
-    }*/
+    }
 
     @Override
 	public Gpu getGpu () {
@@ -87,9 +87,9 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     @Override
     public final boolean allocateCoresForVGpu (final CustomVGpu vgpu, 
     		final MipsShare requestedMips) {
-        /*if (!vm.isInMigration() && host.getVmsMigratingOut().contains(vm)) {
-            host.removeVmMigratingOut(vm);
-        }*/
+        if (!vgpu.isInMigration() && gpu.getVGpusMigratingOut().contains(vgpu)) {
+            gpu.removeVGpuMigratingOut(vgpu);
+        }
 
         ((CustomVGpuSimple)vgpu).setRequestedMips(new MipsShare(requestedMips));
         if(allocateCoresForVGpuInternal(vgpu, requestedMips)) {
@@ -145,16 +145,18 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     public MipsShare getAllocatedMips (final CustomVGpu vgpu) {
         final MipsShare mipsShare = ((CustomVGpuSimple)vgpu).getAllocatedMips();
 
-        //return host.getVmsMigratingOut().contains(vm) ? getMipsShareRequestedReduced(vm, mipsShare) : mipsShare;
-        return mipsShare;
+        return gpu.getVGpusMigratingOut().contains(vgpu) ? getMipsShareRequestedReduced(
+        		vgpu, mipsShare) : mipsShare;
     }
     
-    /*protected MipsShare getMipsShareRequestedReduced(final Vm vm, final MipsShare mipsShareRequested){
-        final double peMips = getPeCapacity();
+    protected MipsShare getMipsShareRequestedReduced(final CustomVGpu vgpu, 
+    		final MipsShare mipsShareRequested){
+        final double peMips = getCoreCapacity();
         final long requestedPes = mipsShareRequested.pes();
         final double requestedMips = mipsShareRequested.mips();
-        return new MipsShare(requestedPes, Math.min(requestedMips, peMips)*percentOfMipsToRequest(vm));
-    }*/
+        return new MipsShare(requestedPes, 
+        		Math.min(requestedMips, peMips) * percentOfMipsToRequest(vgpu));
+    }
     
     @Override
     public double getTotalAllocatedMipsForVGpu (final CustomVGpu vgpu) {
@@ -176,9 +178,8 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
 
     @Override
     public double getTotalAvailableMips () {
-        final var vgpuStream = Stream.of(gpu.getVGpuList().stream());
-        		//Stream.concat(gpu.getVGpuList().stream(), 
-        		//gpu.getVGpusMigratingIn().stream());
+        final var vgpuStream = Stream.concat(gpu.getVGpuList().stream(),
+        		gpu.getVGpusMigratingIn().stream());
         final double allocatedMips =
                 vgpuStream
                     .map(vgpu -> (CustomVGpuSimple)vgpu)
@@ -194,35 +195,30 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
         return totalVGpuRequestedMips / percentOfMipsToRequest(vgpu);
     }
     
-    protected double percentOfMipsToRequest (final CustomVGpuSimple vgpu) {
-        /*if (host.getVmsMigratingIn().contains(vm)) {
+    protected double percentOfMipsToRequest (final CustomVGpu vgpu) {
+        if (gpu.getVGpusMigratingIn().contains(vgpu)) {
             /* While the VM is migrating in,
             the destination host only increases CPU usage according
-            to the CPU migration overhead.
+            to the CPU migration overhead.*/
              
-            return vmMigrationCpuOverhead;
+            return vgpuMigrationGpuOverhead;
         }
 
-        if (host.getVmsMigratingOut().contains(vm)) {
+        if (gpu.getVGpusMigratingOut().contains(vgpu)) {
             /* While the VM is migrating out, the host where it's migrating from
             experiences a performance degradation.
             Thus, the allocated MIPS for that VM is reduced according to the CPU migration
-            overhead.
-            return getMaxCpuUsagePercentDuringOutMigration();
-        }*/
+            overhead.*/
+            return getMaxGpuUsagePercentDuringOutMigration();
+        }
 
         //VM is not migrating, thus 100% of its requested MIPS will be requested to the Host.
         return 1;
     }
     
-    /*@Override
-    public double getMaxCpuUsagePercentDuringOutMigration() {
-        return 1 - vmMigrationCpuOverhead;
-    }
-
     @Override
-    public double getVmMigrationCpuOverhead() {
-        return vmMigrationCpuOverhead;
-    }*/
+    public double getMaxGpuUsagePercentDuringOutMigration() {
+        return 1 - vgpuMigrationGpuOverhead;
+    }
 
 }

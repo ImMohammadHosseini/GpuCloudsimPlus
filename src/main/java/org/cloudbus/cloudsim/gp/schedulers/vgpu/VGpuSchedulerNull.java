@@ -20,14 +20,14 @@ public class VGpuSchedulerNull implements VGpuScheduler {
     @Override public double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu) {
         return 0.0;
     }
-    //@Override public double getMaxCpuUsagePercentDuringOutMigration() { return 0; }
+    @Override public double getMaxGpuUsagePercentDuringOutMigration() { return 0; }
     @Override public boolean isSuitableForVGpu (CustomVGpu vgpu) {
         return false;
     }
     @Override public boolean isSuitableForVGpu (CustomVGpu vgpu, MipsShare requestedMips) { 
     	return false; 
     }
-    //@Override public double getVGpuMigrationCpuOverhead() { return 0.0; }
+    @Override public double getVGpuMigrationGpuOverhead() { return 0.0; }
     @Override public Gpu getGpu () {
         return Gpu.NULL;
     }

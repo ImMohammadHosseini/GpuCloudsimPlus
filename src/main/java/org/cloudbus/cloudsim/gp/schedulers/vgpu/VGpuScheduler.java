@@ -36,8 +36,8 @@ public interface VGpuScheduler {
 
     double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu);
 
-    //double getMaxGpuUsagePercentDuringOutMigration ();
+    double getMaxGpuUsagePercentDuringOutMigration ();
 
-	//double getVGpuMigrationGpuOverhead ();
+	double getVGpuMigrationGpuOverhead ();
 
 }
