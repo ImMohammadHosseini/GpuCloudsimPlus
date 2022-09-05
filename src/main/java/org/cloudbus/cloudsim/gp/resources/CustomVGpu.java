@@ -34,16 +34,19 @@ GpuResourceStatsComputer<VGpuResourceStats> {
 		
 	MipsShare getCurrentRequestedMips ();
 	
-	//getTotalCpuMipsRequested
-	double getTotalCoreMipsRequested ();
+	double getTotalGpuMipsRequested ();
 	
 	//double getMaxMipsRequested ();
 	
-	long getCurrentRequestedBw();
+	long getCurrentRequestedBw ();
 	
-	long getCurrentRequestedGddram();
+	long getCurrentRequestedGddram ();
 	
 	//utilization in vgpu need
+	
+	double getTotalGpuMipsUtilization ();
+
+    double getTotalGpuMipsUtilization (double time);
 	
 	long getId ();
 	

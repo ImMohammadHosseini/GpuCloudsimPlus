@@ -4,6 +4,7 @@ import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.vms.GpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskSchedulerTimeShared;
@@ -47,7 +48,7 @@ public class CustomVGpuSimple implements CustomVGpu {
 	
 	private final List<VGpuStateHistoryEntry> vGpuStateHistory;
 	
-	//private VGpuResourceStats gpuUtilizationStats;
+	private VGpuResourceStats gpuUtilizationStats;
 	//private HorizontalVmScaling horizontalScaling;
 	
     private boolean failed;
@@ -243,12 +244,12 @@ public class CustomVGpuSimple implements CustomVGpu {
 	
 	@Override
     public double getExpectedGpuCoreUtilization (final double vgpuCoreUtilizationPercent) {
-        return gpu.getExpectedRelativeCpuUtilization(this, vgpuCoreUtilizationPercent);
+        return gpu.getExpectedRelativeGpuUtilization(this, vgpuCoreUtilizationPercent);
     }
 	
 	@Override
     public double getGpuGddramUtilization () {
-        return gpu.getRelativeRamUtilization(this);
+        return gpu.getRelativeGddramUtilization(this);
     }
 
     @Override
@@ -267,7 +268,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public double getTotalCoreMipsRequested () {
+    public double getTotalGpuMipsRequested () {
         return getCurrentRequestedMips().totalMips();
     }
     
@@ -648,18 +649,18 @@ public class CustomVGpuSimple implements CustomVGpu {
         final String desc = StringUtils.isBlank(description) ? "" : String.format(" (%s)", description);
         final String type = this instanceof VmGroup ? "VmGroup" : "Vm";
         return String.format("%s %d%s", type, getId(), desc);
-    }
+    }*/
 
     @Override
-    public int compareTo(final Vm obj) {
+    public int compareTo(final CustomVGpu obj) {
         if(this.equals(requireNonNull(obj))) {
             return 0;
         }
 
         return Double.compare(getTotalMipsCapacity(), obj.getTotalMipsCapacity()) +
                Long.compare(this.getId(), obj.getId()) +
-               this.getBroker().compareTo(obj.getBroker());
-    }*/
+               this.getGpuVm().getBroker().compareTo(obj.getGpuVm().getBroker());
+    }
     
     @Override
     public void setFailed(final boolean failed) {
@@ -671,10 +672,15 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     public void setGpuTasksToFailed() {
-        getBroker().getCloudletWaitingList()
+    	getGpuVm().getBroker().getCloudletWaitingList().stream()
+    				.filter(cl -> getGpuVm().equals(cl.getVm()))
+    		        .forEach(cl -> cl.setStatus(
+    		        		GpuCloudlet.Status.FAILED_RESOURCE_UNAVAILABLE));
+
+        /*getBroker().getCloudletWaitingList()
                    .stream()
                    .filter(cl -> this.equals(cl.getVm()))
-                   .forEach(cl -> cl.setStatus(Cloudlet.Status.FAILED_RESOURCE_UNAVAILABLE));
+                   .forEach(cl -> cl.setStatus(Cloudlet.Status.FAILED_RESOURCE_UNAVAILABLE));*/
     }
     
     @Override
@@ -972,7 +978,30 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public boolean removeOnCreationFailureListener(final EventListener<VGpuVideocardEventInfo> listener) {
+    public boolean removeOnCreationFailureListener (final EventListener<VGpuVideocardEventInfo> listener) {
         return onCreationFailureListeners.remove(requireNonNull(listener));
     }
+
+	@Override
+	public VGpuResourceStats getGpuUtilizationStats () {
+		return gpuUtilizationStats;
+	}
+
+	@Override
+	public void enableUtilizationStats () {
+		if(gpuUtilizationStats == null || gpuUtilizationStats == VGpuResourceStats.NULL) {
+            this.gpuUtilizationStats = new VGpuResourceStats(this, 
+            		vgpu -> vgpu.getGpuPercentUtilization(getSimulation().clock()));
+        }
+	}
+
+	@Override
+	public double getTotalGpuMipsUtilization () {
+		return getTotalGpuMipsUtilization(getSimulation().clock());
+	}
+
+	@Override
+	public double getTotalGpuMipsUtilization(double time) {
+		return getGpuPercentUtilization(time) * getTotalMipsCapacity();
+	}
 }
