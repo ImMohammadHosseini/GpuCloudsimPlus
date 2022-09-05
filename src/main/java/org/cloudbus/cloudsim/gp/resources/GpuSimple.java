@@ -82,22 +82,36 @@ public class GpuSimple implements Gpu {
     private int failedCoresNumber;
     private boolean lazySuitabilityEvaluation;
 	
+    public GpuSimple(final List<GpuCore> coreList) {
+        this(coreList, true);
+    }
     
-    public GpuSimple (long id,
-    		final GpuResourceProvisioner gpuGddramProvisioner,
+    public GpuSimple(final List<GpuCore> coreList, final boolean activate) {
+        this(defaultGddramCapacity, defaultBwCapacity, coreList, activate);
+    }
+    
+    public GpuSimple (final GpuResourceProvisioner gpuGddramProvisioner,
             final GpuResourceProvisioner gpubwProvisioner,
-            final long storage,
             final List<GpuCore> coreList) {
     	
-    	this(id, "", gpuGddramProvisioner.getCapacity(), gpubwProvisioner.getCapacity(), coreList, 
+    	this("", gpuGddramProvisioner.getCapacity(), gpubwProvisioner.getCapacity(), coreList, 
     			true);
     	setGpuGddramProvisioner(gpuGddramProvisioner);
     	setGpuBwProvisioner(gpubwProvisioner);
 	}
     
-	public GpuSimple (long id, String type, final long ram, final long bw,
+    public GpuSimple (final long ram, final long bw, final List<GpuCore> coreList) {
+        this(ram, bw, coreList, true);
+    }
+
+    public GpuSimple (final long ram, final long bw, final List<GpuCore> coreList, 
+    		final boolean activate) {
+    	this("", ram, bw, coreList, activate);
+	}
+    
+	public GpuSimple (String type, final long ram, final long bw,
 			final List<GpuCore> coreList, final boolean activate) {
-		this.setId(id);
+		//this.setId(id);
 		this.setType(type);
 		
 		this.idleShutdownDeadline = DEF_IDLE_SHUTDOWN_DEADLINE;
