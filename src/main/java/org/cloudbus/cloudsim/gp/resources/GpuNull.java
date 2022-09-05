@@ -24,7 +24,7 @@ final class GpuNull implements Gpu {
         return -1;
     }
 	
-	@Override public List<Pe> getGpuCoreList () {
+	@Override public List<GpuCore> getGpuCoreList () {
         return Collections.emptyList ();
     }
 	
@@ -64,9 +64,9 @@ final class GpuNull implements Gpu {
 	@Override public double getTotalAllocatedMips () { return 0.0; }
 	@Override public double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu) { return 0.0; }
 	@Override public void removeMigratingInVGpu (CustomVGpu vgpu) { /**/ }
-	@Override public List<Pe> getWorkingCoreList () { return Collections.emptyList(); }
-	@Override public List<Pe> getBusyCoreList () { return Collections.emptyList(); }
-	@Override public List<Pe> getFreeCoreList () { return Collections.emptyList(); }
+	@Override public List<GpuCore> getWorkingCoreList () { return Collections.emptyList(); }
+	@Override public List<GpuCore> getBusyCoreList () { return Collections.emptyList(); }
+	@Override public List<GpuCore> getFreeCoreList () { return Collections.emptyList(); }
 	@Override public int getFreeCoresNumber () { return 0; }
 	@Override public int getWorkingCoresNumber () { return 0; }
 	@Override public int getBusyCoresNumber () { return 0; }

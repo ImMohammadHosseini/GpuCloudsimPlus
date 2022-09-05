@@ -5,16 +5,14 @@ import java.util.function.Predicate;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
-import org.cloudbus.cloudsim.resources.Pe;
+
 import org.cloudbus.cloudsim.resources.Ram;
 import org.cloudbus.cloudsim.util.TimeUtil;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
-import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.util.BytesConversion;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
-import org.cloudbus.cloudsim.provisioners.PeProvisioner;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudbus.cloudsim.resources.ResourceManageableAbstract;
 
@@ -23,9 +21,11 @@ import org.gpucloudsimplus.listeners.GpuEventInfo;
 
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 
+import org.cloudbus.cloudsim.gp.resources.GpuCore;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.GpuResourceStats;
 import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
+import org.cloudbus.cloudsim.gp.provisioners.CoreProvisioner;
 import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
@@ -41,7 +41,7 @@ public class GpuSimple implements Gpu {
 	private String type;
 	private final Ram ram;
     private final Bandwidth bw;
-	private List<Pe> gpuCoreList;
+	private List<GpuCore> gpuCoreList;
 	private GpuResourceProvisioner gpuGddramProvisioner;
 	private GpuResourceProvisioner gpuBwProvisioner;
 	protected GpuResourceStats gpuUtilizationStats;
@@ -87,7 +87,7 @@ public class GpuSimple implements Gpu {
     		final GpuResourceProvisioner gpuGddramProvisioner,
             final GpuResourceProvisioner gpubwProvisioner,
             final long storage,
-            final List<Pe> coreList) {
+            final List<GpuCore> coreList) {
     	
     	this(id, "", gpuGddramProvisioner.getCapacity(), gpubwProvisioner.getCapacity(), coreList, 
     			true);
@@ -96,7 +96,7 @@ public class GpuSimple implements Gpu {
 	}
     
 	public GpuSimple (long id, String type, final long ram, final long bw,
-			final List<Pe> coreList, final boolean activate) {
+			final List<GpuCore> coreList, final boolean activate) {
 		this.setId(id);
 		this.setType(type);
 		
@@ -172,7 +172,7 @@ public class GpuSimple implements Gpu {
 		return type;
 	}
 	
-	public void setGpuCoreList (final List<Pe> gpuCoreList) {
+	public void setGpuCoreList (final List<GpuCore> gpuCoreList) {
 		if(requireNonNull(gpuCoreList).isEmpty()){
             throw new IllegalArgumentException("The CORE list for a Gpu cannot be empty");
         }
@@ -181,11 +181,11 @@ public class GpuSimple implements Gpu {
 		this.gpuCoreList = gpuCoreList;
 		
 		long coreId = Math.max(gpuCoreList.get(gpuCoreList.size()-1).getId(), -1);
-	    for(final Pe core: gpuCoreList){
+	    for(final GpuCore core: gpuCoreList){
 	        if(core.getId() < 0) {
 	            core.setId(++coreId);
 	        }
-	        core.setStatus(Pe.Status.FREE);
+	        core.setStatus(GpuCore.Status.FREE);
 	    }
 
 	    failedCoresNumber = 0;
@@ -195,7 +195,7 @@ public class GpuSimple implements Gpu {
 	}
 
 	@Override 
-	public List<Pe> getGpuCoreList () {
+	public List<GpuCore> getGpuCoreList () {
 		return gpuCoreList;
     }
 	
@@ -521,11 +521,11 @@ public class GpuSimple implements Gpu {
 
     @Override
     public void destroyAllVGpus () {
-        final PeProvisioner peProvisioner = getGpuCoreList().get(0).getPeProvisioner();
+        final CoreProvisioner coreProvisioner = getGpuCoreList().get(0).getCoreProvisioner();
         for (final CustomVGpu vgpu : vgpuList) {
             gpuGddramProvisioner.deallocateResourceForVGpu(vgpu);
             gpuBwProvisioner.deallocateResourceForVGpu(vgpu);
-            peProvisioner.deallocateResourceForVm(vgpu);
+            coreProvisioner.deallocateResourceForVGpu(vgpu);
             vgpu.setCreated(false);
             //disk.getStorage().deallocateResource(vm.getStorage());
         }
@@ -573,14 +573,14 @@ public class GpuSimple implements Gpu {
 
     @Override
     public double getMips () {
-        return gpuCoreList.stream().mapToDouble(Pe::getCapacity).findFirst().orElse(0);
+        return gpuCoreList.stream().mapToDouble(GpuCore::getCapacity).findFirst().orElse(0);
     }
 
     @Override
     public double getTotalMipsCapacity () {
         return gpuCoreList.stream()
-                     .filter(Pe::isWorking)
-                     .mapToDouble(Pe::getCapacity)
+                     .filter(GpuCore::isWorking)
+                     .mapToDouble(GpuCore::getCapacity)
                      .sum();
     }
 
@@ -733,7 +733,7 @@ public class GpuSimple implements Gpu {
     @Override
     public final boolean setFailed (final boolean failed) {
         this.failed = failed;
-        final Pe.Status newStatus = failed ? Pe.Status.FAILED : Pe.Status.FREE;
+        final GpuCore.Status newStatus = failed ? GpuCore.Status.FAILED : GpuCore.Status.FREE;
         setCoreStatus(gpuCoreList, newStatus);
 
         if(failed && this.active){
@@ -743,15 +743,16 @@ public class GpuSimple implements Gpu {
         return true;
     }
 
-    public final void setCoreStatus (final List<Pe> coreList, final Pe.Status newStatus){
+    public final void setCoreStatus (final List<GpuCore> coreList, 
+    		final GpuCore.Status newStatus){
         /*For performance reasons, stores the number of free and failed PEs
         instead of iterating over the PE list every time to find out.*/
-        for (final Pe core : coreList) {
+        for (final GpuCore core : coreList) {
             updateCoreStatus(core, newStatus);
         }
     }
 
-    private void updateCoreStatus (final Pe core, final Pe.Status newStatus) {
+    private void updateCoreStatus (final GpuCore core, final GpuCore.Status newStatus) {
         if(core.getStatus() != newStatus) {
             updateCoreStatusCount(core.getStatus(), false);
             updateCoreStatusCount(newStatus, true);
@@ -759,7 +760,8 @@ public class GpuSimple implements Gpu {
         }
     }
 
-    private void updateCoreStatusCount (final Pe.Status status, final boolean isIncrement) {
+    private void updateCoreStatusCount (final GpuCore.Status status, 
+    		final boolean isIncrement) {
         final int inc = isIncrement ? 1 : -1;
         switch (status) {
             case FAILED:
@@ -977,21 +979,21 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public List<Pe> getWorkingCoreList () {
-        return getFilteredCoreList(Pe::isWorking);
+    public List<GpuCore> getWorkingCoreList () {
+        return getFilteredCoreList(GpuCore::isWorking);
     }
 
     @Override
-    public List<Pe> getBusyCoreList() {
-        return getFilteredCoreList(Pe::isBusy);
+    public List<GpuCore> getBusyCoreList() {
+        return getFilteredCoreList(GpuCore::isBusy);
     }
 
     @Override
-    public List<Pe> getFreeCoreList() {
-        return getFilteredCoreList(Pe::isFree);
+    public List<GpuCore> getFreeCoreList() {
+        return getFilteredCoreList(GpuCore::isFree);
     }
 
-    private List<Pe> getFilteredCoreList(final Predicate<Pe> status) {
+    private List<GpuCore> getFilteredCoreList(final Predicate<GpuCore> status) {
         return gpuCoreList.stream().filter(status).collect(toList());
     }
 
@@ -1093,7 +1095,7 @@ public class GpuSimple implements Gpu {
     public List<CustomVGpu> getFinishedVGpus() {
         return getVGpuList().stream()
             .filter(vgpu -> !vgpu.isInMigration())
-            .filter(vgpu -> vgpu.getTotalCoreMipsRequested () == 0)
+            .filter(vgpu -> vgpu.getTotalGpuMipsRequested () == 0)
             .collect(toList());
     }
     
@@ -1105,15 +1107,15 @@ public class GpuSimple implements Gpu {
             return totalAllocatedMips;
         }
 
-        final double totalRequestedMips = vgpu.getTotalCoreMipsRequested();
+        final double totalRequestedMips = vgpu.getTotalGpuMipsRequested();
         if (totalAllocatedMips + 0.1 < totalRequestedMips) {
             final String reason = getVGpusMigratingOut().contains(vgpu) ? 
             		"migration overhead" : "capacity unavailability";
-            final long notAllocatedMipsByPe = 
+            final long notAllocatedMipsByCore = 
             		(long)((totalRequestedMips - totalAllocatedMips)/vgpu.getNumberOfCores());
             LOGGER.warn(
-                "{}: {}: {} MIPS not allocated for each one of the {} PEs from {} due to {}.",
-                getSimulation().clockStr(), this, notAllocatedMipsByPe, 
+                "{}: {}: {} MIPS not allocated for each one of the {} COREs from {} due to {}.",
+                getSimulation().clockStr(), this, notAllocatedMipsByCore, 
                 vgpu.getNumberOfCores(), vgpu, reason);
         }
 
@@ -1139,7 +1141,7 @@ public class GpuSimple implements Gpu {
         double hostTotalRequestedMips = 0;
 
         for (final CustomVGpu vgpu : getVGpuList()) {
-            final double totalRequestedMips = vgpu.getTotalCoreMipsRequested();
+            final double totalRequestedMips = vgpu.getTotalGpuMipsRequested();
             addVGpuResourceUseToHistoryIfNotMigratingIn (vgpu, currentTime);
             hostTotalRequestedMips += totalRequestedMips;
         }
@@ -1184,5 +1186,35 @@ public class GpuSimple implements Gpu {
 	public boolean isActivateOnVideocardStartup () {
 		return activateOnVideocardStartup;
 	}
+
+	@Override
+	public double getGpuPercentUtilization() {
+		return computeGpuUtilizationPercent(getGpuMipsUtilization());
+	}
+
+	@Override
+	public double getGpuPercentRequested() {
+		return computeGpuUtilizationPercent(getGpuMipsRequested());
+	}
+	
+	private double getGpuMipsRequested() {
+        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsRequested).sum();
+    }
+
+	@Override
+	public double getGpuMipsUtilization() {
+		return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsUtilization).sum();
+	}
+	
+	private double computeGpuUtilizationPercent (final double mipsUsage) {
+        final double totalMips = getTotalMipsCapacity();
+        if(totalMips == 0){
+            return 0;
+        }
+
+        final double utilization = mipsUsage / totalMips;
+        return utilization > 1 && utilization < 1.01 ? 1 : utilization;
+    }
+	
 	
 }

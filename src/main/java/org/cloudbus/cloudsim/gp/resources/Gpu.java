@@ -9,12 +9,13 @@ import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudbus.cloudsim.gp.core.AbstractGpu;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.ChangeableId;
-import org.cloudbus.cloudsim.resources.Pe;
+
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.gp.resources.GpuCore;
 
 public interface Gpu extends ChangeableId, Comparable<Gpu>, AbstractGpu, 
 GpuResourceStatsComputer<GpuResourceStats> {
@@ -25,7 +26,7 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
 	Gpu NULL = new GpuNull ();
     
-	List<Pe> getGpuCoreList ();
+	List<GpuCore> getGpuCoreList ();
 	
 	GpuResourceProvisioner getGpuGddramProvisioner ();
 	
@@ -74,11 +75,11 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
     void removeMigratingInVGpu (CustomVGpu vgpu);
 
-    List<Pe> getWorkingCoreList ();
+    List<GpuCore> getWorkingCoreList ();
 
-    List<Pe> getBusyCoreList ();
+    List<GpuCore> getBusyCoreList ();
 
-    List<Pe> getFreeCoreList ();
+    List<GpuCore> getFreeCoreList ();
 
     int getFreeCoresNumber ();
 
@@ -204,5 +205,25 @@ GpuResourceStatsComputer<GpuResourceStats> {
     
     double getGpuMipsUtilization ();
     
+    default double getRelativeGpuUtilization (final CustomVGpu vgpu) {
+        return getExpectedRelativeGpuUtilization(vgpu, vgpu.getGpuPercentUtilization());
+    }
+
+    default double getExpectedRelativeGpuUtilization (final CustomVGpu vgpu, 
+    		final double vgpuGpuUtilizationPercent) {
+        return vgpuGpuUtilizationPercent * getRelativeMipsCapacityPercent(vgpu);
+    }
+    
+    default double getRelativeMipsCapacityPercent (final CustomVGpu vgpu) {
+        return vgpu.getTotalMipsCapacity() / getTotalMipsCapacity();
+    }
+
+    default double getRelativeGddramUtilization (final CustomVGpu vgpu) {
+        return vgpu.getGddram().getAllocatedResource() / (double)getGddram().getCapacity();
+    }
+
+    default double getRelativeBwUtilization(final CustomVGpu vgpu){
+        return vgpu.getBw().getAllocatedResource() / (double)getBw().getCapacity();
+    }
     
 }
