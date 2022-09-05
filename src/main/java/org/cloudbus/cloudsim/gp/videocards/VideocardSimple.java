@@ -122,11 +122,12 @@ public class VideocardSimple implements Videocard {
 
 	private void setGpuList (final List<? extends Gpu> gpuList) {
         this.gpuList = requireNonNull(gpuList);
-        long lastHostId = gpuList.isEmpty() ? -1 : gpuList.get(gpuList.size()-1).getId();
-        for (final Gpu gpu : gpuList) {
-        	lastHostId = Math.max(lastHostId, -1);
+        long lastGpuId = this.gpuList.isEmpty() ? -1 : 
+        	this.gpuList.get(this.gpuList.size()-1).getId();
+        for (final Gpu gpu : this.gpuList) {
+        	lastGpuId = Math.max(lastGpuId, -1);
             if(gpu.getId() < 0) {
-                gpu.setId(++lastHostId);
+                gpu.setId(++lastGpuId);
             }
             gpu.setVideocard(this);
             gpu.setActive(((GpuSimple)gpu).isActivateOnVideocardStartup());
@@ -353,6 +354,7 @@ public class VideocardSimple implements Videocard {
         double nextSimulationDelay = updateGpusProcessing();
 
         if (nextSimulationDelay != Double.MAX_VALUE) {
+        	//simplify with delete Interval
             nextSimulationDelay = getGpuTaskProcessingUpdateInterval (nextSimulationDelay);
             schedule(nextSimulationDelay, GpuCloudsimTags.VGPU_UPDATE_GPUTASK_PROCESSING);
         }
