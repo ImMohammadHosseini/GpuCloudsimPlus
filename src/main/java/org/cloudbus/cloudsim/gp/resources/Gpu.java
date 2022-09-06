@@ -183,6 +183,8 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
     boolean isLazySuitabilityEvaluation ();
 
+    void processActivation (boolean activate);
+    
     Gpu setLazySuitabilityEvaluation (boolean lazySuitabilityEvaluation);
     
     //Simulation getSimulation ();

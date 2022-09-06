@@ -456,6 +456,7 @@ public class GpuSimple implements Gpu {
         return this;
     }
     
+    @Override
     public void processActivation (final boolean activate) {
         final boolean wasActive = this.active;
         if(activate) {
