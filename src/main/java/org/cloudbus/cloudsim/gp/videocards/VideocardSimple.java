@@ -6,9 +6,13 @@ import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.gpucloudsimplus.listeners.VideocardVGpuMigrationEventInfo;
 import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.gp.resources.GpuSimple;
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.hosts.Host;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.resources.GpuSimple;
+import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenterSimple;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.core.GpuCloudsimTags;
@@ -73,6 +77,71 @@ public class VideocardSimple implements Videocard {
         setVGpuAllocationPolicy(vgpuAllocationPolicy);
 	}
 	
+	@Override
+	public boolean processVGpuCreate (final CustomVGpu vgpu) {
+        final boolean gpuAllocatedForVGpu = vgpuAllocationPolicy.allocateGpuForVGpu(vgpu).fully();
+        if (gpuAllocatedForVGpu)
+            vgpu.updateGpuTaskProcessing(vgpu.getGpu().getVGpuScheduler().getAllocatedMips(vgpu));
+        return gpuAllocatedForVGpu;
+    }
+
+	@Override
+    public VGpuAllocationPolicy getVGpuAllocationPolicy () {
+        return vgpuAllocationPolicy;
+    }
+	
+	@Override
+    public String processVGpuDestroy (final CustomVGpu vgpu) {
+		getVGpuAllocationPolicy().deallocateGpuForVGpu(vgpu);
+		return generateNotFinishedGpuTasksWarning (vgpu);
+	}
+	
+	private String generateNotFinishedGpuTasksWarning (final CustomVGpu vgpu) {
+		final int gpuTasksNoFinished = vgpu.getGpuTaskScheduler().getGpuTaskList().size();
+
+		if(gpuTasksNoFinished == 0) {
+            return "";
+        }
+
+        return String.format("It had a total of %d gpuTask (running + waiting)", gpuTasksNoFinished);
+    }
+	
+	@Override
+    public <T extends Gpu> List<T> getGpuList () {
+        return (List<T>)Collections.unmodifiableList(gpuList);
+    }
+	
+	@Override
+	public double updateGpusProcessing () {
+        for (final Gpu gpu : getGpuList()) {
+            final double delay = gpu.updateProcessing(clock());
+        }
+    }
+	
+	@Override
+	public void processGpuAdditionRequest () {
+		for (final Gpu gpu : getGpuList()) {
+			notifyOnGpuAvailableListeners(gpu);
+		}
+	}
+	
+	private <T extends Gpu> void notifyOnGpuAvailableListeners (final T gpu) {
+        onGpuAvailableListeners.forEach(listener -> listener.update(GpuEventInfo.of(
+        		listener, gpu, clock())));
+    }
+	
+	@Override
+	public void gpusProcessActivation (final boolean activate) {
+		for (final Gpu gpu : getGpuList()) {
+			gpu.processActivation(activate);
+		}
+	}
+	
+	@Override
+	public void gpuProcessActivation (final Gpu gpu, final boolean activate) {
+		gpu.processActivation(activate);
+	}
+	
 	/*@Override 
 	public long getId () {
 		return id;
@@ -115,10 +184,7 @@ public class VideocardSimple implements Videocard {
         		this.getSimulation().equals(that.getSimulation());
     }
     
-    @Override
-    public <T extends Gpu> List<T> getGpuList () {
-        return (List<T>)Collections.unmodifiableList(gpuList);
-    }
+    
 
 	private void setGpuList (final List<? extends Gpu> gpuList) {
         this.gpuList = requireNonNull(gpuList);
@@ -207,10 +273,7 @@ public class VideocardSimple implements Videocard {
         return this;
     }
 
-	@Override
-    public VGpuAllocationPolicy getVGpuAllocationPolicy () {
-        return vgpuAllocationPolicy;
-    }
+	
 	
 	@Override
     public final Videocard setVGpuAllocationPolicy ( final VGpuAllocationPolicy vgpuAllocationPolicy) {
@@ -279,10 +342,7 @@ public class VideocardSimple implements Videocard {
         activeGpusNumber += gpu.isActive() ? 1 : -1;
     }
 
-    private <T extends Gpu> void notifyOnGpuAvailableListeners (final T gpu) {
-        onGpuAvailableListeners.forEach(listener -> listener.update(GpuEventInfo.of(
-        		listener, gpu, clock())));
-    }
+    
     
     protected double getLastProcessTime () {
         return lastProcessTime;
@@ -332,19 +392,7 @@ public class VideocardSimple implements Videocard {
         sendNow(gpuTask.getBroker(), GpuCloudsimTags.GPUTASK_SUBMIT_ACK, gpuTask);
     }
 	
-	protected double updateGpusProcessing () {
-        double nextSimulationDelay = Double.MAX_VALUE;
-        for (final Gpu gpu : getGpuList()) {
-            final double delay = gpu.updateProcessing(clock());
-            nextSimulationDelay = Math.min(delay, nextSimulationDelay);
-        }
-
-        final double minTimeBetweenEvents = getSimulation().getMinTimeBetweenEvents()+0.01;
-        nextSimulationDelay = nextSimulationDelay == 0 ? nextSimulationDelay : 
-        	Math.max(nextSimulationDelay, minTimeBetweenEvents);
-
-        return nextSimulationDelay;
-    }
+	
 	
 	protected double updateGpuTaskProcessing() {
         if (!isTimeToUpdateGpuTasksProcessing()){

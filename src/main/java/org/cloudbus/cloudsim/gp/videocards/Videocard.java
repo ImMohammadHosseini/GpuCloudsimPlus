@@ -9,6 +9,7 @@ import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 
 import java.util.*;
@@ -18,9 +19,29 @@ import java.util.stream.Stream;
 
 
 public interface Videocard {
+	
     Logger LOGGER = LoggerFactory.getLogger(Videocard.class.getSimpleName());
 
 	Videocard NULL = new VideocardNull ();
+	
+	boolean processVGpuCreate (final CustomVGpu vgpu);
+	
+	VGpuAllocationPolicy getVGpuAllocationPolicy ();
+	
+	String processVGpuDestroy (final CustomVGpu vgpu);
+	
+	<T extends Gpu> List<T> getGpuList ();
+	
+	double updateGpusProcessing ();
+
+	<T extends CustomVGpu> List<T> getVGpuList ();
+	
+	void processGpuAdditionRequest ();
+	
+	void gpusProcessActivation (boolean activate);
+	
+	void gpuProcessActivation (Gpu gpu, boolean activate);
+	//<T extends Gpu> void notifyOnGpuAvailableListeners (final T gpu);
 	
 	//double DEF_BW_PERCENT_FOR_MIGRATION = 0.5;
 	
@@ -35,7 +56,8 @@ public interface Videocard {
 	void videocardProcess ();
 	
 	
-	VGpuAllocationPolicy getVGpuAllocationPolicy ();
+	
+	
 	
 	Videocard setVGpuAllocationPolicy (VGpuAllocationPolicy vgpuAllocationPolicy);
 	
@@ -47,7 +69,7 @@ public interface Videocard {
 
     //void requestVGpuMigration (CustomVGpu sourceVGpu);
 
-    <T extends Gpu> List<T> getGpuList ();
+    
     
     Stream<? extends Gpu> getActiveGpuStream ();
 
