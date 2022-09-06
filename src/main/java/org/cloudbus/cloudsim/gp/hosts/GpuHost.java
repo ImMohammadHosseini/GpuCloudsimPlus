@@ -2,6 +2,7 @@ package org.cloudbus.cloudsim.gp.hosts;
 
 import org.cloudbus.cloudsim.hosts.Host;
 
+import org.cloudbus.cloudsim.gp.videocards.Videocard;
 
 import java.util.*;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ public interface GpuHost extends Host {
 	double DEF_IDLE_SHUTDOWN_DEADLINE = -1;
 
     GpuHost NULL = new GpuHostNull();
+    
+    Videocard getVideocard ();
 }
 
 

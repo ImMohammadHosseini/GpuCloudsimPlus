@@ -100,4 +100,22 @@ public class GpuHostSimple implements GpuHost {
 
         return this;
     }
+    
+    public void processActivation(final boolean activate) {
+        final boolean wasActive = this.active;
+        if(activate) {
+            setStartTime(getSimulation().clock());
+            powerModel.addStartupTotals();
+        } 
+        else {
+            setShutdownTime(getSimulation().clock());
+            powerModel.addShutDownTotals();
+        }
+
+        this.active = activate;
+        ((DatacenterSimple) datacenter).updateActiveHostsNumber(this);
+        videocard.gpusProcessActivation(activate);
+        activationChangeInProgress = false;
+        notifyStartupOrShutdown(activate, wasActive);
+    }
 }
