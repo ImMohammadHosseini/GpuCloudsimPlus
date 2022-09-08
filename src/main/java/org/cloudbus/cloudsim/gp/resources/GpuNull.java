@@ -1,5 +1,6 @@
 package org.cloudbus.cloudsim.gp.resources;
 
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.core.AbstractGpu;
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
@@ -45,25 +46,25 @@ final class GpuNull implements Gpu {
     }
 	@Override public Videocard getVideocard () { return Videocard.NULL; }
 	@Override public void setVideocard (Videocard videocard) { /**/ }
-	@Override public boolean isSuitableForVGpu (CustomVGpu vgpu) { return false; }
-	@Override public GpuSuitability getSuitabilityFor(CustomVGpu vgpu) { return GpuSuitability.NULL; }
+	@Override public boolean isSuitableForVGpu (VGpu vgpu) { return false; }
+	@Override public GpuSuitability getSuitabilityFor(VGpu vgpu) { return GpuSuitability.NULL; }
 	@Override public boolean isActive () { return false; }
 	@Override public boolean hasEverStarted () { return false; }
 	@Override public Gpu setActive (boolean activate) { return this; }
-	@Override public <T extends CustomVGpu> Set<T> getVGpusMigratingIn () { 
+	@Override public <T extends VGpu> Set<T> getVGpusMigratingIn () { 
 		return Collections.emptySet();
 	}
 	@Override public boolean hasMigratingVGpus () { return false; }
-	@Override public boolean addMigratingInVGpu (CustomVGpu vgpu) { return false; }
-	@Override public Set<CustomVGpu> getVGpusMigratingOut () { return Collections.emptySet(); }
-	@Override public boolean addVGpuMigratingOut (CustomVGpu vgpu) { return false; }
-	@Override public boolean removeVGpuMigratingOut (CustomVGpu vgpu) { return false; }
+	@Override public boolean addMigratingInVGpu (VGpu vgpu) { return false; }
+	@Override public Set<VGpu> getVGpusMigratingOut () { return Collections.emptySet(); }
+	@Override public boolean addVGpuMigratingOut (VGpu vgpu) { return false; }
+	@Override public boolean removeVGpuMigratingOut (VGpu vgpu) { return false; }
 	@Override public void reallocateMigratingInVGpus () { /**/ }
 	@Override public double getTotalMipsCapacity () { return 0.0; }
 	@Override public double getTotalAvailableMips () { return 0.0; }
 	@Override public double getTotalAllocatedMips () { return 0.0; }
-	@Override public double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu) { return 0.0; }
-	@Override public void removeMigratingInVGpu (CustomVGpu vgpu) { /**/ }
+	@Override public double getTotalAllocatedMipsForVGpu (VGpu vgpu) { return 0.0; }
+	@Override public void removeMigratingInVGpu (VGpu vgpu) { /**/ }
 	@Override public List<GpuCore> getWorkingCoreList () { return Collections.emptyList(); }
 	@Override public List<GpuCore> getBusyCoreList () { return Collections.emptyList(); }
 	@Override public List<GpuCore> getFreeCoreList () { return Collections.emptyList(); }
@@ -73,8 +74,8 @@ final class GpuNull implements Gpu {
 	@Override public double getBusyCoresPercent () { return 0.0; }
 	@Override public double getBusyCoresPercent (boolean hundredScale) { return 0.0; }
 	@Override public int getFailedCoresNumber () { return 0; }
-	@Override public <T extends CustomVGpu> List<T> getVGpuList () { return Collections.emptyList(); }
-	@Override public <T extends CustomVGpu> List<T> getVGpuCreatedList () {
+	@Override public <T extends VGpu> List<T> getVGpuList () { return Collections.emptyList(); }
+	@Override public <T extends VGpu> List<T> getVGpuCreatedList () {
 		return Collections.emptyList();
 	}
 	@Override public VGpuScheduler getVGpuScheduler () { return VGpuScheduler.NULL; }
@@ -88,11 +89,11 @@ final class GpuNull implements Gpu {
 	@Override public boolean isFailed () { return false; }
 	@Override public boolean setFailed (boolean failed) { return false; }
 	@Override public double updateProcessing (double currentTime) { return 0.0; }
-	@Override public GpuSuitability createVGpu (CustomVGpu vgpu) { return GpuSuitability.NULL; }
-	@Override public void destroyVGpu (CustomVGpu vgpu) { /**/ }
-	@Override public GpuSuitability createTemporaryVGpu (CustomVGpu vgpu) { return GpuSuitability.NULL;
+	@Override public GpuSuitability createVGpu (VGpu vgpu) { return GpuSuitability.NULL; }
+	@Override public void destroyVGpu (VGpu vgpu) { /**/ }
+	@Override public GpuSuitability createTemporaryVGpu (VGpu vgpu) { return GpuSuitability.NULL;
 	}
-	@Override public void destroyTemporaryVGpu (CustomVGpu vgpu) { /**/ }
+	@Override public void destroyTemporaryVGpu (VGpu vgpu) { /**/ }
 	@Override public void destroyAllVGpus () { /**/ }
 	@Override public Gpu addOnStartupListener (EventListener<GpuEventInfo> listener) { 
 		return this;
@@ -122,8 +123,8 @@ final class GpuNull implements Gpu {
 	@Override public void disableStateHistory () { /**/ }
 	@Override public boolean isStateHistoryEnabled () { return false; }
 	@Override public List<GpuStateHistoryEntry> getStateHistory () { return Collections.emptyList(); }
-	@Override public List<CustomVGpu> getFinishedVGpus () { return Collections.emptyList(); }
-	@Override public List<CustomVGpu> getMigratableVGpus () { return Collections.emptyList(); }
+	@Override public List<VGpu> getFinishedVGpus () { return Collections.emptyList(); }
+	@Override public List<VGpu> getMigratableVGpus () { return Collections.emptyList(); }
 	@Override public boolean isLazySuitabilityEvaluation () { return false; }
 	@Override public Gpu setLazySuitabilityEvaluation (boolean lazySuitabilityEvaluation) { 
 		return this;
@@ -152,4 +153,5 @@ final class GpuNull implements Gpu {
 	@Override public double getGpuPercentUtilization () { return 0.0; }
 	@Override public double getGpuPercentRequested () { return 0.0; }
 	@Override public double getGpuMipsUtilization () { return 0.0; }
+	@Override public void processActivation (boolean activate) { /**/ }
 }

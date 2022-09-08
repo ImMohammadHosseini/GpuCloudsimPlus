@@ -21,6 +21,8 @@ import org.gpucloudsimplus.listeners.GpuEventInfo;
 
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
 import org.cloudbus.cloudsim.gp.resources.GpuCore;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.GpuResourceStats;
@@ -60,10 +62,10 @@ public class GpuSimple implements Gpu {
     private double idleShutdownDeadline;
     
     private VGpuScheduler vgpuScheduler;
-    private final List<CustomVGpu> vgpuList = new ArrayList<>();
+    private final List<VGpu> vgpuList = new ArrayList<>();
 
-    private final Set<CustomVGpu> vgpusMigratingIn;
-    private final Set<CustomVGpu> vgpusMigratingOut;
+    private final Set<VGpu> vgpusMigratingIn;
+    private final Set<VGpu> vgpusMigratingOut;
     
     private Videocard videocard;
 
@@ -74,7 +76,7 @@ public class GpuSimple implements Gpu {
     private List<ResourceManageable> resources;
 
     private List<GpuResourceProvisioner> provisioners;
-    private final List<CustomVGpu> vgpuCreatedList;
+    private final List<VGpu> vgpuCreatedList;
     
     private int freeCoresNumber;
     private int busyCoresNumber;
@@ -218,7 +220,7 @@ public class GpuSimple implements Gpu {
 	public Gpu setGpuGddramProvisioner (GpuResourceProvisioner gpuGddramProvisioner) {
         checkSimulationIsRunningAndAttemptedToChangeGpu("GDDRAM");
 		this.gpuGddramProvisioner = requireNonNull(gpuGddramProvisioner);
-        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((CustomVGpuSimple)vgpu).getGddram());
+        this.gpuGddramProvisioner.setResources(ram, vgpu -> ((VGpuSimple)vgpu).getGddram());
         return this;
 	}
 	
@@ -231,7 +233,7 @@ public class GpuSimple implements Gpu {
     public Gpu setGpuBwProvisioner (GpuResourceProvisioner gpuBwProvisioner) {
         checkSimulationIsRunningAndAttemptedToChangeGpu("BW");
     	this.gpuBwProvisioner = requireNonNull(gpuBwProvisioner);
-        this.gpuBwProvisioner.setResources(bw, vgpu -> ((CustomVGpuSimple)vgpu).getBw());
+        this.gpuBwProvisioner.setResources(bw, vgpu -> ((VGpuSimple)vgpu).getBw());
         //must add set resource in gpurespro //has to
     	return this;
     }
@@ -276,7 +278,7 @@ public class GpuSimple implements Gpu {
         return getSimulation().clock() - getLastBusyTime();
     }*/
 
-    protected double updateVGpuProcessing (final CustomVGpu vgpu, final double currentTime, 
+    protected double updateVGpuProcessing (final VGpu vgpu, final double currentTime, 
     		final double nextSimulationDelay) {
         final double delay = vgpu.updateGpuTaskProcessing(currentTime, 
         		vgpuScheduler.getAllocatedMips(vgpu));
@@ -289,7 +291,7 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public GpuSuitability createVGpu (final CustomVGpu vgpu) {
+    public GpuSuitability createVGpu (final VGpu vgpu) {
         final GpuSuitability suitability = createVGpuInternal(vgpu);
         if(suitability.fully()) {
             addVGpuToCreatedList(vgpu);
@@ -302,11 +304,11 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public GpuSuitability createTemporaryVGpu (final CustomVGpu vgpu) {
+    public GpuSuitability createTemporaryVGpu (final VGpu vgpu) {
         return createVGpuInternal(vgpu);
     }
 
-    private GpuSuitability createVGpuInternal (final CustomVGpu vgpu) {
+    private GpuSuitability createVGpuInternal (final VGpu vgpu) {
         /*if(vm instanceof VmGroup){
             return new HostSuitability("Just internal VMs inside a VmGroup can be created, not the VmGroup itself.");
         }*/
@@ -319,7 +321,7 @@ public class GpuSimple implements Gpu {
         return suitability;
     }
     
-    private GpuSuitability allocateResourcesForVGpu (final CustomVGpu vgpu, 
+    private GpuSuitability allocateResourcesForVGpu (final VGpu vgpu, 
     		final boolean inMigration) {
         final GpuSuitability suitability = isSuitableForVGpu(vgpu, inMigration, true);
         if(!suitability.fully()) {
@@ -335,14 +337,14 @@ public class GpuSimple implements Gpu {
         return suitability;
     }
 
-    private void allocateResourcesForVGpu (final CustomVGpu vgpu) {
+    private void allocateResourcesForVGpu (final VGpu vgpu) {
         gpuGddramProvisioner.allocateResourceForVGpu(vgpu, vgpu.getCurrentRequestedGddram());
         gpuBwProvisioner.allocateResourceForVGpu(vgpu, vgpu.getCurrentRequestedBw());
         //disk.getStorage().allocateResource(vm.getStorage());
         vgpuScheduler.allocateCoresForVGpu(vgpu, vgpu.getCurrentRequestedMips());
     }
     
-    private void logAllocationError (final boolean showFailureLog, final CustomVGpu vgpu,
+    private void logAllocationError (final boolean showFailureLog, final VGpu vgpu,
             final boolean inMigration, final String resourceUnit, final Resource gpuResource, 
             final Resource vgpuRequestedResource) {
     	
@@ -362,7 +364,7 @@ public class GpuSimple implements Gpu {
     
     @Override
     public void reallocateMigratingInVGpus () {
-        for (final CustomVGpu vgpu : getVGpusMigratingIn()) {
+        for (final VGpu vgpu : getVGpusMigratingIn()) {
             if (!vgpuList.contains(vgpu)) {
                 vgpuList.add(vgpu);
             }
@@ -372,11 +374,11 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public boolean isSuitableForVGpu (final CustomVGpu vgpu) {
+    public boolean isSuitableForVGpu (final VGpu vgpu) {
         return getSuitabilityFor(vgpu).fully();
     }
     
-    private GpuSuitability isSuitableForVGpu (final CustomVGpu vgpu, final boolean inMigration, 
+    private GpuSuitability isSuitableForVGpu (final VGpu vgpu, final boolean inMigration, 
     		final boolean showFailureLog) {
         final GpuSuitability suitability = new GpuSuitability();
 
@@ -406,7 +408,7 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public GpuSuitability getSuitabilityFor (final CustomVGpu vgpu) {
+    public GpuSuitability getSuitabilityFor (final VGpu vgpu) {
         return isSuitableForVGpu(vgpu, false, false);
     }
 
@@ -504,7 +506,7 @@ public class GpuSimple implements Gpu {
     }
     
     @Override
-    public void destroyVGpu (final CustomVGpu vgpu) {
+    public void destroyVGpu (final VGpu vgpu) {
         if(!vgpu.isCreated()){
             return;
         }
@@ -515,18 +517,18 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public void destroyTemporaryVGpu (final CustomVGpu vgpu) {
+    public void destroyTemporaryVGpu (final VGpu vgpu) {
         destroyVGpuInternal(vgpu);
     }
 
     //destroy VGpu with destroy all GpuVm that include this VGpu in Broker
-    private void destroyVGpuInternal (final CustomVGpu vgpu) {
+    private void destroyVGpuInternal (final VGpu vgpu) {
         deallocateResourcesOfVGpu(requireNonNull(vgpu));
         vgpuList.remove(vgpu);
         vgpu.getGpuVm().getBroker().getVmExecList().remove(vgpu.getGpuVm());
     }
     
-    protected void deallocateResourcesOfVGpu (final CustomVGpu vgpu) {
+    protected void deallocateResourcesOfVGpu (final VGpu vgpu) {
         vgpu.setCreated(false);
         gpuGddramProvisioner.deallocateResourceForVGpu(vgpu);
         gpuBwProvisioner.deallocateResourceForVGpu(vgpu);
@@ -537,7 +539,7 @@ public class GpuSimple implements Gpu {
     @Override
     public void destroyAllVGpus () {
         final CoreProvisioner coreProvisioner = getGpuCoreList().get(0).getCoreProvisioner();
-        for (final CustomVGpu vgpu : vgpuList) {
+        for (final VGpu vgpu : vgpuList) {
             gpuGddramProvisioner.deallocateResourceForVGpu(vgpu);
             gpuBwProvisioner.deallocateResourceForVGpu(vgpu);
             coreProvisioner.deallocateResourceForVGpu(vgpu);
@@ -582,7 +584,7 @@ public class GpuSimple implements Gpu {
         return gpuCoreList.size();
     }
     
-    protected MipsShare getAllocatedMipsForVGpu (final CustomVGpu vgpu) {
+    protected MipsShare getAllocatedMipsForVGpu (final VGpu vgpu) {
         return vgpuScheduler.getAllocatedMips(vgpu);
     }
 
@@ -610,7 +612,7 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public double getTotalAllocatedMipsForVGpu (final CustomVGpu vgpu) {
+    public double getTotalAllocatedMipsForVGpu (final VGpu vgpu) {
         return vgpuScheduler.getTotalAllocatedMipsForVGpu(vgpu);
     }
 
@@ -723,20 +725,20 @@ public class GpuSimple implements Gpu {
     }
     
     @Override
-    public <T extends CustomVGpu> List<T> getVGpuList() {
+    public <T extends VGpu> List<T> getVGpuList() {
         return (List<T>) vgpuList;
     }
 
     @Override
-    public <T extends CustomVGpu> List<T> getVGpuCreatedList() {
+    public <T extends VGpu> List<T> getVGpuCreatedList() {
         return (List<T>) Collections.unmodifiableList(vgpuCreatedList);
     }
 
-    protected void addVGpuToList (final CustomVGpu vgpu){
+    protected void addVGpuToList (final VGpu vgpu){
         vgpuList.add(requireNonNull(vgpu));
     }
 
-    protected void addVGpuToCreatedList (final CustomVGpu vgpu){
+    protected void addVGpuToCreatedList (final VGpu vgpu){
         vgpuCreatedList.add(requireNonNull(vgpu));
     }
 
@@ -802,7 +804,7 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public <T extends CustomVGpu> Set<T> getVGpusMigratingIn() {
+    public <T extends VGpu> Set<T> getVGpusMigratingIn() {
         return (Set<T>)vgpusMigratingIn;
     }
 
@@ -812,7 +814,7 @@ public class GpuSimple implements Gpu {
     }
     
     @Override
-    public boolean addMigratingInVGpu (final CustomVGpu vgpu) {
+    public boolean addMigratingInVGpu (final VGpu vgpu) {
         /* TODO: Instead of keeping a list of VMs which are migrating into a Host,
         *  which requires searching in such a list every time a VM is requested to be migrated
         *  to that Host (to check if it isn't migrating to that same host already),
@@ -826,7 +828,7 @@ public class GpuSimple implements Gpu {
             return false;
         }
 
-        ((CustomVGpuSimple)vgpu).updateMigrationStartListeners(this);
+        ((VGpuSimple)vgpu).updateMigrationStartListeners(this);
 
         updateProcessing(getSimulation().clock());
         vgpu.getGpu().updateProcessing(getSimulation().clock());
@@ -835,24 +837,24 @@ public class GpuSimple implements Gpu {
     }
     
     @Override
-    public void removeMigratingInVGpu (final CustomVGpu vgpu) {
+    public void removeMigratingInVGpu (final VGpu vgpu) {
         vgpusMigratingIn.remove(vgpu);
         vgpuList.remove(vgpu);
         vgpu.setInMigration(false);
     }
 
     @Override
-    public Set<CustomVGpu> getVGpusMigratingOut () {
+    public Set<VGpu> getVGpusMigratingOut () {
         return Collections.unmodifiableSet(vgpusMigratingOut);
     }
 
     @Override
-    public boolean addVGpuMigratingOut (final CustomVGpu vgpu) {
+    public boolean addVGpuMigratingOut (final VGpu vgpu) {
         return this.vgpusMigratingOut.add(vgpu);
     }
 
     @Override
-    public boolean removeVGpuMigratingOut(final CustomVGpu vgpu) {
+    public boolean removeVGpuMigratingOut(final VGpu vgpu) {
         return this.vgpusMigratingOut.remove(vgpu);
     }
 
@@ -1034,11 +1036,11 @@ public class GpuSimple implements Gpu {
 
     @Override
     public double getGpuCoreMipsUtilization () {
-        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsUtilization).sum();
+        return vgpuList.stream().mapToDouble(VGpu::getTotalGpuMipsUtilization).sum();
     }
 
     private double getGpuCoreMipsRequested () {
-        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsRequested).sum();
+        return vgpuList.stream().mapToDouble(VGpu::getTotalGpuMipsRequested).sum();
     }
 
     @Override
@@ -1107,14 +1109,14 @@ public class GpuSimple implements Gpu {
     }
 
     @Override
-    public List<CustomVGpu> getFinishedVGpus() {
+    public List<VGpu> getFinishedVGpus() {
         return getVGpuList().stream()
             .filter(vgpu -> !vgpu.isInMigration())
             .filter(vgpu -> vgpu.getTotalGpuMipsRequested () == 0)
             .collect(toList());
     }
     
-    private double addVGpuResourceUseToHistoryIfNotMigratingIn (final CustomVGpu vgpu,
+    private double addVGpuResourceUseToHistoryIfNotMigratingIn (final VGpu vgpu,
     		final double currentTime) {
         double totalAllocatedMips = getVGpuScheduler().getTotalAllocatedMipsForVGpu(vgpu);
         if (getVGpusMigratingIn().contains(vgpu)) {
@@ -1155,7 +1157,7 @@ public class GpuSimple implements Gpu {
 
         double hostTotalRequestedMips = 0;
 
-        for (final CustomVGpu vgpu : getVGpuList()) {
+        for (final VGpu vgpu : getVGpuList()) {
             final double totalRequestedMips = vgpu.getTotalGpuMipsRequested();
             addVGpuResourceUseToHistoryIfNotMigratingIn (vgpu, currentTime);
             hostTotalRequestedMips += totalRequestedMips;
@@ -1183,7 +1185,7 @@ public class GpuSimple implements Gpu {
 	}
 
 	@Override
-	public List<CustomVGpu> getMigratableVGpus () {
+	public List<VGpu> getMigratableVGpus () {
 		return vgpuList.stream().filter(vm -> !vm.isInMigration()).collect(toList());
 	}
 
@@ -1213,12 +1215,12 @@ public class GpuSimple implements Gpu {
 	}
 	
 	private double getGpuMipsRequested() {
-        return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsRequested).sum();
+        return vgpuList.stream().mapToDouble(VGpu::getTotalGpuMipsRequested).sum();
     }
 
 	@Override
 	public double getGpuMipsUtilization() {
-		return vgpuList.stream().mapToDouble(CustomVGpu::getTotalGpuMipsUtilization).sum();
+		return vgpuList.stream().mapToDouble(VGpu::getTotalGpuMipsUtilization).sum();
 	}
 	
 	private double computeGpuUtilizationPercent (final double mipsUsage) {

@@ -4,14 +4,14 @@ import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
 import org.cloudbus.cloudsim.core.CustomerEntityAbstract;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.schedulers.gpucloudlet.GpuCloudletScheduler;
 
 public class GpuVmSimple extends VmSimple implements GpuVm {
 	
 	private String type;
 	
-	private CustomVGpu vgpu;
+	private VGpu vgpu;
 	
 	//private double arrivalTime;
 	
@@ -56,7 +56,7 @@ public class GpuVmSimple extends VmSimple implements GpuVm {
 	}
 	
 	@Override
-	public GpuVmSimple setVGpu (CustomVGpu vgpu) {
+	public GpuVmSimple setVGpu (VGpu vgpu) {
 		this.vgpu = vgpu;
 		if (vgpu.getGpuVm () == null)
 			vgpu.setGpuVm (this);
@@ -64,7 +64,7 @@ public class GpuVmSimple extends VmSimple implements GpuVm {
 	}
 	
 	@Override
-	public CustomVGpu getVGpu () {
+	public VGpu getVGpu () {
 		return vgpu;
 	}
 	

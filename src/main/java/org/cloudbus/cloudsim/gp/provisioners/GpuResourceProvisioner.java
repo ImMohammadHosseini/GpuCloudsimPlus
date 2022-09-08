@@ -3,7 +3,7 @@ package org.cloudbus.cloudsim.gp.provisioners;
 //import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import java.util.function.Function;
 
@@ -11,27 +11,27 @@ public interface GpuResourceProvisioner {
 	
 	GpuResourceProvisioner NULL = new GpuResourceProvisionerNull();
 	
-	boolean allocateResourceForVGpu (CustomVGpu vgpu, long newTotalVGpuResourceCapacity);
+	boolean allocateResourceForVGpu (VGpu vgpu, long newTotalVGpuResourceCapacity);
 	
-	default boolean allocateResourceForVGpu (final CustomVGpu vgpu, 
+	default boolean allocateResourceForVGpu (final VGpu vgpu, 
 			final double newTotalVGpuResource) {
         return allocateResourceForVGpu(vgpu, (long)newTotalVGpuResource);
     }
 	
-	long getAllocatedResourceForVGpu (CustomVGpu vgpu);
+	long getAllocatedResourceForVGpu (VGpu vgpu);
 	
 	long getTotalAllocatedResource();
 	
-	long deallocateResourceForVGpu(CustomVGpu vgpu);
+	long deallocateResourceForVGpu(VGpu vgpu);
 	
-	boolean isSuitableForVGpu (CustomVGpu vgpu, long newVGpuTotalAllocatedResource);
+	boolean isSuitableForVGpu (VGpu vgpu, long newVGpuTotalAllocatedResource);
 	
-	boolean isSuitableForVGpu(CustomVGpu vgpu, Resource resource);
+	boolean isSuitableForVGpu(VGpu vgpu, Resource resource);
 	
 	ResourceManageable getPGpuResource();
 	
 	void setResources(ResourceManageable pGpuResource, 
-			Function<CustomVGpu, ResourceManageable> vGpuResourceFunction);
+			Function<VGpu, ResourceManageable> vGpuResourceFunction);
 	
 	long getCapacity();
 	

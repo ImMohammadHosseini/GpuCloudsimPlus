@@ -1,21 +1,22 @@
-package org.cloudbus.cloudsim.gp.resources;
-
+package org.cloudbus.cloudsim.gp.vgpu;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.resources.VGpuCore;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
-import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 
-import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
+import org.gpucloudsimplus.listeners.VGpuGpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
+import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 
 import java.util.*;
 
-public class CustomVGpuNull implements CustomVGpu {
+public class VGpuNull implements VGpu {
 	
 	@Override public void setId (long id) {/**/}
     @Override public long getId () {
@@ -37,11 +38,11 @@ public class CustomVGpuNull implements CustomVGpu {
     @Override public long getCurrentRequestedGddram () {
         return 0;
     }
-    @Override public double getTotalCoreMipsRequested () {
+    @Override public double getTotalGpuMipsRequested () {
         return 0.0;
     }
-    @Override public Videocard getVideocard () {
-        return Videocard.NULL;
+    @Override public Gpu getGpu () {
+        return Gpu.NULL;
     }
     @Override public double getMips () {
         return 0;
@@ -49,36 +50,35 @@ public class CustomVGpuNull implements CustomVGpu {
     @Override public long getNumberOfCores () {
         return 0;
     }
-    @Override public CustomVGpu addOnVideocardAllocationListener (
-    		EventListener<VGpuVideocardEventInfo> listener) {
+    @Override public VGpu addOnGpuAllocationListener (
+    		EventListener<VGpuGpuEventInfo> listener) {
         return this;
     }
-    @Override public CustomVGpu addOnMigrationStartListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return this; }
-    @Override public CustomVGpu addOnMigrationFinishListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return this; }
-    @Override public CustomVGpu addOnVideocardDeallocationListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return this; }
+    @Override public VGpu addOnMigrationStartListener (
+    		EventListener<VGpuGpuEventInfo> listener) { return this; }
+    @Override public VGpu addOnMigrationFinishListener (
+    		EventListener<VGpuGpuEventInfo> listener) { return this; }
+    @Override public VGpu addOnGpuDeallocationListener (
+    		EventListener<VGpuGpuEventInfo> listener) { return this; }
     
-    @Override public CustomVGpu addOnUpdateProcessingListener (
-    		EventListener<VGpuVideocardEventInfo> listener) {
+    @Override public VGpu addOnUpdateProcessingListener (
+    		EventListener<VGpuGpuEventInfo> listener) {
         return this;
     }
-    @Override public void notifyOnVideocardAllocationListeners () {/**/}
-    @Override public void notifyOnVideocardDeallocationListeners (
-    		Videocard deallocatedVideocard) {/**/}
+    @Override public void notifyOnGpuAllocationListeners () {/**/}
+    @Override public void notifyOnGpuDeallocationListeners ( Gpu deallocatedGpu) {/**/}
     @Override public boolean removeOnMigrationStartListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return false; }
+    		EventListener<VGpuGpuEventInfo> listener) { return false; }
     @Override public boolean removeOnMigrationFinishListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return false; }
+    		EventListener<VGpuGpuEventInfo> listener) { return false; }
     @Override public boolean removeOnUpdateProcessingListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return false; 
+    		EventListener<VGpuGpuEventInfo> listener) { return false; 
     		}
-    @Override public boolean removeOnVideocardAllocationListener (
-    		EventListener<VGpuVideocardEventInfo> listener) { return false; }
+    @Override public boolean removeOnGpuAllocationListener (
+    		EventListener<VGpuGpuEventInfo> listener) { return false; }
     
-    @Override public boolean removeOnVideocardDeallocationListener (
-    		EventListener<VGpuVideocardEventInfo> listener) {
+    @Override public boolean removeOnGpuDeallocationListener (
+    		EventListener<VGpuGpuEventInfo> listener) {
         return false;
     }
     @Override public Resource getGddram () {
@@ -94,12 +94,12 @@ public class CustomVGpuNull implements CustomVGpu {
     }
     @Override public double getCorePercentRequested () { return 0; }
     @Override public double getCorePercentRequested (double time) { return 0; }
-    @Override public double getVideocardCoreUtilization (double time) { return 0; }
-    @Override public double getExpectedVideocardCoreUtilization (double vmCpuUtilizationPercent) { 
+    @Override public double getGpuCoreUtilization (double time) { return 0; }
+    @Override public double getExpectedGpuCoreUtilization (double vmCpuUtilizationPercent) { 
     	return 0; 
     }
-    @Override public double getVideocardGddramUtilization () { return 0; }
-    @Override public double getVideocardBwUtilization () { return 0; }
+    @Override public double getGpuGddramUtilization () { return 0; }
+    @Override public double getGpuBwUtilization () { return 0; }
     @Override public double getTotalCoreMipsUtilization () { return 0; }
     @Override public double getTotalCoreMipsUtilization (double time) {
         return 0.0;
@@ -107,7 +107,7 @@ public class CustomVGpuNull implements CustomVGpu {
     
     @Override public double getStopTime () { return 0; }
     @Override public double getTotalExecutionTime () { return 0; }
-    @Override public CustomVGpu setStopTime (double stopTime) { return this; }
+    @Override public VGpu setStopTime (double stopTime) { return this; }
     @Override public boolean isCreated () {
         return false;
     }
@@ -116,12 +116,12 @@ public class CustomVGpuNull implements CustomVGpu {
         return false;
     }
     @Override public void setCreated (boolean created) {/**/}
-    @Override public CustomVGpu setBw (long bwCapacity) {
+    @Override public VGpu setBw (long bwCapacity) {
         return this;
     }
-    @Override public CustomVGpu setVideocard (Videocard videocard) { return this; }
+    @Override public VGpu setGpu (Gpu gpu) { return this; }
     @Override public void setInMigration (boolean migrating) {/**/}
-    @Override public CustomVGpu setGddram (long ram) {
+    @Override public VGpu setGddram (long ram) {
         return this;
     }
     
@@ -129,7 +129,7 @@ public class CustomVGpuNull implements CustomVGpu {
     	return 0.0; 
     }
     @Override public double updateGpuTaskProcessing (MipsShare mipsShare) { return 0; }
-    @Override public CustomVGpu setGpuTaskScheduler(GpuTaskScheduler gpuTaskScheduler) {
+    @Override public VGpu setGpuTaskScheduler(GpuTaskScheduler gpuTaskScheduler) {
         return this;
     }
     
@@ -145,11 +145,11 @@ public class CustomVGpuNull implements CustomVGpu {
     
     @Override public VGpuCore getVGpuCore() { return VGpuCore.NULL; }
     @Override public String getDescription() { return ""; }
-    @Override public CustomVGpu setDescription (String description) { return this; }
+    @Override public VGpu setDescription (String description) { return this; }
     @Override public String getType () { return ""; }
     @Override public void setType (String type) { /**/ }
     @Override public GpuVm getGpuVm () { return GpuVm.NULL; } 
-    @Override public CustomVGpu setGpuVm (GpuVm gpuVm) { return this; } 
+    @Override public VGpu setGpuVm (GpuVm gpuVm) { return this; } 
     @Override public int getPCIeBw () {
     	return -1;
     }

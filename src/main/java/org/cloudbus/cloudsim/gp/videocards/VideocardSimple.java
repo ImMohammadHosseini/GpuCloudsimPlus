@@ -4,7 +4,7 @@ import org.cloudbus.cloudsim.gp.provisioners.VideocardBwProvisioner;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicySimple;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.gpucloudsimplus.listeners.VideocardVGpuMigrationEventInfo;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.resources.GpuSimple;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.hosts.Host;
@@ -78,7 +78,7 @@ public class VideocardSimple implements Videocard {
 	}
 	
 	@Override
-	public boolean processVGpuCreate (final CustomVGpu vgpu) {
+	public boolean processVGpuCreate (final VGpu vgpu) {
         final boolean gpuAllocatedForVGpu = vgpuAllocationPolicy.allocateGpuForVGpu(vgpu).fully();
         if (gpuAllocatedForVGpu)
             vgpu.updateGpuTaskProcessing(vgpu.getGpu().getVGpuScheduler().getAllocatedMips(vgpu));
@@ -91,12 +91,12 @@ public class VideocardSimple implements Videocard {
     }
 	
 	@Override
-    public String processVGpuDestroy (final CustomVGpu vgpu) {
+    public String processVGpuDestroy (final VGpu vgpu) {
 		getVGpuAllocationPolicy().deallocateGpuForVGpu(vgpu);
 		return generateNotFinishedGpuTasksWarning (vgpu);
 	}
 	
-	private String generateNotFinishedGpuTasksWarning (final CustomVGpu vgpu) {
+	private String generateNotFinishedGpuTasksWarning (final VGpu vgpu) {
 		final int gpuTasksNoFinished = vgpu.getGpuTaskScheduler().getGpuTaskList().size();
 
 		if(gpuTasksNoFinished == 0) {
@@ -329,7 +329,7 @@ public class VideocardSimple implements Videocard {
         return this;
     }
 	
-	private <T extends CustomVGpu> List<T> getVGpuList () {
+	private <T extends VGpu> List<T> getVGpuList () {
         return (List<T>) Collections.unmodifiableList(
                 getGpuList()
                     .stream()
@@ -417,7 +417,7 @@ public class VideocardSimple implements Videocard {
                clock() >= lastProcessTime + getSimulation().getMinTimeBetweenEvents();
     }
 	
-	private double timeToMigrateVGpu (final CustomVGpu vgpu, final Gpu targetGpu) {
+	private double timeToMigrateVGpu (final VGpu vgpu, final Gpu targetGpu) {
         return vgpu.getGddram().getCapacity() / bitesToBytes(targetGpu.getBw().getCapacity() * getBandwidthPercentForMigration());
     }
 
@@ -427,7 +427,7 @@ public class VideocardSimple implements Videocard {
         }
 
         lastMigrationMap = vgpuAllocationPolicy.getOptimizedAllocationMap(getVGpuList());
-        for (final Map.Entry<CustomVGpu, Gpu> entry : lastMigrationMap.entrySet()) {
+        for (final Map.Entry<VGpu, Gpu> entry : lastMigrationMap.entrySet()) {
             requestVGpuMigration(entry.getKey(), entry.getValue());
         }
 

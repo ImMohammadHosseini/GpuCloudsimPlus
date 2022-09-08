@@ -2,7 +2,7 @@ package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
 import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudsimplus.listeners.EventListener;
@@ -163,9 +163,9 @@ public interface GpuTask extends Comparable<GpuTask> {
 
 	double getLifeTime ();
 	
-	CustomVGpu getVGpu ();
+	VGpu getVGpu ();
 	
-	GpuTask setVGpu(CustomVGpu vgpu);
+	GpuTask setVGpu(VGpu vgpu);
 	
 	double getSubmissionDelay ();
 }

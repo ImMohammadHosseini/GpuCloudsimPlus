@@ -2,17 +2,17 @@ package org.gpucloudsimplus.listeners;
 
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.GpuSuitability;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudsimplus.listeners.EventListener;
 
 
 public final class VideocardVGpuMigrationEventInfo implements VGpuVideocardEventInfo {
     private final double time;
-    private final CustomVGpu vgpu;
+    private final VGpu vgpu;
     private final GpuSuitability suitability;
     private final EventListener<VideocardVGpuMigrationEventInfo> listener;
 
-    private VideocardVGpuMigrationEventInfo (final CustomVGpu vgpu, final GpuSuitability suitability,
+    private VideocardVGpuMigrationEventInfo (final VGpu vgpu, final GpuSuitability suitability,
     		final EventListener<VideocardVGpuMigrationEventInfo> listener){
     	this.vgpu = vgpu;
         this.time = vgpu.getSimulation().clock();
@@ -20,7 +20,7 @@ public final class VideocardVGpuMigrationEventInfo implements VGpuVideocardEvent
         this.listener = listener;
     }
 
-    public CustomVGpu getVGpu () {
+    public VGpu getVGpu () {
         return vgpu;
     }
 
@@ -49,7 +49,7 @@ public final class VideocardVGpuMigrationEventInfo implements VGpuVideocardEvent
 
     public static VideocardVGpuMigrationEventInfo of (
     		final EventListener<VideocardVGpuMigrationEventInfo> listener, 
-    		final CustomVGpu vgpu, final GpuSuitability suitability) {
+    		final VGpu vgpu, final GpuSuitability suitability) {
         return new VideocardVGpuMigrationEventInfo(vgpu, suitability, listener);
     }
 }

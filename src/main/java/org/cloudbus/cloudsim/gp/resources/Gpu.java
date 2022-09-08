@@ -5,17 +5,19 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.gpucloudsimplus.listeners.GpuEventInfo;
-import org.cloudbus.cloudsim.gp.core.AbstractGpu;
-import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.ChangeableId;
 
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
+import org.gpucloudsimplus.listeners.GpuEventInfo;
+import org.cloudsimplus.listeners.EventListener;
+
 import org.cloudbus.cloudsim.gp.provisioners.GpuResourceProvisioner;
 import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
 import org.cloudbus.cloudsim.gp.schedulers.vgpu.VGpuScheduler;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.GpuCore;
+import org.cloudbus.cloudsim.gp.core.AbstractGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 public interface Gpu extends ChangeableId, Comparable<Gpu>, AbstractGpu, 
 GpuResourceStatsComputer<GpuResourceStats> {
@@ -40,9 +42,9 @@ GpuResourceStatsComputer<GpuResourceStats> {
 	
     void setVideocard (Videocard videocard);
 
-    boolean isSuitableForVGpu (CustomVGpu vgpu);
+    boolean isSuitableForVGpu (VGpu vgpu);
 
-    GpuSuitability getSuitabilityFor (CustomVGpu vgpu);
+    GpuSuitability getSuitabilityFor (VGpu vgpu);
 
     boolean isActive();
     
@@ -50,17 +52,17 @@ GpuResourceStatsComputer<GpuResourceStats> {
     
     Gpu setActive (boolean activate);
 
-    <T extends CustomVGpu> Set<T> getVGpusMigratingIn ();
+    <T extends VGpu> Set<T> getVGpusMigratingIn ();
 
     boolean hasMigratingVGpus ();
     
-    boolean addMigratingInVGpu (CustomVGpu vgpu);
+    boolean addMigratingInVGpu (VGpu vgpu);
 
-    Set<CustomVGpu> getVGpusMigratingOut ();
+    Set<VGpu> getVGpusMigratingOut ();
 
-    boolean addVGpuMigratingOut (CustomVGpu vgpu);
+    boolean addVGpuMigratingOut (VGpu vgpu);
 
-    boolean removeVGpuMigratingOut (CustomVGpu vgpu);
+    boolean removeVGpuMigratingOut (VGpu vgpu);
 
     void reallocateMigratingInVGpus ();
 
@@ -71,9 +73,9 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
     double getTotalAllocatedMips ();
 
-    double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu);
+    double getTotalAllocatedMipsForVGpu (VGpu vgpu);
 
-    void removeMigratingInVGpu (CustomVGpu vgpu);
+    void removeMigratingInVGpu (VGpu vgpu);
 
     List<GpuCore> getWorkingCoreList ();
 
@@ -95,9 +97,9 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
     //long getAvailableStorage();
 
-    <T extends CustomVGpu> List<T> getVGpuList ();
+    <T extends VGpu> List<T> getVGpuList ();
 
-    <T extends CustomVGpu> List<T> getVGpuCreatedList ();
+    <T extends VGpu> List<T> getVGpuCreatedList ();
 
     VGpuScheduler getVGpuScheduler ();
 
@@ -127,13 +129,13 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
     double updateProcessing (double currentTime);
 
-    GpuSuitability createVGpu (CustomVGpu vgpu);
+    GpuSuitability createVGpu (VGpu vgpu);
 
-    void destroyVGpu (CustomVGpu vgpu);
+    void destroyVGpu (VGpu vgpu);
 
-    GpuSuitability createTemporaryVGpu (CustomVGpu vgpu);
+    GpuSuitability createTemporaryVGpu (VGpu vgpu);
 
-    void destroyTemporaryVGpu (CustomVGpu vgpu);
+    void destroyTemporaryVGpu (VGpu vgpu);
 
     void destroyAllVGpus ();
 
@@ -177,9 +179,9 @@ GpuResourceStatsComputer<GpuResourceStats> {
 
     List<GpuStateHistoryEntry> getStateHistory ();
 
-    List<CustomVGpu> getFinishedVGpus ();
+    List<VGpu> getFinishedVGpus ();
 
-    List<CustomVGpu> getMigratableVGpus ();
+    List<VGpu> getMigratableVGpus ();
 
     boolean isLazySuitabilityEvaluation ();
 
@@ -207,24 +209,24 @@ GpuResourceStatsComputer<GpuResourceStats> {
     
     double getGpuMipsUtilization ();
     
-    default double getRelativeGpuUtilization (final CustomVGpu vgpu) {
+    default double getRelativeGpuUtilization (final VGpu vgpu) {
         return getExpectedRelativeGpuUtilization(vgpu, vgpu.getGpuPercentUtilization());
     }
 
-    default double getExpectedRelativeGpuUtilization (final CustomVGpu vgpu, 
+    default double getExpectedRelativeGpuUtilization (final VGpu vgpu, 
     		final double vgpuGpuUtilizationPercent) {
         return vgpuGpuUtilizationPercent * getRelativeMipsCapacityPercent(vgpu);
     }
     
-    default double getRelativeMipsCapacityPercent (final CustomVGpu vgpu) {
+    default double getRelativeMipsCapacityPercent (final VGpu vgpu) {
         return vgpu.getTotalMipsCapacity() / getTotalMipsCapacity();
     }
 
-    default double getRelativeGddramUtilization (final CustomVGpu vgpu) {
+    default double getRelativeGddramUtilization (final VGpu vgpu) {
         return vgpu.getGddram().getAllocatedResource() / (double)getGddram().getCapacity();
     }
 
-    default double getRelativeBwUtilization(final CustomVGpu vgpu){
+    default double getRelativeBwUtilization(final VGpu vgpu){
         return vgpu.getBw().getAllocatedResource() / (double)getBw().getCapacity();
     }
     

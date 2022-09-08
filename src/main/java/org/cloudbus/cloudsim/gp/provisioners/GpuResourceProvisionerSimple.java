@@ -3,7 +3,7 @@ package org.cloudbus.cloudsim.gp.provisioners;
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -16,12 +16,12 @@ public class GpuResourceProvisionerSimple extends GpuResourceProvisionerAbstract
     }
 
     protected GpuResourceProvisionerSimple(final ResourceManageable resource, 
-    		final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
+    		final Function<VGpu, ResourceManageable> vGpuResourceFunction) {
         super(resource, vGpuResourceFunction);
     }
     
     @Override
-    public boolean allocateResourceForVGpu (final CustomVGpu vgpu, 
+    public boolean allocateResourceForVGpu (final VGpu vgpu, 
     		final long newTotalVGpuResourceCapacity) {
     	
     	Objects.requireNonNull(vgpu);
@@ -48,13 +48,13 @@ public class GpuResourceProvisionerSimple extends GpuResourceProvisionerAbstract
     }
     
     @Override
-    public boolean allocateResourceForVGpu (final CustomVGpu vgpu, 
+    public boolean allocateResourceForVGpu (final VGpu vgpu, 
     		final double newTotalVGpuResourceCapacity) {
         return allocateResourceForVGpu(vgpu, (long)newTotalVGpuResourceCapacity);
     }
     
     @Override
-    public long deallocateResourceForVGpu (final CustomVGpu vgpu) {
+    public long deallocateResourceForVGpu (final VGpu vgpu) {
         final ResourceManageable vGpuResource = getVGpuResourceFunction().apply(vgpu);
         final long vGpuAllocatedResource = vGpuResource.getAllocatedResource();
 
@@ -65,14 +65,14 @@ public class GpuResourceProvisionerSimple extends GpuResourceProvisionerAbstract
     }
 
     @Override
-    public boolean isSuitableForVGpu (CustomVGpu vgpu, long newVGpuTotalAllocatedResource) {
+    public boolean isSuitableForVGpu (VGpu vgpu, long newVGpuTotalAllocatedResource) {
         final long currentAllocatedResource = getAllocatedResourceForVGpu (vgpu);
         final long allocationDifference = newVGpuTotalAllocatedResource - currentAllocatedResource;
         return getPGpuResource().getAvailableResource() >=  allocationDifference;
     }
 
     @Override
-    public boolean isSuitableForVGpu (final CustomVGpu vgpu, final Resource resource) {
+    public boolean isSuitableForVGpu (final VGpu vgpu, final Resource resource) {
         return isSuitableForVGpu(vgpu, resource.getCapacity());
     }
 }

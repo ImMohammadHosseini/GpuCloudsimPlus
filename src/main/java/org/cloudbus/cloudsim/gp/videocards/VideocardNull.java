@@ -6,8 +6,8 @@ import java.util.stream.Stream;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.gpucloudsimplus.listeners.VideocardVGpuMigrationEventInfo;
 import org.cloudbus.cloudsim.gp.provisioners.VideocardBwProvisioner;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
@@ -44,8 +44,8 @@ public class VideocardNull implements Videocard {
 	@Override public Videocard setVGpuAllocationPolicy (VGpuAllocationPolicy vgpuAllocationPolicy) {
 		return this;
 	}
-	@Override public void requestVGpuMigration (CustomVGpu sourceVGpu, Gpu targetGpu) { /**/ }
-	@Override public void requestVGpuMigration (CustomVGpu sourceVGpu) { /**/ }
+	@Override public void requestVGpuMigration (VGpu sourceVGpu, Gpu targetGpu) { /**/ }
+	@Override public void requestVGpuMigration (VGpu sourceVGpu) { /**/ }
 	@Override public List<Gpu> getGpuList () { return Collections.emptyList(); }
 	@Override public Stream<? extends Gpu> getActiveGpuStream () { return Stream.empty(); }
 	@Override public Gpu getGpu(int index) { return Gpu.NULL; }

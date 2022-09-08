@@ -1,11 +1,11 @@
 package org.cloudbus.cloudsim.gp.schedulers.vgpu;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpuSimple;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.gp.resources.GpuSimple;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
+import org.cloudbus.cloudsim.gp.resources.GpuCore;
+import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
-import org.cloudbus.cloudsim.resources.Pe;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -54,12 +54,12 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     }
     
     @Override
-    public final boolean isSuitableForVGpu (final CustomVGpu vgpu) {
+    public final boolean isSuitableForVGpu (final VGpu vgpu) {
         return isSuitableForVGpu(vgpu, vgpu.getCurrentRequestedMips());
     }
 
     @Override
-    public final boolean isSuitableForVGpu (final CustomVGpu vgpu, 
+    public final boolean isSuitableForVGpu (final VGpu vgpu, 
     		final MipsShare requestedMips) {
         if(requestedMips.isEmpty()){
             LOGGER.warn(
@@ -76,22 +76,22 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     }
 
     protected abstract boolean isSuitableForVGpuInternal (
-    		CustomVGpu vgpu, MipsShare requestedMips);
+    		VGpu vgpu, MipsShare requestedMips);
 
     @Override
-    public final boolean allocateCoresForVGpu (final CustomVGpu vgpu) {
+    public final boolean allocateCoresForVGpu (final VGpu vgpu) {
         return allocateCoresForVGpu (vgpu, new MipsShare(vgpu.getVGpuCore().getCapacity(), 
         		vgpu.getVGpuCore().getMips()));
     }
 
     @Override
-    public final boolean allocateCoresForVGpu (final CustomVGpu vgpu, 
+    public final boolean allocateCoresForVGpu (final VGpu vgpu, 
     		final MipsShare requestedMips) {
         if (!vgpu.isInMigration() && gpu.getVGpusMigratingOut().contains(vgpu)) {
             gpu.removeVGpuMigratingOut(vgpu);
         }
 
-        ((CustomVGpuSimple)vgpu).setRequestedMips(new MipsShare(requestedMips));
+        ((VGpuSimple)vgpu).setRequestedMips(new MipsShare(requestedMips));
         if(allocateCoresForVGpuInternal(vgpu, requestedMips)) {
             updateGpuCoresStatusToBusy(vgpu);
             return true;
@@ -99,15 +99,15 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
         return false;
     }
     
-    protected abstract boolean allocateCoresForVGpuInternal (CustomVGpu vgpu, 
+    protected abstract boolean allocateCoresForVGpuInternal (VGpu vgpu, 
     		MipsShare mipsShareRequested);
     
-    private void updateGpuCoresStatusToBusy (final CustomVGpu vgpu) {
-        updateGpuCoresStatus (gpu.getFreeCoreList(), vgpu.getNumberOfCores(), Pe.Status.BUSY);
+    private void updateGpuCoresStatusToBusy (final VGpu vgpu) {
+        updateGpuCoresStatus (gpu.getFreeCoreList(), vgpu.getNumberOfCores(), GpuCore.Status.BUSY);
     }
     
-    private void updateGpuCoresStatus (final List<Pe> coreList, 
-    		final long vCoresNumber, final Pe.Status newStatus) {
+    private void updateGpuCoresStatus (final List<GpuCore> coreList, 
+    		final long vCoresNumber, final GpuCore.Status newStatus) {
         if(vCoresNumber <= 0) 
             return;
 
@@ -116,12 +116,12 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     }
     
     @Override
-    public void deallocateCoresFromVGpu (final CustomVGpu vgpu) {
+    public void deallocateCoresFromVGpu (final VGpu vgpu) {
         deallocateCoresFromVGpu(vgpu, (int)vgpu.getNumberOfCores());
     }
 
     @Override
-    public void deallocateCoresFromVGpu (final CustomVGpu vgpu, final int coresToRemove) {
+    public void deallocateCoresFromVGpu (final VGpu vgpu, final int coresToRemove) {
         if(coresToRemove <= 0 || vgpu.getNumberOfCores() == 0){
             return;
         }
@@ -131,25 +131,25 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     }
     
     private void updateGpuUsedCoresToFree (final long removedCores) {
-        updateGpuCoresStatus(gpu.getBusyCoreList(), removedCores, Pe.Status.FREE);
+        updateGpuCoresStatus(gpu.getBusyCoreList(), removedCores, GpuCore.Status.FREE);
     }
     
-    protected final long removeCoresFromVGpu (final CustomVGpu vgpu, final MipsShare mipsShare, 
+    protected final long removeCoresFromVGpu (final VGpu vgpu, final MipsShare mipsShare, 
     		final long coresToRemove) {
         return mipsShare.remove(Math.min(vgpu.getNumberOfCores(), coresToRemove));
     }
 
-    protected abstract long deallocateCoresFromVGpuInternal(CustomVGpu vgpu, int pesToRemove);
+    protected abstract long deallocateCoresFromVGpuInternal(VGpu vgpu, int pesToRemove);
 
     @Override
-    public MipsShare getAllocatedMips (final CustomVGpu vgpu) {
-        final MipsShare mipsShare = ((CustomVGpuSimple)vgpu).getAllocatedMips();
+    public MipsShare getAllocatedMips (final VGpu vgpu) {
+        final MipsShare mipsShare = ((VGpuSimple)vgpu).getAllocatedMips();
 
         return gpu.getVGpusMigratingOut().contains(vgpu) ? getMipsShareRequestedReduced(
         		vgpu, mipsShare) : mipsShare;
     }
     
-    protected MipsShare getMipsShareRequestedReduced(final CustomVGpu vgpu, 
+    protected MipsShare getMipsShareRequestedReduced(final VGpu vgpu, 
     		final MipsShare mipsShareRequested){
         final double peMips = getCoreCapacity();
         final long requestedPes = mipsShareRequested.pes();
@@ -159,7 +159,7 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
     }
     
     @Override
-    public double getTotalAllocatedMipsForVGpu (final CustomVGpu vgpu) {
+    public double getTotalAllocatedMipsForVGpu (final VGpu vgpu) {
         return getAllocatedMips(vgpu).totalMips();
     }
     
@@ -167,13 +167,13 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
         return getWorkingCoreList().isEmpty() ? 0 : getWorkingCoreList().get(0).getCapacity();
     }
     
-    public final List<Pe> getWorkingCoreList () {
+    public final List<GpuCore> getWorkingCoreList () {
         return gpu.getWorkingCoreList();
     }
     
     @Override
-    public MipsShare getRequestedMips (final CustomVGpu vgpu) {
-        return ((CustomVGpuSimple)vgpu).getRequestedMips();
+    public MipsShare getRequestedMips (final VGpu vgpu) {
+        return ((VGpuSimple)vgpu).getRequestedMips();
     }
 
     @Override
@@ -182,20 +182,20 @@ public abstract class VGpuSchedulerAbstract implements VGpuScheduler {
         		gpu.getVGpusMigratingIn().stream());
         final double allocatedMips =
                 vgpuStream
-                    .map(vgpu -> (CustomVGpuSimple)vgpu)
+                    .map(vgpu -> (VGpuSimple)vgpu)
                     .mapToDouble(this::actualVGpuTotalRequestedMips)
                     .sum();
 
         return gpu.getTotalMipsCapacity() - allocatedMips;
     }
     
-    private double actualVGpuTotalRequestedMips (final CustomVGpuSimple vgpu) {
+    private double actualVGpuTotalRequestedMips (final VGpuSimple vgpu) {
         final double totalVGpuRequestedMips = vgpu.getAllocatedMips().totalMips();
 
         return totalVGpuRequestedMips / percentOfMipsToRequest(vgpu);
     }
     
-    protected double percentOfMipsToRequest (final CustomVGpu vgpu) {
+    protected double percentOfMipsToRequest (final VGpu vgpu) {
         if (gpu.getVGpusMigratingIn().contains(vgpu)) {
             /* While the VM is migrating in,
             the destination host only increases CPU usage according

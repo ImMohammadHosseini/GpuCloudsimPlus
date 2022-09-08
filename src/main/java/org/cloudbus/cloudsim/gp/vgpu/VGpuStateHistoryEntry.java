@@ -1,4 +1,4 @@
-package org.cloudbus.cloudsim.gp.resources;
+package org.cloudbus.cloudsim.gp.vgpu;
 
 import org.cloudbus.cloudsim.vms.VmStateHistoryEntry;
 

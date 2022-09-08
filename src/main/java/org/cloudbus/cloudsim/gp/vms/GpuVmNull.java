@@ -1,6 +1,6 @@
 package org.cloudbus.cloudsim.gp.vms;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
@@ -31,10 +31,10 @@ public class GpuVmNull implements GpuVm {
 	public String getType () {return "";}
 	
 	@Override
-	public GpuVm setVGpu (CustomVGpu vgpu) {return this;}
+	public GpuVm setVGpu (VGpu vgpu) {return this;}
 	
 	@Override
-	public CustomVGpu getVGpu () {return CustomVGpu.NULL;}
+	public VGpu getVGpu () {return VGpu.NULL;}
 	
 	@Override public void setId(long id) {/**/}
     @Override public long getId() {

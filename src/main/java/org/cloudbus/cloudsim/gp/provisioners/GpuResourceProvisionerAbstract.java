@@ -1,8 +1,8 @@
 package org.cloudbus.cloudsim.gp.provisioners;
 
-import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.resources.Resource;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import java.util.function.Function;
 import java.util.Objects;
@@ -11,20 +11,20 @@ import java.util.Objects;
 public abstract class GpuResourceProvisionerAbstract implements GpuResourceProvisioner {
 	
 	private ResourceManageable pGpuResource;
-	private Function<CustomVGpu, ResourceManageable> vGpuResourceFunction;
+	private Function<VGpu, ResourceManageable> vGpuResourceFunction;
 	
 	protected GpuResourceProvisionerAbstract() {
         this(ResourceManageable.NULL, vgpu -> ResourceManageable.NULL);
     }
 
     public GpuResourceProvisionerAbstract(final ResourceManageable pGpuResource, 
-    		final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
+    		final Function<VGpu, ResourceManageable> vGpuResourceFunction) {
         setResources(pGpuResource, vGpuResourceFunction);
     }
     
     
 	@Override
-    public long getAllocatedResourceForVGpu(final CustomVGpu vGpu) {
+    public long getAllocatedResourceForVGpu(final VGpu vGpu) {
         return vGpuResourceFunction.apply(vGpu).getAllocatedResource();
     }
 	
@@ -35,7 +35,7 @@ public abstract class GpuResourceProvisionerAbstract implements GpuResourceProvi
 
     @Override
     public final void setResources(final ResourceManageable pGpuResource, 
-    		final Function<CustomVGpu, ResourceManageable> vGpuResourceFunction) {
+    		final Function<VGpu, ResourceManageable> vGpuResourceFunction) {
         this.pGpuResource = Objects.requireNonNull(pGpuResource);
         this.vGpuResourceFunction = Objects.requireNonNull(vGpuResourceFunction);
     }
@@ -55,7 +55,7 @@ public abstract class GpuResourceProvisionerAbstract implements GpuResourceProvi
         return pGpuResource.getAvailableResource();
     }
     
-    protected Function<CustomVGpu, ResourceManageable> getVGpuResourceFunction() {
+    protected Function<VGpu, ResourceManageable> getVGpuResourceFunction() {
         return vGpuResourceFunction;
     }
 }

@@ -2,8 +2,8 @@ package org.cloudbus.cloudsim.gp.schedulers.gputask;
 
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTaskExecution;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpuSimple;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.GpuTaskResourceAllocationFailEventInfo;
@@ -42,13 +42,13 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     private MipsShare currentMipsShare;
     private boolean enableGpuTaskSubmittedList;
     
-    private CustomVGpu vgpu;
+    private VGpu vgpu;
     
     private final List<EventListener<GpuTaskResourceAllocationFailEventInfo>> resourceAllocationFailListeners;
 
     protected GpuTaskSchedulerAbstract () {
         setPreviousTime(0.0);
-        vgpu = CustomVGpu.NULL;
+        vgpu = VGpu.NULL;
         gpuTaskSubmittedList = new ArrayList<>();
         gpuTaskExecList = new ArrayList<>();
         gpuTaskPausedList = new ArrayList<>();
@@ -362,8 +362,8 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     }
     
     private void deallocateVGpuResources () {
-        ((CustomVGpuSimple)vgpu).getGddram().deallocateAllResources();
-        ((CustomVGpuSimple)vgpu).getBw().deallocateAllResources();
+        ((VGpuSimple)vgpu).getGddram().deallocateAllResources();
+        ((VGpuSimple)vgpu).getBw().deallocateAllResources();
     }
     
     @SuppressWarnings("ForLoopReplaceableByForEach")
@@ -380,7 +380,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
             usedCores += gte.getGpuTask().getNumberOfPes();
         }
 
-        ((CustomVGpuSimple) vgpu).setFreePesNumber(vgpu.getNumberOfPes() - usedCores);
+        ((VGpuSimple) vgpu).setFreePesNumber(vgpu.getNumberOfPes() - usedCores);
 
         return nextGpuTaskFinishTime;
     }
@@ -399,8 +399,8 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
         final double partialFinishedInstructions = gpuTaskExecutedInstructionsForTimeSpan (gte, 
         		currentTime);
         gte.updateProcessing(partialFinishedInstructions);
-        updateVGpuResourceAbsoluteUtilization(gte, ((CustomVGpuSimple)vgpu).getGddram());
-        updateVGpuResourceAbsoluteUtilization(gte, ((CustomVGpuSimple)vgpu).getBw());
+        updateVGpuResourceAbsoluteUtilization(gte, ((VGpuSimple)vgpu).getGddram());
+        updateVGpuResourceAbsoluteUtilization(gte, ((VGpuSimple)vgpu).getBw());
 
         return (long)(partialFinishedInstructions/ Conversion.MILLION);
     }
@@ -504,7 +504,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     		final double processingTimeSpan) {
     	gg;
         return getResourceOverSubscriptionDelay(
-            gte, processingTimeSpan, ((CustomVGpuSimple)vgpu).getGddram(),
+            gte, processingTimeSpan, ((VGpuSimple)vgpu).getGddram(),
 
             (vgpuGddram, requestedRam) -> requestedRam <= vgpuGddram.getCapacity() && 
             requestedRam <= vm.getStorage().getAvailableResource(),
@@ -519,7 +519,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     private double getBandwidthOverSubscriptionDelay (final GpuTaskExecution gte, 
     		final double processingTimeSpan) {
         return getResourceOverSubscriptionDelay(
-            gte, processingTimeSpan, ((CustomVGpuSimple)vgpu).getBw(),
+            gte, processingTimeSpan, ((VGpuSimple)vgpu).getBw(),
             (vgpuBw, requestedBw) -> requestedBw <= vgpuBw.getCapacity(),
 
             (notAllocatedBw, requestedBw) -> requestedBw/(requestedBw-notAllocatedBw) - 1);
@@ -640,12 +640,12 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     }
 
     @Override
-    public CustomVGpu getVGpu () {
+    public VGpu getVGpu () {
         return vgpu;
     }
 
     @Override
-    public void setVGpu (final CustomVGpu vgpu) {
+    public void setVGpu (final VGpu vgpu) {
         if (isOtherVmAssigned(requireNonNull(vgpu))) {
             throw new IllegalArgumentException(
                 "GpuTaskScheduler already has a vgpu assigned to it. Each vgpu must have its own GpuTaskScheduler instance.");
@@ -654,8 +654,8 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
         this.vgpu = vgpu;
     }
     
-    private boolean isOtherVmAssigned (final CustomVGpu vgpu) {
-        return this.vgpu != null && this.vgpu != CustomVGpu.NULL && !CustomVGpu.equals(this.vgpu);
+    private boolean isOtherVmAssigned (final VGpu vgpu) {
+        return this.vgpu != null && this.vgpu != VGpu.NULL && !VGpu.equals(this.vgpu);
     }
 
     @Override

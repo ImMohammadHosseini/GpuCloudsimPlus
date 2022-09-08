@@ -1,8 +1,10 @@
-package org.cloudbus.cloudsim.gp.resources;
+package org.cloudbus.cloudsim.gp.vgpu;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.gp.vms.GpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
+import org.cloudbus.cloudsim.gp.resources.VGpuCore;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
@@ -25,7 +27,7 @@ import java.util.*;
 
 import static java.util.Objects.requireNonNull;
 
-public class CustomVGpuSimple implements CustomVGpu {
+public class VGpuSimple implements VGpu {
 
 	private static long defaultGddramCapacity = 1024;
     private static long defaultBwCapacity = 100;
@@ -82,30 +84,30 @@ public class CustomVGpuSimple implements CustomVGpu {
     private MipsShare allocatedMips;
     private MipsShare requestedMips;
 	
-    public CustomVGpuSimple(final CustomVGpu sourceVGpu) {
+    public VGpuSimple(final VGpu sourceVGpu) {
         this(sourceVGpu.getMips(), sourceVGpu.getNumberOfCores());
         this.setBw(sourceVGpu.getBw().getCapacity())
             .setGddram(sourceVGpu.getGddram().getCapacity());
             //.setSize(sourceVGpu.getStorage().getCapacity());
     }
     
-    public CustomVGpuSimple(final double mips, final long numberOfCores) {
+    public VGpuSimple(final double mips, final long numberOfCores) {
         this(-1, "", "", -1, (long)mips, numberOfCores);
     }
     
-    public CustomVGpuSimple(final double mips, final long numberOfCores, 
+    public VGpuSimple(final double mips, final long numberOfCores, 
     		final GpuTaskScheduler gpuTaskScheduler) {
         this(-1, "", "", -1, (long)mips, numberOfCores);
         setGpuTaskScheduler(gpuTaskScheduler);
     }
     
-    public CustomVGpuSimple(final long id, final String type, final String tenancy, 
+    public VGpuSimple(final long id, final String type, final String tenancy, 
 			final int PCIeBw, final double mips, final long numberOfCores) {
         this(id, type, tenancy, PCIeBw,(long)mips, numberOfCores);
     }
     
     //gddram, bw, scheduler, 
-	public CustomVGpuSimple (final long id, final String type, final String tenancy, 
+	public VGpuSimple (final long id, final String type, final String tenancy, 
 			final int PCIeBw, final long mips, final long numberOfCores) {
 		setId(id);
 		setType(type);
@@ -188,7 +190,7 @@ public class CustomVGpuSimple implements CustomVGpu {
         return freeCoresNumber;
     }
 	
-	public CustomVGpu setFreeCoresNumber (long freeCoresNumber) {
+	public VGpu setFreeCoresNumber (long freeCoresNumber) {
         if (freeCoresNumber < 0) {
             freeCoresNumber = 0;
         }
@@ -201,15 +203,15 @@ public class CustomVGpuSimple implements CustomVGpu {
         return expectedFreeCoresNumber;
     }
 	
-	public CustomVGpu addExpectedFreeCoresNumber (final long coresToAdd) {
+	public VGpu addExpectedFreeCoresNumber (final long coresToAdd) {
         return setExpectedFreeCoresNumber (expectedFreeCoresNumber + coresToAdd);
     }
 	
-	public CustomVGpu removeExpectedFreeCoresNumber (final long coresToRemove) {
+	public VGpu removeExpectedFreeCoresNumber (final long coresToRemove) {
         return setExpectedFreeCoresNumber (expectedFreeCoresNumber - coresToRemove);
     }
 	
-	private CustomVGpu setExpectedFreeCoresNumber(long expectedFreeCores) {
+	private VGpu setExpectedFreeCoresNumber(long expectedFreeCores) {
         if (expectedFreeCores < 0) {
             expectedFreeCores = 0;
         }
@@ -312,7 +314,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public CustomVGpu setStartTime (final double startTime) {
+    public VGpu setStartTime (final double startTime) {
         if (startTime < 0) {
             return this;
         }
@@ -328,7 +330,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public CustomVGpu setStopTime (final double stopTime) {
+    public VGpu setStopTime (final double stopTime) {
         this.stopTime = Math.max(stopTime, -1);
         return this;
     }
@@ -392,7 +394,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public final CustomVGpu setGddram (final long gddramCapacity) {
+    public final VGpu setGddram (final long gddramCapacity) {
         if (this.isCreated()) {
             throw new UnsupportedOperationException("gddram capacity can just be changed when the vgpu was not created inside a videocard yet.");
         }
@@ -411,7 +413,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public final CustomVGpu setBw (final long bwCapacity) {
+    public final VGpu setBw (final long bwCapacity) {
         if (this.isCreated()) {
             throw new UnsupportedOperationException("Bandwidth capacity can just be changed when the vgpu was not created inside a videocard yet.");
         }
@@ -447,7 +449,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }*/
     
     @Override
-    public CustomVGpu setGpu (final Gpu gpu) {
+    public VGpu setGpu (final Gpu gpu) {
         if (Gpu.NULL.equals(requireNonNull(gpu)))  {
             setCreated(false);
         }
@@ -467,7 +469,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public final CustomVGpu setGpuTaskScheduler (final GpuTaskScheduler gpuTaskScheduler) {
+    public final VGpu setGpuTaskScheduler (final GpuTaskScheduler gpuTaskScheduler) {
         requireNonNull(gpuTaskScheduler);
         if (isCreated()) {
             throw new UnsupportedOperationException("GpuTaskScheduler can just be changed when the vgpu was not created inside a Videocard yet.");
@@ -569,28 +571,28 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public CustomVGpu addOnGpuAllocationListener(
+    public VGpu addOnGpuAllocationListener(
     		final EventListener<VGpuGpuEventInfo> listener) {
         this.onGpuAllocationListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
-    public CustomVGpu addOnMigrationStartListener(
+    public VGpu addOnMigrationStartListener(
     		final EventListener<VGpuGpuEventInfo> listener) {
         onMigrationStartListeners.add(requireNonNull(listener));
         return this;
     }
     
     @Override
-    public CustomVGpu addOnMigrationFinishListener(
+    public VGpu addOnMigrationFinishListener(
     		final EventListener<VGpuGpuEventInfo> listener) {
         onMigrationFinishListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
-    public CustomVGpu addOnGpuDeallocationListener(
+    public VGpu addOnGpuDeallocationListener(
     		final EventListener<VGpuGpuEventInfo> listener) {
         if (listener.equals(EventListener.NULL)) {
             return this;
@@ -601,7 +603,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public CustomVGpu addOnCreationFailureListener(final EventListener<VGpuVideocardEventInfo> listener) {
+    public VGpu addOnCreationFailureListener(final EventListener<VGpuVideocardEventInfo> listener) {
         if (listener.equals(EventListener.NULL)) {
             return this;
         }
@@ -611,7 +613,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public CustomVGpu addOnUpdateProcessingListener(
+    public VGpu addOnUpdateProcessingListener(
     		final EventListener<VGpuGpuEventInfo> listener) {
         if (listener.equals(EventListener.NULL)) {
             return this;
@@ -652,7 +654,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }*/
 
     @Override
-    public int compareTo(final CustomVGpu obj) {
+    public int compareTo(final VGpu obj) {
         if(this.equals(requireNonNull(obj))) {
             return 0;
         }
@@ -838,7 +840,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
 
     @Override
-    public CustomVGpu setDescription (final String description) {
+    public VGpu setDescription (final String description) {
         this.description = description == null ? "" : description;
         return this;
     }
@@ -935,7 +937,7 @@ public class CustomVGpuSimple implements CustomVGpu {
     }
     
     @Override
-    public CustomVGpu setGpuVm (GpuVm gpuVm) {
+    public VGpu setGpuVm (GpuVm gpuVm) {
     	this.gpuVm = gpuVm;
     	if (!gpuVm.hasVGpu())
     		gpuVm.setVGpu(this);

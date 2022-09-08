@@ -1,8 +1,8 @@
 package org.cloudbus.cloudsim.gp.schedulers.vgpu;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,15 +12,15 @@ public interface VGpuScheduler {
 
 	VGpuScheduler NULL = new VGpuSchedulerNull ();
 	
-	boolean allocateCoresForVGpu (CustomVGpu vgpu, MipsShare requestedMips);
+	boolean allocateCoresForVGpu (VGpu vgpu, MipsShare requestedMips);
 
-    boolean allocateCoresForVGpu (CustomVGpu vgpu);
+    boolean allocateCoresForVGpu (VGpu vgpu);
 
-    void deallocateCoresFromVGpu (CustomVGpu vgpu);
+    void deallocateCoresFromVGpu (VGpu vgpu);
 
-    void deallocateCoresFromVGpu (CustomVGpu vgpu, int coresToRemove);
+    void deallocateCoresFromVGpu (VGpu vgpu, int coresToRemove);
 
-    MipsShare getAllocatedMips (CustomVGpu vgpu);
+    MipsShare getAllocatedMips (VGpu vgpu);
 
     double getTotalAvailableMips ();
 
@@ -28,13 +28,13 @@ public interface VGpuScheduler {
 
 	VGpuScheduler setGpu (Gpu gpu);
 
-    MipsShare getRequestedMips (CustomVGpu vgpu);
+    MipsShare getRequestedMips (VGpu vgpu);
 
-    boolean isSuitableForVGpu (CustomVGpu vgpu);
+    boolean isSuitableForVGpu (VGpu vgpu);
 
-    boolean isSuitableForVGpu (CustomVGpu vgpu, MipsShare requestedMips);
+    boolean isSuitableForVGpu (VGpu vgpu, MipsShare requestedMips);
 
-    double getTotalAllocatedMipsForVGpu (CustomVGpu vgpu);
+    double getTotalAllocatedMipsForVGpu (VGpu vgpu);
 
     double getMaxGpuUsagePercentDuringOutMigration ();
 

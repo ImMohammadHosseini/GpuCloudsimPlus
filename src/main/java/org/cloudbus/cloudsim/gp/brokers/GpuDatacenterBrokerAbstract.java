@@ -2,15 +2,15 @@ package org.cloudbus.cloudsim.gp.brokers;
 
 import org.cloudsimplus.listeners.DatacenterBrokerEventInfo;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudletSimple;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpuSimple;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
 import org.cloudbus.cloudsim.gp.datacenters.TimeZoned;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
 import org.cloudbus.cloudsim.gp.core.GpuCloudsimTags;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.cloudbus.cloudsim.util.InvalidEventDataTypeException;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
@@ -36,7 +36,7 @@ GpuDatacenterBroker {
 	
 	private static final Function<GpuVm, Double> DEF_VM_DESTRUCTION_DELAY_FUNC = 
 			gpuvm -> DEF_VM_DESTRUCTION_DELAY;
-	private static final Function<CustomVGpu, Double> DEF_VGPU_DESTRUCTION_DELAY_FUNC = 
+	private static final Function<VGpu, Double> DEF_VGPU_DESTRUCTION_DELAY_FUNC = 
 			vgpu -> DEF_VGPU_DESTRUCTION_DELAY;
 	
     private boolean selectClosestGpuDatacenter;
@@ -73,7 +73,7 @@ GpuDatacenterBroker {
     private GpuVm lastSubmittedGpuVm;
 
     private Function<GpuVm, Double> gpuvmDestructionDelayFunction;
-    private Function<CustomVGpu, Double> vgpuDestructionDelayFunction;
+    private Function<VGpu, Double> vgpuDestructionDelayFunction;
 
     private boolean shutdownRequested;
     private boolean shutdownWhenIdle;
@@ -351,7 +351,7 @@ GpuDatacenterBroker {
     }
     
     @Override
-    public boolean bindGpuTaskToVGpu (GpuTask gpuTask, CustomVGpu vgpu) {
+    public boolean bindGpuTaskToVGpu (GpuTask gpuTask, VGpu vgpu) {
     	gpuTask.setVGpu (vgpu);
     	return true;
     }
@@ -635,7 +635,7 @@ GpuDatacenterBroker {
         
         gpucloudletsFinishedList.add(cloudlet);
         ((GpuVmSimple) cloudlet.getVm()).addExpectedFreePesNumber(cloudlet.getNumberOfPes());
-        ((CustomVGpuSimple) cloudlet.getGpuTask().getVGpu()).addExpectedFreeCoresNumber(
+        ((VGpuSimple) cloudlet.getGpuTask().getVGpu()).addExpectedFreeCoresNumber(
         		cloudlet.getGpuTask().getNumberOfCores());
         
         String cloudletLifeTime = cloudlet.getLifeTime() == -1 ? "" : 
@@ -675,7 +675,7 @@ GpuDatacenterBroker {
     }*/
     
     /*@Override
-    public DatacenterBroker requestIdleVGpuDestruction (CustomVGpu vgpu) {
+    public DatacenterBroker requestIdleVGpuDestruction (VGpu vgpu) {
     	if (vgpu.isCreated()) {
             if(isVGpuIdleEnough(vgpu) || isFinisheddd()) {
                 LOGGER.info("{}: {}: Requesting {} destruction.", getSimulation().clockStr(), 
@@ -683,7 +683,7 @@ GpuDatacenterBroker {
                 sendNow(getDatacenter(vgpu.getGpuVm()), GpuCloudsimTags.VGPU_DESTROY, vgpu);
             }
 
-            if(isVGpuIdlenessVerificationRequired((CustomVGpuSimple)vgpu)) {
+            if(isVGpuIdlenessVerificationRequired((VGpuSimple)vgpu)) {
                 getSimulation().send(
                     new CloudSimEvent(vgpuDestructionDelayFunction.apply(vgpu),
                         vgpu.getGpuVm().getHost().getDatacenter(),
@@ -693,7 +693,7 @@ GpuDatacenterBroker {
         }
     }*/
     
-    private boolean isVGpuIdlenessVerificationRequired (final CustomVGpuSimple vgpu) {
+    private boolean isVGpuIdlenessVerificationRequired (final VGpuSimple vgpu) {
         if(vgpu.hasStartedSomeGpuTask() && vgpu.getGpuTaskScheduler().isEmpty()){
             final int schedulingInterval = (int)vgpu.getGpuVm().getHost().getDatacenter().
             		getSchedulingInterval();
@@ -704,7 +704,7 @@ GpuDatacenterBroker {
         return false;
     }
     
-    /*private boolean isVGpuIdleEnough (final CustomVGpu vgpu) {
+    /*private boolean isVGpuIdleEnough (final VGpu vgpu) {
         final double delay = vgpuDestructionDelayFunction.apply(vgpu);
         return delay > DEF_VGPU_DESTRUCTION_DELAY && vgpu.isIdleEnough(delay);
     }*/
@@ -719,7 +719,7 @@ GpuDatacenterBroker {
             }
 
             if(isVmIdlenessVerificationRequired((GpuVmSimple)vm) ||
-            		isVGpuIdlenessVerificationRequired((CustomVGpuSimple)((GpuVmSimple)vm).getVGpu())) {
+            		isVGpuIdlenessVerificationRequired((VGpuSimple)((GpuVmSimple)vm).getVGpu())) {
                 getSimulation().send(
                     new CloudSimEvent(gpuvmDestructionDelayFunction.apply((GpuVm)vm),
                         vm.getHost().getDatacenter(),

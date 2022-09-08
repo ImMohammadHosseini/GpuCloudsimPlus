@@ -6,7 +6,7 @@ import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.Simulation;
 
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 final class GpuTaskNull implements GpuTask {
 	
@@ -178,8 +178,8 @@ final class GpuTaskNull implements GpuTask {
     @Override public GpuTask setLifeTime (final double lifeTime) { return this; }
     @Override public double getLifeTime () { return -1; }
 	@Override public double registerArrivalInVideocard () { return 0; }
-	@Override public CustomVGpu getVGpu () { return CustomVGpu.NULL; }
-	@Override public GpuTask setVGpu(CustomVGpu vgpu) { return this; }
+	@Override public VGpu getVGpu () { return VGpu.NULL; }
+	@Override public GpuTask setVGpu(VGpu vgpu) { return this; }
 	@Override public double getSubmissionDelay () { return 0; }
 
 }

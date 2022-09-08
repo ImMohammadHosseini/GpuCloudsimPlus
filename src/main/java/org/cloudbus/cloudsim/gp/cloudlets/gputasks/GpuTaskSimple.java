@@ -4,9 +4,9 @@ import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import java.util.*;
 
@@ -24,7 +24,7 @@ public class GpuTaskSimple implements GpuTask {
     private double execStartTime;
     private int priority;
     ///private int netServiceLevel;
-    private CustomVGpu vgpu;
+    private VGpu vgpu;
     //private List<String> requiredFiles;
     private long fileSize;
     private long outputSize;
@@ -89,7 +89,7 @@ public class GpuTaskSimple implements GpuTask {
         this.priority = 0;
         //setBroker(DatacenterBroker.NULL);
         setFinishTime(NOT_ASSIGNED); // meaning this GpuTask hasn't finished yet
-        this.vgpu = CustomVGpu.NULL;
+        this.vgpu = VGpu.NULL;
         setExecStartTime(0.0);
         setArrivalTime(0);
         //setCreationTime(0);
@@ -227,7 +227,7 @@ public class GpuTaskSimple implements GpuTask {
     @Override
     public void setExecStartTime (final double clockTime) {
         final boolean isStartingInVgpu = this.execStartTime <= 0 && clockTime > 0 && 
-        		vgpu != CustomVGpu.NULL && vgpu != null;
+        		vgpu != VGpu.NULL && vgpu != null;
         this.execStartTime = clockTime;
         if(isStartingInVgpu){
             onStartListeners.forEach(listener -> listener.update(
@@ -476,12 +476,12 @@ public class GpuTaskSimple implements GpuTask {
 	}
 
 	@Override
-	public CustomVGpu getVGpu () {
+	public VGpu getVGpu () {
 		return vgpu;
 	}
 
 	@Override
-	public GpuTask setVGpu (CustomVGpu vgpu) {
+	public GpuTask setVGpu (VGpu vgpu) {
 		this.vgpu = vgpu;
         return this;
 	}

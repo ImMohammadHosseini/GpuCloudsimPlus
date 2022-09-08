@@ -5,10 +5,10 @@ import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.gpucloudsimplus.listeners.VideocardVGpuMigrationEventInfo;
 import org.cloudbus.cloudsim.gp.provisioners.VideocardBwProvisioner;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 
@@ -24,17 +24,17 @@ public interface Videocard {
 
 	Videocard NULL = new VideocardNull ();
 	
-	boolean processVGpuCreate (final CustomVGpu vgpu);
+	boolean processVGpuCreate (final VGpu vgpu);
 	
 	VGpuAllocationPolicy getVGpuAllocationPolicy ();
 	
-	String processVGpuDestroy (final CustomVGpu vgpu);
+	String processVGpuDestroy (final VGpu vgpu);
 	
 	<T extends Gpu> List<T> getGpuList ();
 	
 	double updateGpusProcessing ();
 
-	<T extends CustomVGpu> List<T> getVGpuList ();
+	<T extends VGpu> List<T> getVGpuList ();
 	
 	void processGpuAdditionRequest ();
 	

@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
 
 import static java.util.Comparator.comparing;
@@ -17,12 +17,12 @@ public  class VGpuAllocationPolicySimple extends VGpuAllocationPolicyAbstract {
     }
 
     public VGpuAllocationPolicySimple (
-    		final BiFunction<VGpuAllocationPolicy, CustomVGpu, Optional<Gpu>> findGpuForVGpuFunction) {
+    		final BiFunction<VGpuAllocationPolicy, VGpu, Optional<Gpu>> findGpuForVGpuFunction) {
         super(findGpuForVGpuFunction);
     }
     
     @Override
-    protected Optional<Gpu> defaultFindGpuForVGpu (final CustomVGpu vgpu) {
+    protected Optional<Gpu> defaultFindGpuForVGpu (final VGpu vgpu) {
         final Comparator<Gpu> comparator = comparing(Gpu::isActive).thenComparingLong(
         		Gpu::getFreeCoresNumber);
 

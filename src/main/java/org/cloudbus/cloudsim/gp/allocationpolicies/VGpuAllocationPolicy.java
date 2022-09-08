@@ -1,7 +1,7 @@
 package org.cloudbus.cloudsim.gp.allocationpolicies;
 
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.GpuSuitability;
 
@@ -25,11 +25,11 @@ public interface VGpuAllocationPolicy {
 
     void setVideocard(Videocard videocard);
 
-    GpuSuitability allocateGpuForVGpu (CustomVGpu vgpu);
+    GpuSuitability allocateGpuForVGpu (VGpu vgpu);
 
-    GpuSuitability allocateGpuForVGpu (CustomVGpu vgpu, Gpu gpu);
+    GpuSuitability allocateGpuForVGpu (VGpu vgpu, Gpu gpu);
 
-    <T extends CustomVGpu> List<T> allocateGpuForVGpu (Collection<T> vgpuCollection);
+    <T extends VGpu> List<T> allocateGpuForVGpu (Collection<T> vgpuCollection);
 
     /**
      * Try to scale some Vm's resource vertically up or down, respectively if:
@@ -46,16 +46,16 @@ public interface VGpuAllocationPolicy {
      */
     //boolean scaleVmVertically (VerticalVmScaling scaling);
 
-    void deallocateGpuForVGpu (CustomVGpu vgpu);
+    void deallocateGpuForVGpu (VGpu vgpu);
 
     void setFindGpuForVGpuFunction (
-    		BiFunction<VGpuAllocationPolicy, CustomVGpu, Optional<Gpu>> findGpuForVGpuFunction);
+    		BiFunction<VGpuAllocationPolicy, VGpu, Optional<Gpu>> findGpuForVGpuFunction);
 
      <T extends Gpu> List<T> getGpuList ();
 
-    Map<CustomVGpu, Gpu> getOptimizedAllocationMap (List<? extends CustomVGpu> vgpuList);
+    Map<VGpu, Gpu> getOptimizedAllocationMap (List<? extends VGpu> vgpuList);
 
-    Optional<Gpu> findGpuForVGpu (CustomVGpu vgpu);
+    Optional<Gpu> findGpuForVGpu (VGpu vgpu);
 
     boolean isVGpuMigrationSupported ();
 

@@ -3,7 +3,7 @@ package org.cloudbus.cloudsim.gp.provisioners;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.gp.resources.GpuCore;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import java.util.Objects;
 
@@ -15,7 +15,7 @@ CoreProvisioner {
     }
 
     public CoreProvisionerSimple (final GpuCore core) {
-        super(core, CustomVGpu::getVGpuCore);
+        super(core, VGpu::getVGpuCore);
         core.setCoreProvisioner(this);
     }
 
@@ -25,7 +25,7 @@ CoreProvisioner {
             throw new IllegalArgumentException("Core already has a CoreProvisioner assigned "
             		+ "to it. Each Core must have its own CoreProvisioner instance.");
         }
-        setResources(core, CustomVGpu::getVGpuCore);
+        setResources(core, VGpu::getVGpuCore);
     }
 
     @Override

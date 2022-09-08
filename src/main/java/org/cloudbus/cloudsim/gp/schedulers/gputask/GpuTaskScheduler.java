@@ -1,6 +1,6 @@
 package org.cloudbus.cloudsim.gp.schedulers.gputask;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTaskExecution;
 import org.gpucloudsimplus.listeners.GpuTaskResourceAllocationFailEventInfo;
@@ -93,9 +93,9 @@ public interface GpuTaskScheduler {
     
     double updateProcessing (double currentTime, MipsShare mipsShare);
 
-    CustomVGpu getVGpu ();
+    VGpu getVGpu ();
 
-    void setVGpu (CustomVGpu vgpu);
+    void setVGpu (VGpu vgpu);
     
     long getUsedCores ();
 

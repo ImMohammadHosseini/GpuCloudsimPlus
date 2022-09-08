@@ -1,14 +1,15 @@
 package org.cloudbus.cloudsim.gp.resources;
 
 import org.cloudbus.cloudsim.resources.ResourceManageableAbstract;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 public final class VGpuCore extends ResourceManageableAbstract {
 	public static final VGpuCore NULL = new VGpuCore(0);
 	
-	private CustomVGpu vgpu;
+	private VGpu vgpu;
 	private double mips;
 	
-	public VGpuCore (final CustomVGpu vgpu, final double mips, final long numberOfPes) {
+	public VGpuCore (final VGpu vgpu, final double mips, final long numberOfPes) {
 		this(numberOfPes);
         this.vgpu = vgpu;
         setMips(mips);
@@ -58,7 +59,7 @@ public final class VGpuCore extends ResourceManageableAbstract {
         return super.setCapacity(numberOfPes);
     }
 
-    public CustomVGpu getVgpu() {
+    public VGpu getVgpu() {
         return vgpu;
     }
 }

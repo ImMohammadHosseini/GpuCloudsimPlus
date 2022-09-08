@@ -1,9 +1,11 @@
-package org.cloudbus.cloudsim.gp.resources;
+package org.cloudbus.cloudsim.gp.vgpu;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.gp.vms.GpuVmNull;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.core.AbstractGpu;
+import org.cloudbus.cloudsim.gp.resources.VGpuCore;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;
@@ -22,10 +24,10 @@ import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
 
 import java.util.List;
 
-public interface CustomVGpu extends AbstractGpu, Comparable<CustomVGpu>, 
+public interface VGpu extends AbstractGpu, Comparable<VGpu>, 
 GpuResourceStatsComputer<VGpuResourceStats> {
 	
-	CustomVGpu NULL = new CustomVGpuNull ();
+	VGpu NULL = new VGpuNull ();
 	
 	//updateProcessing
 	double updateGpuTaskProcessing (MipsShare mipsShare);
@@ -56,11 +58,11 @@ GpuResourceStatsComputer<VGpuResourceStats> {
 	
 	String getType ();
 	
-	CustomVGpu setGpuVm (GpuVm gpuVm);
+	VGpu setGpuVm (GpuVm gpuVm);
 	
 	GpuVm getGpuVm ();
 	
-	CustomVGpu setGpuTaskScheduler (GpuTaskScheduler gpuTaskScheduler);
+	VGpu setGpuTaskScheduler (GpuTaskScheduler gpuTaskScheduler);
 	
 	GpuTaskScheduler getGpuTaskScheduler ();
 	
@@ -75,7 +77,7 @@ GpuResourceStatsComputer<VGpuResourceStats> {
 	///
 	String getDescription ();
 
-    CustomVGpu setDescription (String description);
+    VGpu setDescription (String description);
 
     //VmGroup getGroup ();
 
@@ -85,17 +87,17 @@ GpuResourceStatsComputer<VGpuResourceStats> {
 
     long getExpectedFreeCoresNumber ();
     
-    CustomVGpu addOnGpuAllocationListener (EventListener<VGpuGpuEventInfo> listener);
+    VGpu addOnGpuAllocationListener (EventListener<VGpuGpuEventInfo> listener);
 
-    CustomVGpu addOnMigrationStartListener (EventListener<VGpuGpuEventInfo> listener);
+    VGpu addOnMigrationStartListener (EventListener<VGpuGpuEventInfo> listener);
     
-    CustomVGpu addOnMigrationFinishListener (EventListener<VGpuGpuEventInfo> listener);
+    VGpu addOnMigrationFinishListener (EventListener<VGpuGpuEventInfo> listener);
 
-    CustomVGpu addOnGpuDeallocationListener (EventListener<VGpuGpuEventInfo> listener);
+    VGpu addOnGpuDeallocationListener (EventListener<VGpuGpuEventInfo> listener);
     
-    CustomVGpu addOnCreationFailureListener (EventListener<VGpuVideocardEventInfo> listener);
+    VGpu addOnCreationFailureListener (EventListener<VGpuVideocardEventInfo> listener);
 
-    CustomVGpu addOnUpdateProcessingListener (EventListener<VGpuGpuEventInfo> listener);
+    VGpu addOnUpdateProcessingListener (EventListener<VGpuGpuEventInfo> listener);
     
     void notifyOnGpuAllocationListeners ();
 
@@ -165,11 +167,11 @@ GpuResourceStatsComputer<VGpuResourceStats> {
 
     void setInMigration (boolean migrating);
 
-    CustomVGpu setBw (long bwCapacity);
+    VGpu setBw (long bwCapacity);
 
-    CustomVGpu setGpu (Gpu gpu);
+    VGpu setGpu (Gpu gpu);
 
-    CustomVGpu setGddram (long gddramCapacity);
+    VGpu setGddram (long gddramCapacity);
 
     //CustomVGpu setSize (long size); //storage
     
@@ -212,7 +214,7 @@ GpuResourceStatsComputer<VGpuResourceStats> {
     
     double getTotalExecutionTime ();
 
-    CustomVGpu setStopTime (double stopTime);
+    VGpu setStopTime (double stopTime);
     
     //@Override
     //double getTimeZone ();
@@ -233,5 +235,5 @@ GpuResourceStatsComputer<VGpuResourceStats> {
 
     double getGpuPercentUtilization ();
     
-    CustomVGpu setStartTime (final double startTime);
+    VGpu setStartTime (final double startTime);
 }
