@@ -71,10 +71,10 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     }
 
     protected void setCurrentMipsShare (final MipsShare currentMipsShare) {
-        if(currentMipsShare.pes() > vgpu.getNumberOfPes()){
+        if(currentMipsShare.pes() > vgpu.getNumberOfCores()){
             LOGGER.warn ("Requested {} PEs but {} has just {}", currentMipsShare.pes(), vgpu, 
-            		vgpu.getNumberOfPes());
-            this.currentMipsShare = new MipsShare (vgpu.getNumberOfPes(), currentMipsShare.mips());
+            		vgpu.getNumberOfCores());
+            this.currentMipsShare = new MipsShare (vgpu.getNumberOfCores(), currentMipsShare.mips());
         }
         else this.currentMipsShare = currentMipsShare;
     }
@@ -99,7 +99,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     private long totalCoresOfAllExecGpuTask () {
         return gpuTaskExecList.stream()
             .map(GpuTaskExecution::getGpuTask)
-            .mapToLong(GpuTask::getNumberOfPes).sum();
+            .mapToLong(GpuTask::getNumberOfCores).sum();
     }
 
     private double getTotalMipsShare (){
@@ -377,10 +377,10 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
             updateGpuTaskProcessingAndPacketsDispatch (gte, currentTime);
             nextGpuTaskFinishTime = Math.min(nextGpuTaskFinishTime, 
             		gpuTaskEstimatedFinishTime(gte, currentTime));
-            usedCores += gte.getGpuTask().getNumberOfPes();
+            usedCores += gte.getGpuTask().getNumberOfCores();
         }
 
-        ((VGpuSimple) vgpu).setFreePesNumber(vgpu.getNumberOfPes() - usedCores);
+        ((VGpuSimple) vgpu).setFreeCoresNumber(vgpu.getNumberOfCores() - usedCores);
 
         return nextGpuTaskFinishTime;
     }
@@ -719,7 +719,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
             getAbsoluteGpuTaskResourceUtilization(
             		gpuTask, gpuTask.getUtilizationModelGpu(), time, getAvailableMipsByCore(), "GPU", requestedUtilization);
 
-        return gpuTaskGpuUsageForOneCore * gpuTask.getNumberOfPes();
+        return gpuTaskGpuUsageForOneCore * gpuTask.getNumberOfCores();
     }
     
     protected double getRequestedMipsForGpuTask (final GpuTaskExecution gte, final double time) {
