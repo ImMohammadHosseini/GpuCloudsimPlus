@@ -344,8 +344,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
         if (!isTimeToSearchForSuitableGpuHosts()) {
             return;
         }
-
-        lastMigrationMap = gpuVmAllocationPolicy.getOptimizedAllocationMap(getGpuVmList());
+        lastMigrationMap = (Map)gpuVmAllocationPolicy.getOptimizedAllocationMap(getGpuVmList());
         for (final Map.Entry<GpuVm, GpuHost> entry : lastMigrationMap.entrySet()) {
             requestVmMigration(entry.getKey(), entry.getValue());
         }
@@ -359,7 +358,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
         return (List<T>) Collections.unmodifiableList(
                 getHostList()
                     .stream()
-                    .map(GpuHost::getVmList)
+                    .map(Host::getVmList)
                     .flatMap(List::stream)
                     .collect(toList()));
     }
@@ -465,7 +464,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
     private boolean processGpuVmCreate (final SimEvent evt) {
         final var vm = (GpuVm) evt.getData();
         final boolean gpuHostAllocatedForGpuVm = gpuVmAllocationPolicy.allocateHostForVm(vm).fully();
-        final boolean gpuAllocatedForVGpu;
+        boolean gpuAllocatedForVGpu = false;
         if (gpuHostAllocatedForGpuVm) {
         	gpuAllocatedForVGpu = ((GpuHost)vm.getHost()).getVideocard().processVGpuCreate(
         			vm.getVGpu());
@@ -718,8 +717,41 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
 
     @Override
     public void requestVmMigration(final Vm sourceVm, Host targetHost) {
-    	//TODO
+        if(GpuHost.NULL.equals(targetHost)){
+            targetHost = gpuVmAllocationPolicy.findHostForVm(sourceVm).orElse(GpuHost.NULL);
+        }
+
+        if(GpuHost.NULL.equals(targetHost)) {
+            LOGGER.warn("{}: {}: No suitable host found for {} in {}", 
+            		sourceVm.getSimulation().clockStr(), getClass().getSimpleName(), sourceVm, this);
+            return;
+        }
+
+        final GpuHost sourceHost = (GpuHost)sourceVm.getHost();
+        final double delay = timeToMigrateGpuVm((GpuVm)sourceVm, (GpuHost)targetHost);
+        final String msg1 =
+            GpuHost.NULL.equals(sourceHost) ?
+                String.format("%s to %s", sourceVm, targetHost) :
+                String.format("%s from %s to %s", sourceVm, sourceHost, targetHost);
+
+        final String currentTime = getSimulation().clockStr();
+        final var fmt = "It's expected to finish in %.2f seconds, considering the %.0f%% of "
+        		+ "bandwidth allowed for migration and the GpuVM RAM size.";
+        final String msg2 = String.format(fmt, delay, getBandwidthPercentForMigration()*100);
+        LOGGER.info("{}: {}: Migration of {} is started. {}", currentTime, getName(), msg1, msg2);
+
+        if(targetHost.addMigratingInVm(sourceVm)) {
+            sourceHost.addVmMigratingOut(sourceVm);
+            ((GpuVm)sourceVm).getVGpu().getGpu().addVGpuMigratingOut(((GpuVm)sourceVm).getVGpu());
+            send(this, delay, CloudSimTag.VM_MIGRATE, new TreeMap.SimpleEntry<>(sourceVm, targetHost));
+        }
     }
+    
+    private double timeToMigrateGpuVm (final GpuVm vm, final GpuHost targetHost) {
+        return vm.getRam().getCapacity() / bitesToBytes(targetHost.getBw().getCapacity() * 
+        		getBandwidthPercentForMigration());
+    }
+
     
     @Override
     public void shutdown() {
