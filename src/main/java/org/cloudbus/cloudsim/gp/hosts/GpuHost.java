@@ -1,5 +1,6 @@
 package org.cloudbus.cloudsim.gp.hosts;
 
+import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.hosts.Host;
 
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
@@ -18,6 +19,9 @@ public interface GpuHost extends Host {
     GpuHost NULL = new GpuHostNull();
     
     Videocard getVideocard ();
+    
+    @Override
+    <T extends Vm> List<T> getVmList ();
 }
 
 

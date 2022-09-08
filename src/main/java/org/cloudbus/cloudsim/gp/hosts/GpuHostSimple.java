@@ -1,16 +1,18 @@
 package org.cloudbus.cloudsim.gp.hosts;
 
 import org.cloudbus.cloudsim.resources.Pe;
-import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
-import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicySimple;
-import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.hosts.HostSimple;
 import org.cloudbus.cloudsim.util.BytesConversion;
-import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.resources.HarddriveStorage;
-import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
+
+import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
+import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenterSimple;
+import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
+import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicySimple;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -19,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 //  extends HostSimple 
-public class GpuHostSimple implements GpuHost {
+public class GpuHostSimple extends HostSimple implements GpuHost {
 	
 	private static long defaultRamCapacity = (long) BytesConversion.gigaToMega(10);
     private static long defaultBwCapacity = 1000;
@@ -65,7 +67,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
 
-    @Override
+    /*@Override
     public GpuHost setActive (final boolean activate) {
         if(!activate) {
             activateOnGpuDatacenterStartup = false;
@@ -86,8 +88,8 @@ public class GpuHostSimple implements GpuHost {
            return this;
         }
 
-        /*If the simulation is not running and there is a startup delay,
-        * when the datacenter is started up, it will request such a Host activation. */
+        //If the simulation is not running and there is a startup delay,
+        // when the datacenter is started up, it will request such a Host activation. 
         if(!simulation.isRunning()){
             return this;
         }
@@ -99,23 +101,17 @@ public class GpuHostSimple implements GpuHost {
         activationChangeInProgress = true;
 
         return this;
-    }
+    }*/
     
+    @Override
     public void processActivation(final boolean activate) {
-        final boolean wasActive = this.active;
-        if(activate) {
-            setStartTime(getSimulation().clock());
-            powerModel.addStartupTotals();
-        } 
-        else {
-            setShutdownTime(getSimulation().clock());
-            powerModel.addShutDownTotals();
-        }
-
-        this.active = activate;
-        ((DatacenterSimple) datacenter).updateActiveHostsNumber(this);
+        super.processActivation(activate);
         videocard.gpusProcessActivation(activate);
-        activationChangeInProgress = false;
-        notifyStartupOrShutdown(activate, wasActive);
+        
     }
+
+	@Override
+	public Videocard getVideocard () {
+		return videocard;
+	}
 }
