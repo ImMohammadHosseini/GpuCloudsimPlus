@@ -12,7 +12,7 @@ import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.vms.Vm;
 
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
-import org.cloudbus.cloudsim.gp.vms.CustomGpuVm;
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
 
 import java.util.*;
 
@@ -107,8 +107,8 @@ public class GpuCloudletNull implements GpuCloudlet {
     @Override public double getUtilizationOfRam(double time) {
         return 0.0;
     }
-    @Override public CustomGpuVm getVm() {
-        return CustomGpuVm.NULL;
+    @Override public GpuVm getVm() {
+        return GpuVm.NULL;
     }
     @Override public double getWaitingTime() {
         return 0.0;
