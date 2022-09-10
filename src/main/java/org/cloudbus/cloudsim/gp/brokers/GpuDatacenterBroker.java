@@ -1,11 +1,13 @@
 package org.cloudbus.cloudsim.gp.brokers;
 
 import java.util.List;
+import java.util.function.Function;
 
-import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
+import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.gp.vgpu.VGpu;
-
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
+import org.cloudbus.cloudsim.vms.Vm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,6 @@ public interface GpuDatacenterBroker extends DatacenterBroker {
     
     //boolean bindGpuTaskToVGpu (GpuTask gpuTask, VGpu vgpu);
     
-    DatacenterBroker requestIdleVGpuDestruction(VGpu vgpu);
+    //DatacenterBroker requestIdleVGpuDestruction(VGpu vgpu);
     
 }

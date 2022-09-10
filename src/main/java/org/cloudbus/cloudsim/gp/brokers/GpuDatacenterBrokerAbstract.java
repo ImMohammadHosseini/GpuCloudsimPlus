@@ -1,6 +1,5 @@
 package org.cloudbus.cloudsim.gp.brokers;
 
-import org.cloudsimplus.listeners.DatacenterBrokerEventInfo;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudletSimple;
 import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
@@ -19,9 +18,12 @@ import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.core.events.SimEvent;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
-import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.core.*;
 import org.cloudbus.cloudsim.vms.Vm;
+
+import org.cloudsimplus.listeners.DatacenterBrokerEventInfo;
+import org.cloudsimplus.listeners.EventListener;
+import org.cloudsimplus.listeners.EventInfo;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -921,5 +923,170 @@ GpuDatacenterBroker {
                 fallbackMsg, vm.getSubmissionDelay());
     }
 
-    protected abstract GpuDatacenter defaultGpuDatacenterMapper (GpuDatacenter lastDatacenter, GpuVm vm);
+    protected abstract GpuDatacenter defaultGpuDatacenterMapper (GpuDatacenter lastDatacenter, 
+    		GpuVm vm);
+    
+    protected GpuVm getGpuVmFromCreatedList (final int vmIndex) {
+        return vmIndex >= 0 && vmIndex < gpuvmExecList.size() ? gpuvmExecList.get(vmIndex) : 
+        	GpuVm.NULL;
+    }
+    
+    @Override
+    public List<Cloudlet> getCloudletCreatedList() {
+        return gpucloudletsCreatedList;
+    }
+
+    @Override
+    public <T extends Cloudlet> List<T> getCloudletWaitingList() {
+        return (List<T>) gpucloudletWaitingList;
+    }
+
+    @Override
+    public <T extends Cloudlet> List<T> getCloudletFinishedList() {
+        return (List<T>) new ArrayList<>(gpucloudletsFinishedList);
+    }
+    
+    @Override
+    public <T extends Vm> List<T> getVmExecList() {
+        return (List<T>) gpuvmExecList;
+    }
+
+    @Override
+    public <T extends Vm> List<T> getVmWaitingList() {
+        return (List<T>) gpuvmWaitingList;
+    }
+
+    @Override
+    public GpuVm getWaitingVm(final int index) {
+        if (index >= 0 && index < gpuvmWaitingList.size()) {
+            return gpuvmWaitingList.get(index);
+        }
+
+        return GpuVm.NULL;
+    }
+    
+    @Override
+    public double getFailedVmsRetryDelay () {
+        return failedGpuVmsRetryDelay;
+    }
+
+    @Override
+    public void setFailedVmsRetryDelay (final double failedVmsRetryDelay) {
+        this.failedGpuVmsRetryDelay = failedVmsRetryDelay;
+    }
+
+    @Override
+    public boolean isShutdownWhenIdle () {
+        return shutdownWhenIdle;
+    }
+
+    @Override
+    public DatacenterBroker setShutdownWhenIdle (final boolean shutdownWhenIdle) {
+        this.shutdownWhenIdle = shutdownWhenIdle;
+        return this;
+    }
+    
+    @Override
+    public <T extends Vm> List<T> getVmFailedList () {
+        return  (List<T>) gpuvmFailedList;
+    }
+    
+    @Override
+    public Function<Vm, Double> getVmDestructionDelayFunction () {
+        return gpuvmDestructionDelayFunction;
+    }
+
+    @Override
+    public GpuDatacenterBroker setVmDestructionDelay (final double delay) {
+        if(delay <= getSimulation().getMinTimeBetweenEvents() && delay != DEF_VM_DESTRUCTION_DELAY){
+            final var msg = "The delay should be larger then the simulation minTimeBetweenEvents "
+            		+ "to ensure GpuVMs are gracefully shutdown.";
+            throw new IllegalArgumentException(msg);
+        }
+
+        setVmDestructionDelayFunction(vm -> delay);
+        return this;
+    }
+
+    @Override
+    public DatacenterBroker setVmDestructionDelayFunction (final Function<Vm, Double> function) {
+        this.gpuvmDestructionDelayFunction = function == null ? DEF_VM_DESTRUCTION_DELAY_FUNC : 
+        	(Function)function;
+        return this;
+    }
+
+    @Override
+    public List<Cloudlet> getCloudletSubmittedList () {
+        return gpucloudletSubmittedList;
+    }
+
+    @Override
+    public void startInternal () {
+        LOGGER.info("{} is starting...", getName());
+        schedule(getSimulation().getCloudInfoService(), 0, CloudSimTag.DC_LIST_REQUEST);
+    }
+    
+    @Override
+    public GpuDatacenterBroker removeOnVmsCreatedListener (
+    		final EventListener<? extends EventInfo> listener) {
+        this.onGpuVmsCreatedListeners.remove(requireNonNull(listener));
+        return this;
+    }
+    
+    @Override
+    public GpuDatacenterBroker addOnVmsCreatedListener (
+    		final EventListener<DatacenterBrokerEventInfo> listener) {
+        this.onGpuVmsCreatedListeners.add(requireNonNull(listener));
+        return this;
+    }
+    
+    @Override
+    public void setCloudletComparator (final Comparator<Cloudlet> comparator) {
+        this.gpucloudletComparator = (Comparator)comparator;
+    }
+
+    @Override
+    public GpuDatacenterBroker setVmComparator (final Comparator<Vm> comparator) {
+        this.gpuvmComparator = (Comparator)comparator;
+        return this;
+    }
+    
+    @Override
+    public <T extends Vm> List<T> getVmCreatedList () {
+        return (List<T>) gpuvmCreatedList;
+    }
+    
+    @Override
+    public int getVmsNumber () {
+        return gpuvmCreatedList.size() + gpuvmWaitingList.size() + gpuvmFailedList.size();
+    }
+    
+	@Override
+	public List<Cloudlet> destroyVm (Vm vm) {
+		
+		if(vm.isCreated()) {
+            final var cloudletsAffectedList = new ArrayList<Cloudlet>();
+
+            for (final var iterator = gpucloudletSubmittedList.iterator(); iterator.hasNext(); ) {
+                final GpuCloudlet cloudlet = iterator.next();
+                if(cloudlet.getVm().equals(vm) && !cloudlet.isFinished()) {
+                    cloudlet.setVm(GpuVm.NULL);
+                    cloudlet.getGpuTask().setVGpu(VGpu.NULL);
+                    cloudletsAffectedList.add(cloudlet.reset());
+                    cloudlet.getGpuTask().reset();
+                    iterator.remove();
+                }
+            }
+
+            vm.getHost().destroyVm(vm);
+            ((GpuVm)vm).getVGpu().getGpu().destroyVGpu(((GpuVm)vm).getVGpu());
+            vm.getCloudletScheduler().clear();
+            ((GpuVm)vm).getVGpu().getGpuTaskScheduler().clear();
+            return cloudletsAffectedList;
+        }
+
+        LOGGER.warn("Vm: " + vm.getId() + " does not belong to this broker! Broker: " + this);
+        return new ArrayList<>();
+	}
+
 }
