@@ -14,7 +14,6 @@ import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.util.BytesConversion;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
-import org.cloudbus.cloudsim.resources.ResourceManageableAbstract;
 
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
@@ -23,9 +22,8 @@ import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 
 import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
-import org.cloudbus.cloudsim.gp.resources.GpuCore;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
-import org.cloudbus.cloudsim.gp.resources.GpuResourceStats;
+import org.cloudbus.cloudsim.gp.vgpu.VGpuStateHistoryEntry;
 import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
 import org.cloudbus.cloudsim.gp.provisioners.CoreProvisioner;
 import org.cloudbus.cloudsim.gp.core.GpuResourceStatsComputer;

@@ -4,7 +4,7 @@ import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
 
 import java.util.Collections;

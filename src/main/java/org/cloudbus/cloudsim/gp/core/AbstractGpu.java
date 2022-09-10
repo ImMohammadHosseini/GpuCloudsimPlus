@@ -1,13 +1,9 @@
 package org.cloudbus.cloudsim.gp.core;
 
-import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.core.ChangeableId;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.Resourceful;
-
-import org.cloudbus.cloudsim.gp.resources.CustomVGpu;
-import org.cloudbus.cloudsim.gp.resources.Gpu;
 
 //  <T extends Resource>
 public interface AbstractGpu extends ChangeableId, Resourceful {
