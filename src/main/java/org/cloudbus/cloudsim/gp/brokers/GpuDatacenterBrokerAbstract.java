@@ -124,7 +124,7 @@ GpuDatacenterBroker {
 	
 	protected abstract GpuVm defaultGpuVmMapper (GpuCloudlet cloudlet);
 	
-	private void setGpuDatacenterList(final List<GpuDatacenter> datacenterList) {
+	private void setGpuDatacenterList (final List<GpuDatacenter> datacenterList) {
         this.gpudatacenterList = new ArrayList<>(datacenterList);
         if(selectClosestGpuDatacenter){
             this.gpudatacenterList.sort(Comparator.comparingDouble(GpuDatacenter::getTimeZone));
@@ -134,29 +134,27 @@ GpuDatacenterBroker {
 	@Override
     public final GpuDatacenterBroker setSelectClosestDatacenter (final boolean select) {
         this.selectClosestGpuDatacenter = select;
-        if(select){
+        if(select)
             setGpuDatacenterMapper(this::closestGpuDatacenterMapper);
-        }
-
         return this;
     }
 	
-	protected GpuDatacenter closestGpuDatacenterMapper(final GpuDatacenter lastDatacenter, 
+	protected GpuDatacenter closestGpuDatacenterMapper (final GpuDatacenter lastDatacenter, 
 			final GpuVm vm) {
         return TimeZoned.closestDatacenter(vm, getGpuDatacenterList());
     }
 
-	protected List<GpuDatacenter> getGpuDatacenterList() {
+	protected List<GpuDatacenter> getGpuDatacenterList () {
         return gpudatacenterList;
     }
 	
 	@Override
-    public final GpuDatacenterBroker setDatacenterMapper(final BiFunction<Datacenter, Vm, 
+    public final GpuDatacenterBroker setDatacenterMapper (final BiFunction<Datacenter, Vm, 
     		Datacenter> datacenterMapper) {
         return setGpuDatacenterMapper((BiFunction)datacenterMapper);
     }
 	
-	public final GpuDatacenterBroker setGpuDatacenterMapper(final BiFunction<GpuDatacenter, GpuVm, 
+	public final GpuDatacenterBroker setGpuDatacenterMapper (final BiFunction<GpuDatacenter, GpuVm, 
     		GpuDatacenter> datacenterMapper) {
         this.gpudatacenterMapper = requireNonNull((BiFunction)datacenterMapper);
         return this;
@@ -170,7 +168,7 @@ GpuDatacenterBroker {
     @Override
     public GpuDatacenterBroker submitVmList (final List<? extends Vm> list, 
     		final double submissionDelay) {
-        setDelayForEntitiesWithNoDelay(list, submissionDelay);
+        setDelayForEntitiesWithNoDelay (list, submissionDelay);
         return submitVmList (list);
     }
     
@@ -197,7 +195,7 @@ GpuDatacenterBroker {
         return this;
     }
     
-    protected void requestDatacentersToCreateWaitingGpuCloudlets() {
+    protected void requestDatacentersToCreateWaitingGpuCloudlets () {
         int createdGpuCloudlets = 0;
         for (final var iterator = gpucloudletWaitingList.iterator(); iterator.hasNext(); ) {
             final GpuCloudletSimple cloudlet = (GpuCloudletSimple)iterator.next();
@@ -212,19 +210,51 @@ GpuDatacenterBroker {
                 continue;
             }
 
-            ((VmSimple) lastSelectedVm).removeExpectedFreePesNumber(cloudlet.getNumberOfPes());
-
-            logCloudletCreationRequest(cloudlet);
-            cloudlet.setVm(lastSelectedVm);
-            final Datacenter dc = getDatacenter(lastSelectedVm);
+            ((GpuVmSimple) lastSelectedGpuVm).removeExpectedFreePesNumber(cloudlet.getNumberOfPes());
+            ((VGpuSimple) lastSelectedGpuVm.getVGpu()).removeExpectedFreeCoresNumber(
+            		cloudlet.getGpuTask().getNumberOfCores());
+            
+            logGpuCloudletCreationRequest(cloudlet);
+            cloudlet.setVm(lastSelectedGpuVm);
+            cloudlet.getGpuTask().setVGpu(lastSelectedGpuVm.getVGpu());
+            final Datacenter dc = getDatacenter(lastSelectedGpuVm);
+            
             send(dc, cloudlet.getSubmissionDelay(), CloudSimTag.CLOUDLET_SUBMIT, cloudlet);
             cloudlet.setLastTriedDatacenter(dc);
-            cloudletsCreatedList.add(cloudlet);
+            gpucloudletsCreatedList.add(cloudlet);
             iterator.remove();
-            createdCloudlets++;
+            createdGpuCloudlets++;
         }
 
-        allWaitingGpuCloudletsSubmittedToGpuVm (createdCloudlets);
+        allWaitingGpuCloudletsSubmittedToGpuVm (createdGpuCloudlets);
+    }
+    
+    private boolean allWaitingGpuCloudletsSubmittedToGpuVm (final int createdCloudlets) {
+        if (!gpucloudletWaitingList.isEmpty()) {
+            return false;
+        }
+
+        //avoid duplicated notifications
+        if (wereThereWaitingGpuCloudlets) {
+            LOGGER.info(
+                "{}: {}: All {} waiting Cloudlets submitted to some GpuVM.",
+                getSimulation().clockStr(), getName(), createdCloudlets);
+            wereThereWaitingGpuCloudlets = false;
+        }
+
+        return true;
+    }
+    
+    private void logGpuCloudletCreationRequest (final GpuCloudlet cloudlet) {
+        final String delayMsg =
+            cloudlet.getSubmissionDelay() > 0 ?
+                String.format(" with a requested delay of %.0f seconds", cloudlet.getSubmissionDelay()) :
+                "";
+
+        LOGGER.info(
+            "{}: {}: Sending Cloudlet {} to {} in {}{}.",
+            getSimulation().clockStr(), getName(), cloudlet.getId(),
+            lastSelectedGpuVm, lastSelectedGpuVm.getHost(), delayMsg);
     }
     
     private void logPostponingGpuCloudletExecution (final GpuCloudlet cloudlet) {
@@ -233,16 +263,17 @@ GpuDatacenterBroker {
 
         final GpuVm vm = (GpuVm)cloudlet.getVm();
         final String vmMsg = Vm.NULL.equals(vm) ?
-                                "it couldn't be mapped to any VM" :
-                                String.format("bind Vm %d is not available", vm.getId());
+                                "it couldn't be mapped to any GpuVM" :
+                                String.format("bind GpuVM %d is not available", vm.getId());
 
         final String msg = String.format(
-            "%s: %s: Postponing execution of Cloudlet %d because {}.",
-            getSimulation().clockStr(), getName(), cloudlet.getId());
+            "%s: %s: Postponing execution of GpuCloudlet %d because {}.",
+            getSimulation().clockStr(), getName(), cloudlet.getId());//vmMsg
 
         if(vm.getSubmissionDelay() > 0) {
             final String secs = vm.getSubmissionDelay() > 1 ? "seconds" : "second";
-            final var reason = String.format("bind Vm %d was requested to be created with %.2f %s delay", vm.getId(), vm.getSubmissionDelay(), secs);
+            final var reason = String.format("bind GpuVM %d was requested to be created with "
+            		+ "%.2f %s delay", vm.getId(), vm.getSubmissionDelay(), secs);
             LOGGER.info(msg, reason);
         } else LOGGER.warn(msg, vmMsg);
     }
@@ -313,14 +344,15 @@ GpuDatacenterBroker {
     }
     
     @Override
-    public GpuDatacenterBroker submitCloudletList(final List<? extends Cloudlet> list) {
+    public GpuDatacenterBroker submitCloudletList (final List<? extends Cloudlet> list) {
         if (list.isEmpty()) {
             return this;
         }
 
         sortGpuCloudletsIfComparatorIsSet((List<GpuCloudlet>)(List<?>)list);
         configureEntities(list);
-        lastSubmittedGpuCloudlet = setIdForEntitiesWithoutOne(list, lastSubmittedGpuCloudlet);
+        lastSubmittedGpuCloudlet = (GpuCloudlet)setIdForEntitiesWithoutOne(list, 
+        		lastSubmittedGpuCloudlet);
         gpucloudletSubmittedList.addAll((List<GpuCloudlet>)(List<?>)list);
         setSimulationForGpuCloudletUtilizationModels((List<GpuCloudlet>)(List<?>)list);
         gpucloudletWaitingList.addAll((List<GpuCloudlet>)(List<?>)list);
@@ -335,29 +367,28 @@ GpuDatacenterBroker {
             getSimulation().clockStr(), getName(), list.size());
 
         LOGGER.info("Cloudlets creation request sent to Datacenter.");
-        requestDatacentersToCreateWaitingCloudlets();
+        requestDatacentersToCreateWaitingGpuCloudlets();
 
         return this;
     }
     
     @Override
-    public boolean bindCloudletToVm(final Cloudlet cloudlet, final Vm vm) {
+    public boolean bindCloudletToVm (final Cloudlet cloudlet, final Vm vm) {
         if (!this.equals(cloudlet.getBroker()) && 
-        		!DatacenterBroker.NULL.equals(cloudlet.getBroker())) {
+        		!GpuDatacenterBroker.NULL.equals(cloudlet.getBroker())) {
             return false;
         }
         cloudlet.setVm(vm);
         return bindGpuTaskToVGpu (((GpuCloudlet)cloudlet).getGpuTask(), ((GpuVm)vm).getVGpu());
     }
     
-    @Override
-    public boolean bindGpuTaskToVGpu (GpuTask gpuTask, VGpu vgpu) {
+    private boolean bindGpuTaskToVGpu (GpuTask gpuTask, VGpu vgpu) {
     	gpuTask.setVGpu (vgpu);
     	return true;
     }
     
     private void bindCloudletsToVm (final List<? extends Cloudlet> cloudlets, Vm vm) {
-        if (Vm.NULL.equals(vm)) {
+        if (GpuVm.NULL.equals(vm)) {
             return;
         }
 
@@ -393,7 +424,7 @@ GpuDatacenterBroker {
         }
     }
     
-    private void setDelayForEntitiesWithNoDelay(final List<? extends CustomerEntity> entities, 
+    private void setDelayForEntitiesWithNoDelay (final List<? extends CustomerEntity> entities, 
     		final double submissionDelay) {
         if (submissionDelay < 0) 
             return;
@@ -409,7 +440,34 @@ GpuDatacenterBroker {
             return;
         }
 
-        LOGGER.trace("{}: {}: Unknown event {} received.", getSimulation().clockStr(), this, evt.getTag());
+        LOGGER.trace("{}: {}: Unknown event {} received.", getSimulation().clockStr(), this, 
+        		evt.getTag());
+    }
+    
+    private boolean processGeneralEvents (final SimEvent evt) {
+        if (evt.getTag() == CloudSimTag.DC_LIST_REQUEST) {
+            processGpuDatacenterListRequest(evt);
+            return true;
+        }
+
+        if (evt.getTag() == CloudSimTag.ENTITY_SHUTDOWN || evt.getTag() == CloudSimTag.SIMULATION_END) {
+            shutdown();
+            return true;
+        }
+
+        return false;
+    }
+    
+    private void processGpuDatacenterListRequest (final SimEvent evt) {
+        if(evt.getData() instanceof List datacenterSet) {
+            setGpuDatacenterList(datacenterSet);
+            LOGGER.info("{}: {}: List of {} Gpudatacenters(s) received.", getSimulation().clockStr(), 
+            		getName(), gpudatacenterList.size());
+            requestDatacenterToCreateWaitingGpuVms (false, false);
+            return;
+        }
+
+        throw new InvalidEventDataTypeException(evt, "DC_LIST_REQUEST", "List<Datacenter>");
     }
     
     private boolean processGpuVmEvents (final SimEvent evt) {
@@ -419,10 +477,22 @@ GpuDatacenterBroker {
                 yield requestDatacenterToCreateWaitingGpuVms(false, true);
             }
             case VM_CREATE_ACK -> processGpuVmCreateResponseFromGpuDatacenter(evt);
-            case VM_VERTICAL_SCALING -> requestVmVerticalScaling(evt);
+            case VM_VERTICAL_SCALING -> requestGpuVmVerticalScaling(evt);
             default -> false;
         };
     }
+    
+    private boolean requestGpuVmVerticalScaling (final SimEvent evt) {
+        if (evt.getData() instanceof VerticalGpuVmScaling scaling) {
+            getSimulation().sendNow(
+                evt.getSource(), scaling.getVm().getHost().getDatacenter(),
+                CloudSimTag.VM_VERTICAL_SCALING, scaling);
+            return true;
+        }
+
+        throw new InvalidEventDataTypeException(evt, "GPUVM_VERTICAL_SCALING", "VerticalGpuVmScaling");
+    }
+
     
     private boolean processGpuVmCreateResponseFromGpuDatacenter (final SimEvent evt) {
         final var vm = (GpuVm) evt.getData();
@@ -448,18 +518,54 @@ GpuDatacenterBroker {
             vm.getVGpu().notifyOnCreationFailureListeners();//maybe in Datacenter
         }
 
-        //Decreases to indicate an ack for the request was received (either if the VM was created or not)
+        //Decreases to indicate an ack for the request was received (
+        //either if the VM was created or not)
         gpuvmCreationRequests--;
 
         if(gpuvmCreationRequests == 0 && !gpuvmWaitingList.isEmpty()) {
-            requestCreationOfWaitingVmsToFallbackDatacenter();
+            requestCreationOfWaitingGpuVmsToFallbackDatacenter();
         }
 
-        if(allNonDelayedVmsCreated()) {
-            requestDatacentersToCreateWaitingCloudlets();
+        if(allNonDelayedGpuVmsCreated()) {
+            requestDatacentersToCreateWaitingGpuCloudlets();
         }
 
         return vm.isCreated();
+    }
+    
+    private boolean allNonDelayedGpuVmsCreated () {
+        return gpuvmWaitingList.stream().noneMatch(vm -> vm.getSubmissionDelay() == 0);
+    }
+
+    
+    private void requestCreationOfWaitingGpuVmsToFallbackDatacenter () {
+        this.lastSelectedGpuDc = GpuDatacenter.NULL;
+        if (gpuvmWaitingList.isEmpty() || requestDatacenterToCreateWaitingGpuVms(false, true)) {
+            return;
+        }
+
+        final var msg =
+            "{}: {}: {} of the requested {} GpuVMs couldn't be created because suitable GpuHosts "
+            + "weren't found in any available Datacenter."
+            + (gpuvmExecList.isEmpty() && !isRetryFailedVms() ? " Shutting broker down..." : "");
+        LOGGER.error(msg, getSimulation().clockStr(), getName(), gpuvmWaitingList.size(), 
+        		getVmsNumber());
+
+        /* If it gets here, it means that all datacenters were already queried and not all VMs could be created. */
+        if (!gpuvmWaitingList.isEmpty()) {
+            processGpuVmCreationFailure();
+            return;
+        }
+
+        requestDatacentersToCreateWaitingGpuCloudlets();
+    }
+    
+    private void processGpuVmCreationFailure () {
+        if (isRetryFailedVms()) {
+            lastSelectedGpuDc = gpudatacenterList.get(0);
+            this.gpuvmCreationRetrySent = true;
+            schedule(failedGpuVmsRetryDelay, CloudSimTag.VM_CREATE_RETRY);
+        } else shutdown();
     }
     
     private void processSuccessGpuVmCreationInGpuDatacenter (final GpuVm vm) {

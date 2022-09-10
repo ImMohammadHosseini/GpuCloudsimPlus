@@ -16,7 +16,7 @@ public interface GpuDatacenterBroker extends DatacenterBroker {
     
     double DEF_VGPU_DESTRUCTION_DELAY = -1.0;
     
-    boolean bindGpuTaskToVGpu (GpuTask gpuTask, VGpu vgpu);
+    //boolean bindGpuTaskToVGpu (GpuTask gpuTask, VGpu vgpu);
     
     DatacenterBroker requestIdleVGpuDestruction(VGpu vgpu);
     

@@ -26,7 +26,7 @@ import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.hosts.GpuHostSimple;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudbus.cloudsim.gp.resources.GpuSuitability;
-import org.cloudbus.cloudsim.gp.resources.CustomVGpuSimple;
+import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
 import org.cloudbus.cloudsim.gp.allocationpolicies.GpuVmAllocationPolicy;
 import org.cloudbus.cloudsim.gp.allocationpolicies.GpuVmAllocationPolicySimple;
 
@@ -295,7 +295,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
         
         if(suitability.fully() && gpuSuitability.fully()) {
             ((GpuVmSimple)vm).updateMigrationFinishListeners(targetHost);
-            ((CustomVGpuSimple)vm.getVGpu()).updateMigrationFinishListeners(vm.getVGpu().getGpu());
+            ((VGpuSimple)vm.getVGpu()).updateMigrationFinishListeners(vm.getVGpu().getGpu());
             
             vm.getBroker().getVmExecList().add(vm);
 
