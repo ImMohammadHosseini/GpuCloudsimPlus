@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 public interface VGpuScheduler {
     Logger LOGGER = LoggerFactory.getLogger (VGpuScheduler.class.getSimpleName());
 
+    double DEF_VGPU_MIGRATION_GPU_OVERHEAD = 0.1;
+
 	VGpuScheduler NULL = new VGpuSchedulerNull ();
 	
 	boolean allocateCoresForVGpu (VGpu vgpu, MipsShare requestedMips);
