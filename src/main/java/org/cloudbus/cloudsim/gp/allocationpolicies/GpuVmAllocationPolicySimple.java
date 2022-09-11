@@ -8,7 +8,7 @@ import java.util.function.BiFunction;
 
 import static java.util.Comparator.comparing;
 
-public abstract class GpuVmAllocationPolicySimple extends GpuVmAllocationPolicyAbstract{
+public class GpuVmAllocationPolicySimple extends GpuVmAllocationPolicyAbstract{
 	
 	public GpuVmAllocationPolicySimple () {
         super();
