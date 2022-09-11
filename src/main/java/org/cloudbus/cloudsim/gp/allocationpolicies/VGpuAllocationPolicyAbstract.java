@@ -5,7 +5,6 @@ import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.resources.GpuSuitability;
 
-
 import java.util.*;
 import java.util.function.BiFunction;
 
