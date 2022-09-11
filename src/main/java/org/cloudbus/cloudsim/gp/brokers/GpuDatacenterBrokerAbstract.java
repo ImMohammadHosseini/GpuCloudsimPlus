@@ -36,8 +36,8 @@ import static java.util.Objects.requireNonNull;
 public abstract class GpuDatacenterBrokerAbstract extends CloudSimEntity implements 
 GpuDatacenterBroker {
 	
-	private static final Function<GpuVm, Double> DEF_VM_DESTRUCTION_DELAY_FUNC = 
-			gpuvm -> DEF_VM_DESTRUCTION_DELAY;
+	private static final Function<GpuVm, Double> DEF_GPUVM_DESTRUCTION_DELAY_FUNC = 
+			gpuvm -> DEF_GPUVM_DESTRUCTION_DELAY;
 	private static final Function<VGpu, Double> DEF_VGPU_DESTRUCTION_DELAY_FUNC = 
 			vgpu -> DEF_VGPU_DESTRUCTION_DELAY;
 	
@@ -74,7 +74,7 @@ GpuDatacenterBroker {
     private GpuCloudlet lastSubmittedGpuCloudlet;
     private GpuVm lastSubmittedGpuVm;
 
-    private Function<GpuVm, Double> gpuvmDestructionDelayFunction;
+    private Function<GpuVm, Double> gpuVmDestructionDelayFunction;
     private Function<VGpu, Double> vgpuDestructionDelayFunction;
 
     private boolean shutdownRequested;
@@ -109,7 +109,7 @@ GpuDatacenterBroker {
 
         setGpuDatacenterMapper(this::defaultGpuDatacenterMapper);
         setGpuVmMapper(this::defaultGpuVmMapper);
-        gpuvmDestructionDelayFunction = DEF_VM_DESTRUCTION_DELAY_FUNC;
+        gpuVmDestructionDelayFunction = DEF_GPUVM_DESTRUCTION_DELAY_FUNC;
         vgpuDestructionDelayFunction = DEF_VGPU_DESTRUCTION_DELAY_FUNC;
 
     }
@@ -128,9 +128,8 @@ GpuDatacenterBroker {
 	
 	private void setGpuDatacenterList (final List<GpuDatacenter> datacenterList) {
         this.gpudatacenterList = new ArrayList<>(datacenterList);
-        if(selectClosestGpuDatacenter){
+        if (selectClosestGpuDatacenter)
             this.gpudatacenterList.sort(Comparator.comparingDouble(GpuDatacenter::getTimeZone));
-        }
     }
 	
 	@Override
@@ -199,7 +198,7 @@ GpuDatacenterBroker {
     
     protected void requestDatacentersToCreateWaitingGpuCloudlets () {
         int createdGpuCloudlets = 0;
-        for (final var iterator = gpucloudletWaitingList.iterator(); iterator.hasNext(); ) {
+        for (final var iterator = gpucloudletWaitingList.iterator(); iterator.hasNext();) {
             final GpuCloudletSimple cloudlet = (GpuCloudletSimple)iterator.next();
             if (!cloudlet.getLastTriedDatacenter().equals(GpuDatacenter.NULL)) {
                 continue;
@@ -829,7 +828,7 @@ GpuDatacenterBroker {
             if(isVmIdlenessVerificationRequired((GpuVmSimple)vm) ||
             		isVGpuIdlenessVerificationRequired((VGpuSimple)((GpuVmSimple)vm).getVGpu())) {
                 getSimulation().send(
-                    new CloudSimEvent(gpuvmDestructionDelayFunction.apply((GpuVm)vm),
+                    new CloudSimEvent(gpuVmDestructionDelayFunction.apply((GpuVm)vm),
                         vm.getHost().getDatacenter(),
                         CloudSimTag.VM_UPDATE_CLOUDLET_PROCESSING));
                 return this;
@@ -860,7 +859,7 @@ GpuDatacenterBroker {
     }
     
     private boolean isGpuVmIdleEnough (final GpuVm vm) {
-        final double delay = gpuvmDestructionDelayFunction.apply(vm);
+        final double delay = gpuVmDestructionDelayFunction.apply(vm);
         return delay > DEF_VM_DESTRUCTION_DELAY && vm.isIdleEnough(delay);
     }
     
@@ -869,7 +868,7 @@ GpuDatacenterBroker {
     private boolean isVmIdlenessVerificationRequired (final GpuVmSimple vm) {
         if(vm.hasStartedSomeCloudlet() && vm.getCloudletScheduler().isEmpty()){
             final int schedulingInterval = (int)vm.getHost().getDatacenter().getSchedulingInterval();
-            final int delay = gpuvmDestructionDelayFunction.apply(vm).intValue();
+            final int delay = gpuVmDestructionDelayFunction.apply(vm).intValue();
             return delay > DEF_VM_DESTRUCTION_DELAY && 
             		(schedulingInterval <= 0 || delay % schedulingInterval != 0);
         }
@@ -993,7 +992,7 @@ GpuDatacenterBroker {
     
     @Override
     public Function<Vm, Double> getVmDestructionDelayFunction () {
-        return gpuvmDestructionDelayFunction;
+        return gpuVmDestructionDelayFunction;
     }
 
     @Override
@@ -1010,7 +1009,7 @@ GpuDatacenterBroker {
 
     @Override
     public DatacenterBroker setVmDestructionDelayFunction (final Function<Vm, Double> function) {
-        this.gpuvmDestructionDelayFunction = function == null ? DEF_VM_DESTRUCTION_DELAY_FUNC : 
+        this.gpuVmDestructionDelayFunction = function == null ? DEF_GPUVM_DESTRUCTION_DELAY_FUNC : 
         	(Function)function;
         return this;
     }
