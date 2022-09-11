@@ -2,10 +2,11 @@ package org.cloudbus.cloudsim.gp.allocationpolicies;
 
 //import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
-import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
+//import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 
+import org.cloudbus.cloudsim.hosts.HostSuitability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,15 +19,15 @@ public interface GpuVmAllocationPolicy {
 
     int DEF_GPUHOST_COUNT_PARALLEL_SEARCH = 20_000;
 
-    GpuVmAllocationPolicy NULL = new GpuVmAllocationPolicyNull();
+    GpuVmAllocationPolicy NULL = new GpuVmAllocationPolicyNull ();
     
     GpuDatacenter getGpuDatacenter ();
 
     void setGpuDatacenter (GpuDatacenter datacenter);
 
-    GpuHostSuitability allocateGpuHostForGpuVm (GpuVm vm);
+    HostSuitability allocateGpuHostForGpuVm (GpuVm vm);
 
-    GpuHostSuitability allocateGpuHostForGpuVm (GpuVm vm, GpuHost host);
+    HostSuitability allocateGpuHostForGpuVm (GpuVm vm, GpuHost host);
 
     <T extends GpuVm> List<T> allocateGpuHostForGpuVm (Collection<T> gpuvmCollection);
 

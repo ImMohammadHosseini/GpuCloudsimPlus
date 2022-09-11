@@ -24,12 +24,6 @@ public interface GpuHost extends Host {
     
     @Override
     <T extends Vm> List<T> getVmList ();
-    
-    GpuHostSuitability getCompleteSuitabilityFor (GpuVm vm);
-    
-    GpuHostSuitability createGpuVm (GpuVm vm);
-    
-    GpuHostSuitability createTemporaryGpuVm (GpuVm vm);
 }
 
 

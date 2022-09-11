@@ -2,12 +2,13 @@ package org.cloudbus.cloudsim.gp.allocationpolicies;
 
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.hosts.Host;
+import org.cloudbus.cloudsim.hosts.HostSuitability;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicyAbstract;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
-import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
+//import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
 
 import java.util.*;
@@ -144,18 +145,18 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public GpuHostSuitability allocateGpuHostForGpuVm (final GpuVm vm) {
+    public HostSuitability allocateGpuHostForGpuVm (final GpuVm vm) {
         if (getGpuHostList().isEmpty()) {
             LOGGER.error(
                 "{}: {}: {} could not be allocated because there isn't any GpuHost for "
                 + "GpuDatacenter {}",
                 vm.getSimulation().clockStr(), getClass().getSimpleName(), vm, 
                 getGpuDatacenter().getId());
-            return new GpuHostSuitability("GpuDatacenter has no Gpuhost.");
+            return new HostSuitability("GpuDatacenter has no Gpuhost.");
         }
 
         if (vm.isCreated()) {
-            return new GpuHostSuitability("GpuVM is already created");
+            return new HostSuitability("GpuVM is already created");
         }
 
         final var optionalGpuHost = findGpuHostForGpuVm(vm);
@@ -163,8 +164,9 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
             return allocateGpuHostForGpuVm(vm, optionalGpuHost.get());
         }
 
-        LOGGER.warn("{}: {}: No suitable Gpuhost found for {} in {}", vm.getSimulation().clockStr(), getClass().getSimpleName(), vm, datacenter);
-        return new GpuHostSuitability("No suitable Gpuhost found");
+        LOGGER.warn("{}: {}: No suitable Gpuhost found for {} in {}", vm.getSimulation().clockStr(), 
+        		getClass().getSimpleName(), vm, gpudatacenter);
+        return new HostSuitability("No suitable Gpuhost found");
     }
 
     @Override
@@ -175,7 +177,7 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public GpuHostSuitability allocateGpuHostForGpuVm (final GpuVm vm, final GpuHost host) {
+    public HostSuitability allocateGpuHostForGpuVm (final GpuVm vm, final GpuHost host) {
         /*if(vm instanceof VmGroup vmGroup){
             return createVmsFromGroup(vmGroup, host);
         }*/
@@ -200,8 +202,8 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
         return hostSuitabilityForVmGroup;
     }*/
 
-    private GpuHostSuitability createGpuVm (final GpuVm vm, final GpuHost host) {
-        final var suitability = host.createGpuVm(vm);
+    private HostSuitability createGpuVm (final GpuVm vm, final GpuHost host) {
+        final var suitability = host.createVm(vm);
         if (suitability.fully()) {
             LOGGER.info(
                 "{}: {}: {} has been allocated to {}",
@@ -227,11 +229,13 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public final Optional<GpuHost> findGpuHostForGpuVm(final GpuVm vm) {
-        final var optionalHost = findGpuHostForGpuVmFunction == null ? 
+    public final Optional<GpuHost> findGpuHostForGpuVm (final GpuVm vm) {
+        Optional<GpuHost> optionalHost = findGpuHostForGpuVmFunction == null ? 
         		defaultFindGpuHostForGpuVm (vm) : findGpuHostForGpuVmFunction.apply (this, vm);
         //If the selected Host is not active, activate it (if it's already active, setActive has no effect)
-        return optionalHost.map(gpuHost -> gpuHost.setActive(true));
+        optionalHost = Optional.of((GpuHost)optionalHost.get().setActive(true));
+        //return optionalHost.map(gpuHost -> gpuHost.setActive(true));
+        return optionalHost;
     }
 
     protected abstract Optional<GpuHost> defaultFindGpuHostForGpuVm (GpuVm vm);
