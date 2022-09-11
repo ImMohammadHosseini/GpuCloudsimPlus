@@ -1,12 +1,15 @@
 package org.cloudbus.cloudsim.gp.hosts;
 
+import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.hosts.HostSimple;
 import org.cloudbus.cloudsim.util.BytesConversion;
+import org.cloudbus.cloudsim.hosts.HostSuitability;
 import org.cloudbus.cloudsim.resources.HarddriveStorage;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
 
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
@@ -114,4 +117,62 @@ public class GpuHostSimple extends HostSimple implements GpuHost {
 	public Videocard getVideocard () {
 		return videocard;
 	}
+	
+	@Override
+    public boolean isSuitableForVm (final Vm vm) {
+        return getCompleteSuitabilityFor((GpuVm)vm).fully();
+    }
+	
+	@Override
+	public GpuHostSuitability getCompleteSuitabilityFor (GpuVm vm) {
+		return isSuitableForVm(vm, false, false);
+	}
+	
+	
+	
+	@Override
+    protected HostSuitability getSuitabilityFor (final Vm vm) {
+        return isSuitableForVm (vm, false, false);
+    }
+	
+	@Override
+    public GpuHostSuitability createGpuVm (GpuVm vm) {
+		
+	}
+	
+	@Override
+	public HostSuitability createVm (final Vm vm) {
+        final HostSuitability suitability = createVmInternal(vm);
+        if(suitability.fully()) {
+            addVmToCreatedList(vm);
+            vm.setHost(this);
+            vm.setCreated(true);
+            vm.setStartTime(getSimulation().clock());
+        }
+
+        return suitability;
+    }
+	
+	@Override
+    public GpuHostSuitability createTemporaryGpuVm (GpuVm vm) {
+		 
+	}
+	
+	@Override
+     HostSuitability createTemporaryVm(final Vm vm) {
+        return createVmInternal(vm);
+    }
+	
+	protected HostSuitability createVmInternal(final Vm vm) {
+        if(vm instanceof VmGroup){
+            return new HostSuitability("Just internal VMs inside a VmGroup can be created, not the VmGroup itself.");
+        }
+
+        final HostSuitability suitability = allocateResourcesForVm(vm, false);
+        if(suitability.fully()){
+            vmList.add(vm);
+        }
+
+        return suitability;
+    }
 }

@@ -2,6 +2,8 @@ package org.cloudbus.cloudsim.gp.hosts;
 
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.hosts.Host;
+import org.cloudbus.cloudsim.hosts.HostSuitability;
+import org.cloudbus.cloudsim.gp.vms.GpuVm;
 
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
 
@@ -22,6 +24,12 @@ public interface GpuHost extends Host {
     
     @Override
     <T extends Vm> List<T> getVmList ();
+    
+    GpuHostSuitability getCompleteSuitabilityFor (GpuVm vm);
+    
+    GpuHostSuitability createGpuVm (GpuVm vm);
+    
+    GpuHostSuitability createTemporaryGpuVm (GpuVm vm);
 }
 
 
