@@ -14,7 +14,7 @@ public final class GpuSuitability {
 
     private String reason;
 
-    public GpuSuitability (){/**/}
+    public GpuSuitability () { /**/ }
 
     public GpuSuitability (final String reason) {
         this.reason = Objects.requireNonNull(reason);

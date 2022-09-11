@@ -7,6 +7,7 @@ import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicyAbstract;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
+import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
 
 import java.util.*;
@@ -143,17 +144,18 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public HostSuitability allocateGpuHostForGpuVm (final GpuVm vm) {
-        if (getHostList().isEmpty()) {
+    public GpuHostSuitability allocateGpuHostForGpuVm (final GpuVm vm) {
+        if (getGpuHostList().isEmpty()) {
             LOGGER.error(
-                "{}: {}: {} could not be allocated because there isn't any GpuHost for GpuDatacenter {}",
+                "{}: {}: {} could not be allocated because there isn't any GpuHost for "
+                + "GpuDatacenter {}",
                 vm.getSimulation().clockStr(), getClass().getSimpleName(), vm, 
                 getGpuDatacenter().getId());
-            return new HostSuitability("GpuDatacenter has no Gpuhost.");
+            return new GpuHostSuitability("GpuDatacenter has no Gpuhost.");
         }
 
         if (vm.isCreated()) {
-            return new HostSuitability("VM is already created");
+            return new GpuHostSuitability("GpuVM is already created");
         }
 
         final var optionalGpuHost = findGpuHostForGpuVm(vm);
@@ -162,7 +164,7 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
         }
 
         LOGGER.warn("{}: {}: No suitable Gpuhost found for {} in {}", vm.getSimulation().clockStr(), getClass().getSimpleName(), vm, datacenter);
-        return new HostSuitability("No suitable host found");
+        return new GpuHostSuitability("No suitable Gpuhost found");
     }
 
     @Override
@@ -173,7 +175,7 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public HostSuitability allocateGpuHostForGpuVm (final GpuVm vm, final GpuHost host) {
+    public GpuHostSuitability allocateGpuHostForGpuVm (final GpuVm vm, final GpuHost host) {
         /*if(vm instanceof VmGroup vmGroup){
             return createVmsFromGroup(vmGroup, host);
         }*/
@@ -198,8 +200,8 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
         return hostSuitabilityForVmGroup;
     }*/
 
-    private HostSuitability createGpuVm (final GpuVm vm, final GpuHost host) {
-        final var suitability = host.createVm(vm);
+    private GpuHostSuitability createGpuVm (final GpuVm vm, final GpuHost host) {
+        final var suitability = host.createGpuVm(vm);
         if (suitability.fully()) {
             LOGGER.info(
                 "{}: {}: {} has been allocated to {}",

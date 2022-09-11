@@ -2,6 +2,7 @@ package org.cloudbus.cloudsim.gp.allocationpolicies;
 
 //import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
+import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 
@@ -23,9 +24,9 @@ public interface GpuVmAllocationPolicy {
 
     void setGpuDatacenter (GpuDatacenter datacenter);
 
-    HostSuitability allocateGpuHostForGpuVm (GpuVm vm);
+    GpuHostSuitability allocateGpuHostForGpuVm (GpuVm vm);
 
-    HostSuitability allocateGpuHostForGpuVm (GpuVm vm, GpuHost host);
+    GpuHostSuitability allocateGpuHostForGpuVm (GpuVm vm, GpuHost host);
 
     <T extends GpuVm> List<T> allocateGpuHostForGpuVm (Collection<T> gpuvmCollection);
 
