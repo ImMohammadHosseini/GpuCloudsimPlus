@@ -1,12 +1,14 @@
 package org.cloudbus.cloudsim.gp.allocationpolicies;
 
-//import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
+import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
 //import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 
 import org.cloudbus.cloudsim.hosts.HostSuitability;
+import org.cloudsimplus.autoscaling.VerticalVmScaling;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -2,9 +2,13 @@ package org.cloudbus.cloudsim.gp.allocationpolicies;
 
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.hosts.Host;
+import org.cloudbus.cloudsim.resources.Processor;
+import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.hosts.HostSuitability;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicyAbstract;
+
+import org.cloudsimplus.autoscaling.VerticalVmScaling;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;

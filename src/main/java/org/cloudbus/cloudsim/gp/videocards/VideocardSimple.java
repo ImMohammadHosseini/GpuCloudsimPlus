@@ -329,7 +329,7 @@ public class VideocardSimple implements Videocard {
         return this;
     }
 	
-	private <T extends VGpu> List<T> getVGpuList () {
+	public <T extends VGpu> List<T> getVGpuList () {
         return (List<T>) Collections.unmodifiableList(
                 getGpuList()
                     .stream()
@@ -338,7 +338,7 @@ public class VideocardSimple implements Videocard {
                     .collect(toList()));
     }
 
-    public void updateActiveGpusNumber(final Gpu gpu){
+    public void updateActiveGpusNumber (final Gpu gpu){
         activeGpusNumber += gpu.isActive() ? 1 : -1;
     }
 

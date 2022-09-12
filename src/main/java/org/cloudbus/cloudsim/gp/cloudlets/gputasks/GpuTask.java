@@ -9,6 +9,7 @@ import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.Simulation;
 
+import java.util.*;
 
 public interface GpuTask extends Comparable<GpuTask> {
 	
@@ -36,15 +37,15 @@ public interface GpuTask extends Comparable<GpuTask> {
 	
 	void setGpuCloudlet (GpuCloudlet GpuCloudlet);
 	
-	//boolean addRequiredFile (String fileName);
+	boolean addRequiredFile (String fileName);
 
-    //boolean addRequiredFiles (List<String> fileNames);
+    boolean addRequiredFiles (List<String> fileNames);
 
-    //boolean deleteRequiredFile (String filename);
+    boolean deleteRequiredFile (String filename);
 
-    //boolean hasRequiresFiles ();
+    boolean hasRequiresFiles ();
 
-    //List<String> getRequiredFiles ();
+    List<String> getRequiredFiles ();
 
     double getArrivalTime ();
     
