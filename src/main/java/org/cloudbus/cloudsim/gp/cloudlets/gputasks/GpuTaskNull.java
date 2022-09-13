@@ -3,6 +3,10 @@ package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
+
+import java.util.List;
+import java.util.Collections;
+
 import org.cloudbus.cloudsim.core.Simulation;
 
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
@@ -181,5 +185,10 @@ final class GpuTaskNull implements GpuTask {
 	@Override public VGpu getVGpu () { return VGpu.NULL; }
 	@Override public GpuTask setVGpu(VGpu vgpu) { return this; }
 	@Override public double getSubmissionDelay () { return 0; }
+	@Override public boolean addRequiredFile (String fileName) { return false; }
+	@Override public boolean addRequiredFiles (List<String> fileNames) { return false; }
+	@Override public boolean deleteRequiredFile (String filename) { return false; }
+	@Override public boolean hasRequiresFiles () { return false; }
+	@Override public List<String> getRequiredFiles () { return Collections.emptyList(); }
 
 }

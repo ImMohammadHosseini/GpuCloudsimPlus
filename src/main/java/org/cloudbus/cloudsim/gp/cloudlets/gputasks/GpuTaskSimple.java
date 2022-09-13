@@ -25,7 +25,7 @@ public class GpuTaskSimple implements GpuTask {
     private int priority;
     ///private int netServiceLevel;
     private VGpu vgpu;
-    //private List<String> requiredFiles;
+    private List<String> requiredFiles;
     private long fileSize;
     private long outputSize;
     private double finishTime;
@@ -43,8 +43,8 @@ public class GpuTaskSimple implements GpuTask {
     
     public GpuTaskSimple (final long id, final long blockLength, final long numberOfPes) {
     	
-    	//this.requiredFiles = new LinkedList<>();
-        this.setTaskId(id);
+    	this.requiredFiles = new LinkedList<>();
+        //this.setTaskId(id);
         this.setNumberOfCores(numberOfPes);
         this.setBlockLength(blockLength);
         this.setFileSize(1);
@@ -378,30 +378,49 @@ public class GpuTaskSimple implements GpuTask {
         return Math.abs(getBlockLength());
     }
 
-	/*@Override
+	@Override
 	public boolean addRequiredFile (String fileName) {
-		
+		if (getRequiredFiles().stream().anyMatch(reqFile -> reqFile.equals(fileName))) {
+            return false;
+        }
+
+        requiredFiles.add(fileName);
+        return true;
 	}
 
 	@Override
-	public boolean addRequiredFiles(List<String> fileNames) {
-		
+	public boolean addRequiredFiles (List<String> fileNames) {
+		boolean atLeastOneFileAdded = false;
+        for (final String fileName : fileNames) {
+            atLeastOneFileAdded |= addRequiredFile(fileName);
+        }
+
+        return atLeastOneFileAdded;
 	}
 
 	@Override
-	public boolean deleteRequiredFile(String filename) {
-		
+	public boolean deleteRequiredFile (String filename) {
+		for (int i = 0; i < getRequiredFiles().size(); i++) {
+            final String currentFile = requiredFiles.get(i);
+
+            if (currentFile.equals(filename)) {
+                requiredFiles.remove(i);
+                return true;
+            }
+        }
+
+        return false;
 	}
 
 	@Override
-	public boolean hasRequiresFiles() {
-		
+	public boolean hasRequiresFiles () {
+        return !getRequiredFiles().isEmpty();
 	}
 
 	@Override
-	public List<String> getRequiredFiles() {
-		
-	}*/
+	public List<String> getRequiredFiles () {
+		return requiredFiles;
+	}
 
 	@Override
 	public double registerArrivalInVideocard () {
