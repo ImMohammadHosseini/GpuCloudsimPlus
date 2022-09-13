@@ -8,10 +8,12 @@ import org.cloudbus.cloudsim.gp.cloudlets.gputasks.GpuTask;
 import org.cloudbus.cloudsim.gp.schedulers.gputask.GpuTaskScheduler;
 
 import org.gpucloudsimplus.listeners.VGpuGpuEventInfo;
+import org.gpucloudsimplus.listeners.VGpuVideocardEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
+import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 
 import java.util.*;
@@ -158,6 +160,23 @@ public class VGpuNull implements VGpu {
     @Override public void setTenancy (String tenancy) { /**/ }
 	@Override public double getGpuPercentUtilization(double time) { return 0; }
 	@Override public double getGpuPercentUtilization() { return 0; }
+	@Override public double getTotalMipsCapacity () { return 0.0; }
+	@Override public double getStartTime () { return 0; }
+	@Override public double getLastBusyTime () { return 0; }
+	@Override public List<ResourceManageable> getResources () { return Collections.emptyList(); }
+	@Override public int compareTo (VGpu o) { return 0; }
+	@Override public VGpuResourceStats getGpuUtilizationStats () {
+		return new VGpuResourceStats(VGpu.NULL, vgpu -> 0.0); 
+	}
+	@Override public void enableUtilizationStats () { /**/ }
+	@Override public double getTotalGpuMipsUtilization () { return 0.0; }
+	@Override public double getTotalGpuMipsUtilization (double time) { return 0.0; }
+	@Override public VGpu addOnCreationFailureListener (
+			EventListener<VGpuVideocardEventInfo> listener) { return this; }
+	@Override public void notifyOnCreationFailureListeners (Videocard failedVideocard) { /**/ }
+	@Override public boolean removeOnCreationFailureListener (
+			EventListener<VGpuVideocardEventInfo> listener) { return false; }
+	@Override public VGpu setStartTime (double startTime) { return this; }
     
 }
 

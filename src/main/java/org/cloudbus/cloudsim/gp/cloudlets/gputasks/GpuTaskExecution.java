@@ -127,7 +127,7 @@ public class GpuTaskExecution {
         
         if(finishRequestTime <= 0 && terminate && gpuTask.getBlockLength() < 0){
             finishRequestTime = simulation.clock();
-            simulation.sendFirst(new CloudSimEvent(cloudlet.getBroker(), CloudSimTag.CLOUDLET_FINISH, cloudlet));
+            //simulation.sendFirst(new CloudSimEvent(cloudlet.getBroker(), CloudSimTag.CLOUDLET_FINISH, cloudlet));
         }
     }
     

@@ -80,7 +80,7 @@ public class VGpuSimple implements VGpu {
     private double stopTime;//can use from gpuvm
     private double lastBusyTime;
     //private VmGroup group;
-    private double timeZone;
+    //private double timeZone;
     private MipsShare allocatedMips;
     private MipsShare requestedMips;
 	
@@ -516,14 +516,14 @@ public class VGpuSimple implements VGpu {
     @Override
     public boolean isSuitableForGpuTask (final GpuTask gpuTask) {
         return getNumberOfCores() >= gpuTask.getNumberOfCores() &&
-            storage.getAvailableResource() >= gpuTask.getFileSize();
+            gpuVm.getStorage().getAvailableResource() >= gpuTask.getFileSize();
     }
     
     @Override
     public void setCreated (final boolean created) {
-        if(!this.created && created){
+        /*if(!this.created && created){
             setCreationTime();
-        }
+        }*/
 
         this.created = created;
         this.setFailed(false);
