@@ -22,10 +22,12 @@ import org.cloudbus.cloudsim.core.*;
 import org.cloudbus.cloudsim.vms.Vm;
 
 import org.cloudsimplus.listeners.DatacenterBrokerEventInfo;
+import org.cloudsimplus.autoscaling.VerticalVmScaling;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudsimplus.listeners.EventInfo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -484,7 +486,7 @@ GpuDatacenterBroker {
     }
     
     private boolean requestGpuVmVerticalScaling (final SimEvent evt) {
-        if (evt.getData() instanceof VerticalGpuVmScaling scaling) {
+        if (evt.getData() instanceof VerticalVmScaling scaling) {
             getSimulation().sendNow(
                 evt.getSource(), scaling.getVm().getHost().getDatacenter(),
                 CloudSimTag.VM_VERTICAL_SCALING, scaling);
@@ -931,8 +933,12 @@ GpuDatacenterBroker {
     }
     
     @Override
-    public List<Cloudlet> getCloudletCreatedList() {
-        return gpucloudletsCreatedList;
+    public List<Cloudlet> getCloudletCreatedList () {
+    	return getGpuCloudletCreatedList();
+    }
+    
+    public <T extends Cloudlet> List<T> getGpuCloudletCreatedList () {
+    	return (List<T>) gpucloudletsCreatedList;
     }
 
     @Override
@@ -992,9 +998,13 @@ GpuDatacenterBroker {
     
     @Override
     public Function<Vm, Double> getVmDestructionDelayFunction () {
-        return gpuVmDestructionDelayFunction;
+        return (Function<Vm, Double>) getGpuVmDestructionDelayFunction();
     }
 
+    public Function<? extends Vm, Double> getGpuVmDestructionDelayFunction () {
+        return gpuVmDestructionDelayFunction;
+    }
+    
     @Override
     public GpuDatacenterBroker setVmDestructionDelay (final double delay) {
         if(delay <= getSimulation().getMinTimeBetweenEvents() && delay != DEF_VM_DESTRUCTION_DELAY){
@@ -1016,7 +1026,11 @@ GpuDatacenterBroker {
 
     @Override
     public List<Cloudlet> getCloudletSubmittedList () {
-        return gpucloudletSubmittedList;
+        return getGpuCloudletSubmittedList();
+    }
+    
+    public <T extends Cloudlet> List<T> getGpuCloudletSubmittedList () {
+    	return (List<T>) gpucloudletSubmittedList;
     }
 
     @Override

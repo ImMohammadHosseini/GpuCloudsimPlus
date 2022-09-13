@@ -4,20 +4,23 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
-import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
+//import org.cloudbus.cloudsim.gp.hosts.GpuHostSuitability;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
+
+import org.cloudbus.cloudsim.hosts.HostSuitability;
+import org.cloudsimplus.autoscaling.VerticalVmScaling;
 
 final class GpuVmAllocationPolicyNull implements GpuVmAllocationPolicy {
 
 	@Override public GpuDatacenter getGpuDatacenter () { return GpuDatacenter.NULL; }
 
 	@Override public void setGpuDatacenter (GpuDatacenter datacenter) { /**/ }
-	@Override public GpuHostSuitability allocateGpuHostForGpuVm (GpuVm vm) {
-		return GpuHostSuitability.NULL;
+	@Override public HostSuitability allocateGpuHostForGpuVm (GpuVm vm) {
+		return HostSuitability.NULL;
 	}
-	@Override public GpuHostSuitability allocateGpuHostForGpuVm (GpuVm vm, GpuHost host) {
-		return GpuHostSuitability.NULL;
+	@Override public HostSuitability allocateGpuHostForGpuVm (GpuVm vm, GpuHost host) {
+		return HostSuitability.NULL;
 	}
 	@Override public <T extends GpuVm> List<T> allocateGpuHostForGpuVm (
 			Collection<T> gpuvmCollection) {
