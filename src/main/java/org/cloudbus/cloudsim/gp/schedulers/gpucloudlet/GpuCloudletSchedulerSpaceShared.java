@@ -2,7 +2,6 @@ package org.cloudbus.cloudsim.gp.schedulers.gpucloudlet;
 
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.cloudlets.CloudletExecution;
-import org.cloudbus.cloudsim.resources.Pe;
 
 import java.io.Serial;
 
@@ -21,19 +20,10 @@ public class GpuCloudletSchedulerSpaceShared extends GpuCloudletSchedulerAbstrac
     private double movePausedCloudletToExecListOrWaitingList(final CloudletExecution cle) {
         getCloudletPausedList().remove(cle);
 
-        // it can go to the exec list
         if (isThereEnoughFreePesForCloudlet(cle)) {
             return movePausedCloudletToExecList(cle);
         }
 
-        // No enough free PEs: go to the waiting queue
-        /*
-         * A resumed cloudlet is not immediately added to the execution list.
-         * It is queued so that the next time the scheduler process VM execution,
-         * the cloudlet may have the opportunity to run.
-         * It goes to the end of the waiting list because other cloudlets
-         * could be waiting longer and have priority to execute.
-         */
         addCloudletToWaitingList(cle);
         return 0.0;
     }
