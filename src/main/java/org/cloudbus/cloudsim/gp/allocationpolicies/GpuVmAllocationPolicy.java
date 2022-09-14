@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.function.BiFunction;
 // extends VmAllocationPolicy
-public interface GpuVmAllocationPolicy {
+public interface GpuVmAllocationPolicy extends VmAllocationPolicy{
 	
     Logger LOGGER = LoggerFactory.getLogger(GpuVmAllocationPolicy.class.getSimpleName());
 
@@ -23,7 +23,7 @@ public interface GpuVmAllocationPolicy {
 
     GpuVmAllocationPolicy NULL = new GpuVmAllocationPolicyNull ();
     
-    GpuDatacenter getGpuDatacenter ();
+    /*GpuDatacenter getGpuDatacenter ();
 
     void setGpuDatacenter (GpuDatacenter datacenter);
 
@@ -54,5 +54,5 @@ public interface GpuVmAllocationPolicy {
 
     int getGpuHostCountForParallelSearch ();
 
-    void setGpuHostCountForParallelSearch (int gpuHostCountForParallelSearch);
+    void setGpuHostCountForParallelSearch (int gpuHostCountForParallelSearch);*/
 }

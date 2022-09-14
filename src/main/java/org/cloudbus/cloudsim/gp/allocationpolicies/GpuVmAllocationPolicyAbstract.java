@@ -6,6 +6,7 @@ import org.cloudbus.cloudsim.resources.Processor;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.hosts.HostSuitability;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
+import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicyAbstract;
 
 import org.cloudsimplus.autoscaling.VerticalVmScaling;
@@ -35,30 +36,30 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
 	}
 	
 	public GpuVmAllocationPolicyAbstract (
-			final BiFunction<GpuVmAllocationPolicy, GpuVm, Optional<GpuHost>> 
+			final BiFunction<VmAllocationPolicy, Vm, Optional<Host>> 
 					findGpuHostForGpuVmFunction) {
-        setGpuDatacenter(GpuDatacenter.NULL);
-        setFindGpuHostForGpuVmFunction(findGpuHostForGpuVmFunction);
+        setDatacenter(GpuDatacenter.NULL);
+        setFindHostForVmFunction(findGpuHostForGpuVmFunction);
         this.gpuHostCountForParallelSearch = DEF_GPUHOST_COUNT_PARALLEL_SEARCH;
     }
 
     @Override
-    public final <T extends GpuHost> List<T> getGpuHostList () {
+    public final <T extends Host> List<T> getHostList () {
         return gpudatacenter.getHostList();
     }
 
     @Override
-    public GpuDatacenter getGpuDatacenter () {
+    public GpuDatacenter getDatacenter () {
         return gpudatacenter;
     }
 
     @Override
-    public void setGpuDatacenter(final GpuDatacenter datacenter) {
-        this.gpudatacenter = requireNonNull(datacenter);
+    public void setDatacenter(final Datacenter datacenter) {
+        this.gpudatacenter = requireNonNull((GpuDatacenter)datacenter);
     }
     
     @Override
-    public boolean scaleGpuVmVertically (final VerticalVmScaling scaling) {
+    public boolean scaleVmVertically (final VerticalVmScaling scaling) {
         if (scaling.isVmUnderloaded()) {
             return downScaleVmVertically(scaling);
         }
@@ -149,13 +150,13 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public HostSuitability allocateGpuHostForGpuVm (final GpuVm vm) {
-        if (getGpuHostList().isEmpty()) {
+    public HostSuitability allocateHostForVm (final Vm vm) {
+        if (getHostList().isEmpty()) {
             LOGGER.error(
                 "{}: {}: {} could not be allocated because there isn't any GpuHost for "
                 + "GpuDatacenter {}",
                 vm.getSimulation().clockStr(), getClass().getSimpleName(), vm, 
-                getGpuDatacenter().getId());
+                getDatacenter().getId());
             return new HostSuitability("GpuDatacenter has no Gpuhost.");
         }
 
@@ -163,9 +164,9 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
             return new HostSuitability("GpuVM is already created");
         }
 
-        final var optionalGpuHost = findGpuHostForGpuVm(vm);
-        if (optionalGpuHost.filter(GpuHost::isActive).isPresent()) {
-            return allocateGpuHostForGpuVm(vm, optionalGpuHost.get());
+        final var optionalGpuHost = findHostForVm(vm);
+        if (optionalGpuHost.filter(Host::isActive).isPresent()) {
+            return allocateHostForVm(vm, optionalGpuHost.get());
         }
 
         LOGGER.warn("{}: {}: No suitable Gpuhost found for {} in {}", vm.getSimulation().clockStr(), 
@@ -174,19 +175,19 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public <T extends GpuVm> List<T> allocateGpuHostForGpuVm (final Collection<T> gpuvmCollection) {
+    public <T extends Vm> List<T> allocateHostForVm (final Collection<T> gpuvmCollection) {
         requireNonNull(gpuvmCollection, "The list of GpuVMs to allocate a Gpuhost to cannot be null");
-        return gpuvmCollection.stream().filter(gpuvm -> !allocateGpuHostForGpuVm(
+        return gpuvmCollection.stream().filter(gpuvm -> !allocateHostForVm(
         		gpuvm).fully()).collect(toList());
     }
 
     @Override
-    public HostSuitability allocateGpuHostForGpuVm (final GpuVm vm, final GpuHost host) {
+    public HostSuitability allocateHostForVm (final Vm vm, final Host host) {
         /*if(vm instanceof VmGroup vmGroup){
             return createVmsFromGroup(vmGroup, host);
         }*/
 
-        return createGpuVm(vm, host);
+        return createVm((GpuVm)vm, (GpuHost)host);
     }
 
     /*private HostSuitability createGpuVmsFromGroup (final VmGroup vmGroup, final Host host) {
@@ -206,7 +207,7 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
         return hostSuitabilityForVmGroup;
     }*/
 
-    private HostSuitability createGpuVm (final GpuVm vm, final GpuHost host) {
+    private HostSuitability createVm (final GpuVm vm, final GpuHost host) {
         final var suitability = host.createVm(vm);
         if (suitability.fully()) {
             LOGGER.info(
@@ -222,30 +223,30 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public void deallocateGpuHostForGpuVm (final GpuVm vm) {
+    public void deallocateHostForVm (final Vm vm) {
         vm.getHost().destroyVm(vm);
     }
 
     @Override
-    public final void setFindGpuHostForGpuVmFunction (
-    		final BiFunction<GpuVmAllocationPolicy, GpuVm, Optional<GpuHost>> findGpuHostForGpuVmFunction) {
-        this.findGpuHostForGpuVmFunction = findGpuHostForGpuVmFunction;
+    public final void setFindHostForVmFunction (
+    		final BiFunction<VmAllocationPolicy, Vm, Optional<Host>> findGpuHostForGpuVmFunction) {
+        this.findGpuHostForGpuVmFunction = (BiFunction)findGpuHostForGpuVmFunction;
     }
 
     @Override
-    public final Optional<GpuHost> findGpuHostForGpuVm (final GpuVm vm) {
-        Optional<GpuHost> optionalHost = findGpuHostForGpuVmFunction == null ? 
-        		defaultFindGpuHostForGpuVm (vm) : findGpuHostForGpuVmFunction.apply (this, vm);
-        //If the selected Host is not active, activate it (if it's already active, setActive has no effect)
-        optionalHost = Optional.of((GpuHost)optionalHost.get().setActive(true));
-        //return optionalHost.map(gpuHost -> gpuHost.setActive(true));
-        return optionalHost;
+    public final Optional<Host> findHostForVm (final Vm vm) {
+        final var optionalHost = findGpuHostForGpuVmFunction == null ? 
+        		defaultFindGpuHostForGpuVm ((GpuVm)vm) : 
+        			findGpuHostForGpuVmFunction.apply (this, (GpuVm)vm);
+        //optionalHost = Optional.of((GpuHost)optionalHost.get().setActive(true));
+        return optionalHost.map(gpuHost -> gpuHost.setActive(true));
+        //return optionalHost;
     }
 
-    protected abstract Optional<GpuHost> defaultFindGpuHostForGpuVm (GpuVm vm);
+    protected abstract Optional<Host> defaultFindGpuHostForGpuVm (GpuVm vm);
 
     @Override
-    public Map<GpuVm, GpuHost> getOptimizedAllocationMap (final List<? extends GpuVm> gpuvmList) {
+    public Map<Vm, Host> getOptimizedAllocationMap (final List<? extends Vm> gpuvmList) {
         /*
          * This method implementation doesn't perform any
          * VM placement optimization and, in fact, has no effect.
@@ -257,17 +258,17 @@ public abstract class GpuVmAllocationPolicyAbstract implements GpuVmAllocationPo
     }
 
     @Override
-    public int getGpuHostCountForParallelSearch () {
+    public int getHostCountForParallelSearch () {
         return gpuHostCountForParallelSearch;
     }
 
     @Override
-    public void setGpuHostCountForParallelSearch (final int hostCountForParallelSearch) {
+    public void setHostCountForParallelSearch (final int hostCountForParallelSearch) {
         this.gpuHostCountForParallelSearch = hostCountForParallelSearch;
     }
 
     @Override
-    public boolean isGpuVmMigrationSupported () {
+    public boolean isVmMigrationSupported () {
         return false;
     }
 }

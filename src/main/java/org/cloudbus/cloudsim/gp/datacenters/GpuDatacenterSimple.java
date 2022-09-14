@@ -115,14 +115,14 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
     public final GpuDatacenter setGpuVmAllocationPolicy (
     		final GpuVmAllocationPolicy gpuVmAllocationPolicy) {
         requireNonNull(gpuVmAllocationPolicy);
-        if(gpuVmAllocationPolicy.getGpuDatacenter() != null && 
-        		gpuVmAllocationPolicy.getGpuDatacenter() != Datacenter.NULL && 
-        		!this.equals(gpuVmAllocationPolicy.getGpuDatacenter())){
+        if(gpuVmAllocationPolicy.getDatacenter() != null && 
+        		gpuVmAllocationPolicy.getDatacenter() != Datacenter.NULL && 
+        		!this.equals(gpuVmAllocationPolicy.getDatacenter())){
             throw new IllegalStateException("The given GpuVmAllocationPolicy is already used by "
             		+ "another Datacenter.");
         }
 
-        gpuVmAllocationPolicy.setGpuDatacenter(this);
+        gpuVmAllocationPolicy.setDatacenter(this);
         this.gpuVmAllocationPolicy = gpuVmAllocationPolicy;
         return this;
     }
@@ -286,10 +286,10 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
         updateGpuHostsProcessing();
 
         sourceHost.getVideocard().getVGpuAllocationPolicy().deallocateGpuForVGpu(vm.getVGpu());
-        gpuVmAllocationPolicy.deallocateGpuHostForGpuVm(vm);
+        gpuVmAllocationPolicy.deallocateHostForVm(vm);
 
         targetHost.removeMigratingInVm(vm);
-        final HostSuitability suitability = gpuVmAllocationPolicy.allocateGpuHostForGpuVm(vm, targetHost);
+        final HostSuitability suitability = gpuVmAllocationPolicy.allocateHostForVm(vm, targetHost);
         final GpuSuitability gpuSuitability = targetHost.getVideocard().getVGpuAllocationPolicy()
         		.allocateGpuForVGpu(vm.getVGpu());
         
@@ -412,7 +412,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
         String gpuTaskWarningmsg = ((GpuHost)vm.getHost()).getVideocard().processVGpuDestroy(
         		vm.getVGpu());
         
-        gpuVmAllocationPolicy.deallocateGpuHostForGpuVm(vm);
+        gpuVmAllocationPolicy.deallocateHostForVm(vm);
 
         if (ack) {
             sendNow(vm.getBroker(), CloudSimTag.VM_DESTROY_ACK, vm);
@@ -455,7 +455,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
     //need add VerticalVGpuScalling
     private boolean requestGpuVmVerticalScaling(final SimEvent evt) {
         if (evt.getData() instanceof VerticalVmScaling scaling) {
-            return gpuVmAllocationPolicy.scaleGpuVmVertically(scaling);
+            return gpuVmAllocationPolicy.scaleVmVertically(scaling);
         }
 
         throw new InvalidEventDataTypeException(evt, "VM_VERTICAL_SCALING", "VerticalVmScaling");
@@ -463,7 +463,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
     
     private boolean processGpuVmCreate (final SimEvent evt) {
         final var vm = (GpuVm) evt.getData();
-        final boolean gpuHostAllocatedForGpuVm = gpuVmAllocationPolicy.allocateGpuHostForGpuVm(vm).fully();
+        final boolean gpuHostAllocatedForGpuVm = gpuVmAllocationPolicy.allocateHostForVm(vm).fully();
         boolean gpuAllocatedForVGpu = false;
         if (gpuHostAllocatedForGpuVm) {
         	gpuAllocatedForVGpu = ((GpuHost)vm.getHost()).getVideocard().processVGpuCreate(
@@ -676,12 +676,12 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
     
     @Override
     public boolean isMigrationsEnabled() {
-        return migrationsEnabled && gpuVmAllocationPolicy.isGpuVmMigrationSupported();
+        return migrationsEnabled && gpuVmAllocationPolicy.isVmMigrationSupported();
     }
 
     @Override
     public final Datacenter enableMigrations() {
-        if(!gpuVmAllocationPolicy.isGpuVmMigrationSupported()){
+        if(!gpuVmAllocationPolicy.isVmMigrationSupported()){
             LOGGER.warn(
                 "{}: {}: It was requested to enable VM migrations but the {} doesn't support that.",
                 getSimulation().clockStr(), getName(), 
@@ -718,7 +718,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
     @Override
     public void requestVmMigration(final Vm sourceVm, Host targetHost) {
         if(GpuHost.NULL.equals(targetHost)){
-            targetHost = gpuVmAllocationPolicy.findGpuHostForGpuVm((GpuVm)sourceVm).orElse(GpuHost.NULL);
+            targetHost = gpuVmAllocationPolicy.findHostForVm((GpuVm)sourceVm).orElse(GpuHost.NULL);
         }
 
         if(GpuHost.NULL.equals(targetHost)) {
