@@ -5,6 +5,7 @@ import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
+import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.Simulation;
@@ -86,7 +87,7 @@ public interface GpuTask extends Comparable<GpuTask> {
 
     UtilizationModel getUtilizationModelGddram ();
 
-    //UtilizationModel getUtilizationModel (Class<? extends ResourceManageable> resourceClass);
+    UtilizationModel getUtilizationModel (Class<? extends ResourceManageable> resourceClass);
     
     double getUtilizationOfGpu ();
 

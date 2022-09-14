@@ -1,12 +1,20 @@
 package org.cloudbus.cloudsim.gp.cloudlets.gputasks;
 
+
+import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
+import org.cloudsimplus.listeners.EventListener;
+
+import org.cloudbus.cloudsim.gp.vgpu.VGpu;
+import org.cloudbus.cloudsim.gp.resources.GpuCore;
+import org.cloudbus.cloudsim.gp.resources.VGpuCore;
+import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
+
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
-import org.gpucloudsimplus.listeners.GpuTaskVGpuEventInfo;
-import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
-import org.cloudsimplus.listeners.EventListener;
+import org.cloudbus.cloudsim.resources.ResourceManageable;
+import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.core.Simulation;
-import org.cloudbus.cloudsim.gp.vgpu.VGpu;
+import org.cloudbus.cloudsim.resources.Ram;
 
 import java.util.*;
 
@@ -341,6 +349,26 @@ public class GpuTaskSimple implements GpuTask {
     @Override
     public UtilizationModel getUtilizationModelGpu() {
         return utilizationModelGpu;
+    }
+    
+    @Override
+    public UtilizationModel getUtilizationModel (
+    		final Class<? extends ResourceManageable> resourceClass) {
+    	
+        if(resourceClass.isAssignableFrom(Ram.class)){
+            return utilizationModelGddram;
+        }
+
+        if(resourceClass.isAssignableFrom(Bandwidth.class)){
+            return utilizationModelBw;
+        }
+
+        if(resourceClass.isAssignableFrom(VGpuCore.class) || 
+        		resourceClass.isAssignableFrom(GpuCore.class)){
+            return utilizationModelGpu;
+        }
+
+        throw new UnsupportedOperationException("This class doesn't support " + resourceClass.getSimpleName() + " resources");
     }
     
     @Override

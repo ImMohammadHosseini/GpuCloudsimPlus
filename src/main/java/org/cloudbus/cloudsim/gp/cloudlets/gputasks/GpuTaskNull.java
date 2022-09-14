@@ -11,6 +11,7 @@ import org.cloudbus.cloudsim.core.Simulation;
 
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudbus.cloudsim.gp.vgpu.VGpu;
+import org.cloudbus.cloudsim.resources.ResourceManageable;
 
 final class GpuTaskNull implements GpuTask {
 	
@@ -190,5 +191,7 @@ final class GpuTaskNull implements GpuTask {
 	@Override public boolean deleteRequiredFile (String filename) { return false; }
 	@Override public boolean hasRequiresFiles () { return false; }
 	@Override public List<String> getRequiredFiles () { return Collections.emptyList(); }
+	@Override public UtilizationModel getUtilizationModel (
+			Class<? extends ResourceManageable> resourceClass) {  return UtilizationModel.NULL; }
 
 }
