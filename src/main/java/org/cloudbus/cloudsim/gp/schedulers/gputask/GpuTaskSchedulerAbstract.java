@@ -8,6 +8,7 @@ import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudsimplus.listeners.EventListener;
 import org.gpucloudsimplus.listeners.GpuTaskResourceAllocationFailEventInfo;
 
+import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.util.Conversion;
@@ -210,7 +211,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
             .findFirst();
     }
     
-    protected Optional<GpuTaskExecution> findCloudletInList(final GpuTask gpuTask, 
+    protected Optional<GpuTaskExecution> findGpuTaskInList (final GpuTask gpuTask, 
     		final List<GpuTaskExecution> list) {
     	
         return list.stream()
@@ -232,16 +233,9 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
 
         gpuTask.setStatus(GpuTask.Status.READY);
 
-        /*
-         Requests a gpuTask processing update to ensure the gpuTask will be moved to the
-         exec list as soon as possible.
-         Without such a request, the GpuTask may start executing only
-         after a new and possibly unrelated message is processed by the simulator.
-         Since the next message to be received may take a long time,
-         the processing update is requested right away.
-         */
-        final Datacenter dc = vm.getHost().getDatacenter();
-        dc.schedule(CloudSimTag.VM_UPDATE_CLOUDLET_PROCESSING);
+ 
+        //final Datacenter dc = vm.getHost().getDatacenter();
+        //dc.schedule(CloudSimTag.VM_UPDATE_CLOUDLET_PROCESSING);
         return true;
     }
     
@@ -334,7 +328,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
                 return gte.getGpuTask();
             };
 
-            return findCloudletInList(gpuTask, gpuTaskList)
+            return findGpuTaskInList(gpuTask, gpuTaskList)
                 .map(removeGpuTaskAndUpdateStatus)
                 .isPresent();
     }
@@ -388,11 +382,12 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     private void updateGpuTaskProcessingAndPacketsDispatch (final GpuTaskExecution gte, 
     		final double currentTime) {
         long partialFinishedMI = 0;
-        if (taskScheduler.isTimeToUpdateCloudletProcessing(gte.getGpuTask())) {
+        /*if (taskScheduler.isTimeToUpdateCloudletProcessing(gte.getGpuTask())) {
             partialFinishedMI = updateGpuTaskProcessing(gte, currentTime);
-        }
+        }*/
+        partialFinishedMI = updateGpuTaskProcessing(gte, currentTime);
 
-        taskScheduler.processCloudletTasks(gte.getGpuTask(), partialFinishedMI);
+        //taskScheduler.processCloudletTasks(gte.getGpuTask(), partialFinishedMI);
     }
 
     protected long updateGpuTaskProcessing (final GpuTaskExecution gte, final double currentTime) {
@@ -483,16 +478,17 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
         final double processingTimeSpan = hasGpuTaskFileTransferTimePassed(gte, 
         		currentTime) ? timeSpan(gte, currentTime) : 0;
 
-        final double vMemDelay = getVirtualMemoryDelay(gte, processingTimeSpan);
+        //final double vMemDelay = getVirtualMemoryDelay(gte, processingTimeSpan);
         final double reducedBwDelay = getBandwidthOverSubscriptionDelay(gte, processingTimeSpan);
         
-        if(vMemDelay == Double.MIN_VALUE && reducedBwDelay == Double.MIN_VALUE) {
+        //vMemDelay == Double.MIN_VALUE &&
+        if( reducedBwDelay == Double.MIN_VALUE) {
             return 0;
         }
 
         final double gpuTaskUsedMips = getAllocatedMipsForGpuTask(gte, currentTime, true);
-        final double actualProcessingTime = processingTimeSpan - (validateDelay(vMemDelay) + 
-        		validateDelay(reducedBwDelay));
+        //validateDelay(vMemDelay) +
+        final double actualProcessingTime = processingTimeSpan - (validateDelay(reducedBwDelay));
         return gpuTaskUsedMips * actualProcessingTime * Conversion.MILLION;
     }
 
@@ -500,7 +496,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
         return delay == Double.MIN_VALUE ? 0 : delay;
     }
     
-    private double getVirtualMemoryDelay (final GpuTaskExecution gte, 
+    /*private double getVirtualMemoryDelay (final GpuTaskExecution gte, 
     		final double processingTimeSpan) {
     	gg;
         return getResourceOverSubscriptionDelay(
@@ -514,7 +510,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     
     private double diskTransferTime (final GpuTaskExecution gte, final Double dataSize) {
         return gte.getGpuTask().getVm().getHost().getStorage().getTransferTime(dataSize.intValue());
-    }
+    }*/
 
     private double getBandwidthOverSubscriptionDelay (final GpuTaskExecution gte, 
     		final double processingTimeSpan) {
@@ -646,16 +642,17 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
 
     @Override
     public void setVGpu (final VGpu vgpu) {
-        if (isOtherVmAssigned(requireNonNull(vgpu))) {
+        if (isOtherVGpuAssigned(requireNonNull(vgpu))) {
             throw new IllegalArgumentException(
-                "GpuTaskScheduler already has a vgpu assigned to it. Each vgpu must have its own GpuTaskScheduler instance.");
+                "GpuTaskScheduler already has a vgpu assigned to it. Each vgpu must have its "
+                + "own GpuTaskScheduler instance.");
         }
 
         this.vgpu = vgpu;
     }
     
-    private boolean isOtherVmAssigned (final VGpu vgpu) {
-        return this.vgpu != null && this.vgpu != VGpu.NULL && !VGpu.equals(this.vgpu);
+    private boolean isOtherVGpuAssigned (final VGpu vgpu) {
+        return this.vgpu != null && this.vgpu != VGpu.NULL && !vgpu.equals(this.vgpu);
     }
 
     @Override
@@ -677,7 +674,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     }
 
     ////////////////////////////////////////////////////////
-    @Override
+    /*@Override
     public CloudletTaskScheduler getTaskScheduler() {
         return taskScheduler;
     }
@@ -691,7 +688,7 @@ public abstract class GpuTaskSchedulerAbstract implements GpuTaskScheduler {
     @Override
     public boolean isThereTaskScheduler() {
         return taskScheduler != null && taskScheduler != CloudletTaskScheduler.NULL;
-    }
+    }*/
     ////////////////////////////////////////////////////////
 
     @Override

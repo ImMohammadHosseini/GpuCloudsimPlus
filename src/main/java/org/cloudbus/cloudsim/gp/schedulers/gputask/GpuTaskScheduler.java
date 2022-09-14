@@ -61,34 +61,11 @@ public interface GpuTaskScheduler {
     
     boolean hasFinishedGpuTasks ();
 ////////////////////////////////////////////////////////////
-    /**
-     * Gets the {@link CloudletTaskScheduler} that will be used by this CloudletScheduler to process
-     * {@link VmPacket}s to be sent or received by the Vm that is assigned to the
-     * current CloudletScheduler.
-     *
-     * @return the CloudletTaskScheduler for this CloudletScheduler or {@link CloudletTaskScheduler#NULL} if this scheduler
-     * will not deal with packets transmission.
-     */
-    CloudletTaskScheduler getTaskScheduler ();
+    //CloudletTaskScheduler getTaskScheduler ();
 
-    /**
-     * Sets the {@link CloudletTaskScheduler} that will be used by this CloudletScheduler to process
-     * {@link VmPacket}s to be sent or received by the Vm that is assigned to the
-     * current CloudletScheduler. The Vm from the CloudletScheduler is also set to the CloudletTaskScheduler.
-     *
-     * <p><b>This attribute usually doesn't need to be set manually. See the note at the {@link CloudletTaskScheduler} interface for more details.</b></p>
-     *
-     * @param taskScheduler the CloudletTaskScheduler to set for this CloudletScheduler or {@link CloudletTaskScheduler#NULL} if this scheduler
-     * will not deal with packets transmission.
-     */
-    void setTaskScheduler (CloudletTaskScheduler taskScheduler);
+    //void setTaskScheduler (CloudletTaskScheduler taskScheduler);
 
-    /**
-     * Checks if there is a {@link CloudletTaskScheduler} assigned to this CloudletScheduler
-     * in order to enable tasks execution and dispatching packets from and to the Vm of this CloudletScheduler.
-     * @return
-     */
-    boolean isThereTaskScheduler ();
+    //boolean isThereTaskScheduler ();
 //////////////////////////////////////////////////////////
     
     double updateProcessing (double currentTime, MipsShare mipsShare);
