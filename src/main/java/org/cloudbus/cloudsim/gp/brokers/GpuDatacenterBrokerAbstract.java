@@ -518,7 +518,7 @@ GpuDatacenterBroker {
             }
 
             vm.notifyOnCreationFailureListeners(lastSelectedGpuDc);
-            vm.getVGpu().notifyOnCreationFailureListeners();//maybe in Datacenter
+            //vm.getVGpu().notifyOnCreationFailureListeners();//maybe in Datacenter
         }
 
         //Decreases to indicate an ack for the request was received (
