@@ -32,7 +32,7 @@ public interface Videocard {
 	
 	<T extends Gpu> List<T> getGpuList ();
 	
-	double updateGpusProcessing ();
+	void updateGpusProcessing ();
 
 	<T extends VGpu> List<T> getVGpuList ();
 	
@@ -53,7 +53,7 @@ public interface Videocard {
 	
 	void setType (String type);*/
 	
-	void videocardProcess ();
+	//void videocardProcess ();
 	
 	
 	
@@ -91,25 +91,29 @@ public interface Videocard {
 
     Videocard setSchedulingInterval (double schedulingInterval);
 
-    //double getBandwidthPercentForMigration ();
+    double getBandwidthPercentForMigration ();
 
-    //void setBandwidthPercentForMigration (double bandwidthPercentForMigration);
+    void setBandwidthPercentForMigration (double bandwidthPercentForMigration);
     
     Videocard addOnGpuAvailableListener (EventListener<GpuEventInfo> listener);
 
     //Videocard addOnVGpuMigrationFinishListener (EventListener<VideocardVGpuMigrationEventInfo> listener);
 
-    boolean isMigrationsEnabled ();
-
     //Videocard enableMigrations ();
 
     //Videocard disableMigrations ();
-    
-    double getGpuSearchRetryDelay ();
-
-    Videocard setGpuSearchRetryDelay (double delay);
-    
+        
     GpuHost getHost ();
 
     Simulation getSimulation ();
+    
+    
+    
+    Videocard setGpuSearchRetryDelay (double delay);
+    
+    double getGpuSearchRetryDelay ();
+    
+    boolean isMigrationsEnabled ();
+
+
 }

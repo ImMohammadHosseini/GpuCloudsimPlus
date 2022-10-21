@@ -16,6 +16,7 @@ import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenterSimple;
 import org.cloudbus.cloudsim.gp.hosts.GpuHost;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.gp.core.GpuCloudsimTags;
+import static org.cloudbus.cloudsim.util.BytesConversion.bitesToBytes;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -40,13 +41,13 @@ public class VideocardSimple implements Videocard {
 	private final List<EventListener<GpuEventInfo>> onGpuAvailableListeners;
     //private final List<EventListener<VideocardVGpuMigrationEventInfo>> onVGpuMigrationFinishListeners;
 
-    //private Map<CustomVGpu, Gpu> lastMigrationMap;
+    private Map<VGpu, Gpu> lastMigrationMap;
 
     private double gpuSearchRetryDelay;
     
     private long activeGpusNumber;
     
-    //private double bandwidthPercentForMigration;
+    private double bandwidthPercentForMigration;
     
     private boolean migrationsEnabled = false;
     
@@ -112,7 +113,7 @@ public class VideocardSimple implements Videocard {
     }
 	
 	@Override
-	public double updateGpusProcessing () {
+	public void updateGpusProcessing () {
         for (final Gpu gpu : getGpuList()) {
             final double delay = gpu.updateProcessing(clock());
         }
@@ -162,10 +163,10 @@ public class VideocardSimple implements Videocard {
 		this.type = type;
 	}*/
 	
-	@Override
+	/*@Override
     public void videocardProcess () {
 		// TODO
-	}
+	}*/
 
 	@Override
     public String toString () {
@@ -365,36 +366,29 @@ public class VideocardSimple implements Videocard {
         return false;
     }
     
-	sarnakh :BROKER NAME
-	private void notifyBrokerAboutAlreadyFinishedGpuTask(final GpuTask gpuTask, final boolean ack) {
+	//sarnakh :BROKER NAME
+	/*private void notifyBrokerAboutAlreadyFinishedGpuTask(final GpuTask gpuTask, final boolean ack) {
         LOGGER.warn(
             "{}: {} owned by {} is already completed/finished. It won't be executed again.",
             getName(), gpuTask, gpuTask.getBroker());
 
-        /*
-         NOTE: If a Cloudlet has finished, then it won't be processed.
-         So, if ack is required, this method sends back a result.
-         If ack is not required, this method don't send back a result.
-         Hence, this might cause CloudSim to be hanged since waiting
-         for this Cloudlet back.
-        */
         sendCloudletSubmitAckToBroker(gpuTask, ack);
 
         sendNow(gpuTask.getBroker(), GpuCloudsimTags.GPUTASK_RETURN, gpuTask);
-    }
+    }*/
 	
-	sarnakh :BROKER NAME
-	private void sendCloudletSubmitAckToBroker(final GpuTask gpuTask, final boolean ack) {
+	//sarnakh :BROKER NAME
+	/*private void sendCloudletSubmitAckToBroker(final GpuTask gpuTask, final boolean ack) {
         if(!ack){
             return;
         }
 
         sendNow(gpuTask.getBroker(), GpuCloudsimTags.GPUTASK_SUBMIT_ACK, gpuTask);
-    }
+    }*/
 	
 	
 	
-	protected double updateGpuTaskProcessing() {
+	/*protected double updateGpuTaskProcessing() {
         if (!isTimeToUpdateGpuTasksProcessing()){
             return Double.MAX_VALUE;
         }
@@ -410,15 +404,16 @@ public class VideocardSimple implements Videocard {
 
         checkIfVGpuMigrationsAreNeeded();
         return nextSimulationDelay;
-    }
+    }*/
 	
-	private boolean isTimeToUpdateGpuTasksProcessing() {
+	/*private boolean isTimeToUpdateGpuTasksProcessing() {
         return clock() < 0.111 ||
                clock() >= lastProcessTime + getSimulation().getMinTimeBetweenEvents();
-    }
+    }*/
 	
 	private double timeToMigrateVGpu (final VGpu vgpu, final Gpu targetGpu) {
-        return vgpu.getGddram().getCapacity() / bitesToBytes(targetGpu.getBw().getCapacity() * getBandwidthPercentForMigration());
+        return vgpu.getGddram().getCapacity() / bitesToBytes(targetGpu.getBw().getCapacity() * 
+        		getBandwidthPercentForMigration());
     }
 
 	private void checkIfVGpuMigrationsAreNeeded () {
@@ -426,23 +421,23 @@ public class VideocardSimple implements Videocard {
             return;
         }
 
-        lastMigrationMap = vgpuAllocationPolicy.getOptimizedAllocationMap(getVGpuList());
+        /*lastMigrationMap = vgpuAllocationPolicy.getOptimizedAllocationMap(getVGpuList());
         for (final Map.Entry<VGpu, Gpu> entry : lastMigrationMap.entrySet()) {
             requestVGpuMigration(entry.getKey(), entry.getValue());
         }
 
         if(areThereUnderOrOverloadedGpusAndMigrationIsSupported()){
             lastUnderOrOverloadedDetection = clock();
-        }
+        }*/
     }
     
 	/*@Override
-    public void requestVGpuMigration(final CustomVGpu sourceVGpu) {
+    public void requestVGpuMigration(final VGpu sourceVGpu) {
         requestVGpuMigration(sourceVGpu, Gpu.NULL);
     }
 
     @Override
-    public void requestVGpuMigration(final CustomVGpu sourceVGpu, Gpu targetGpu) {
+    public void requestVGpuMigration(final VGpu sourceVGpu, Gpu targetGpu) {
         if(Gpu.NULL.equals(targetGpu)){
             targetGpu = vgpuAllocationPolicy.findGpuForVGpu(sourceVGpu).orElse(Gpu.NULL);
         }
@@ -474,10 +469,10 @@ public class VideocardSimple implements Videocard {
         }
     }*/
     
-	/*@Override
+	@Override
     public double getBandwidthPercentForMigration () {
         return bandwidthPercentForMigration;
-    }*/
+    }
 
     /*@Override
     public void setBandwidthPercentForMigration (final double bandwidthPercentForMigration) {
@@ -534,7 +529,13 @@ public class VideocardSimple implements Videocard {
 	}
 	
 	@Override public Videocard setPcieBwProvisioner (VideocardBwProvisioner pcieBwProvisioner) {
-		
+		this.pcieBwProvisioner = pcieBwProvisioner;
+		return this;
+	}
+
+	@Override
+	public void setBandwidthPercentForMigration (double bandwidthPercentForMigration) {
+		this.bandwidthPercentForMigration = bandwidthPercentForMigration;
 	}
 }
 
