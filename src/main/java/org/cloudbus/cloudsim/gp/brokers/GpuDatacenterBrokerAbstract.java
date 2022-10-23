@@ -6,7 +6,7 @@ import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
 import org.cloudbus.cloudsim.gp.datacenters.TimeZoned;
 import org.cloudbus.cloudsim.gp.cloudlets.GpuCloudlet;
 import org.cloudbus.cloudsim.gp.vgpu.VGpuSimple;
-import org.cloudbus.cloudsim.gp.core.GpuCloudsimTags;
+//import org.cloudbus.cloudsim.gp.core.GpuCloudsimTags;
 import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.vgpu.VGpu;
@@ -27,7 +27,7 @@ import org.cloudsimplus.listeners.EventListener;
 import org.cloudsimplus.listeners.EventInfo;
 
 import java.util.ArrayList;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BiFunction;

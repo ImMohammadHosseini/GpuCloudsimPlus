@@ -354,7 +354,7 @@ public class GpuDatacenterSimple extends CloudSimEntity implements GpuDatacenter
         }
     }
     
-    private <T extends GpuVm> List<T> getGpuVmList() {
+    private <T extends Vm> List<T> getGpuVmList() {
         return (List<T>) Collections.unmodifiableList(
                 getHostList()
                     .stream()

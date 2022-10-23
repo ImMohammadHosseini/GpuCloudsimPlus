@@ -2,7 +2,7 @@ package org.cloudbus.cloudsim.gp.vms;
 
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
-import org.cloudbus.cloudsim.core.CustomerEntityAbstract;
+//import org.cloudbus.cloudsim.core.CustomerEntityAbstract;
 
 import org.cloudbus.cloudsim.gp.vgpu.VGpu;
 import org.cloudbus.cloudsim.gp.schedulers.gpucloudlet.GpuCloudletScheduler;
