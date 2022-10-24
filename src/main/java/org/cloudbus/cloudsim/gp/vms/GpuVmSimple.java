@@ -15,33 +15,39 @@ public class GpuVmSimple extends VmSimple implements GpuVm {
 	
 	//private double arrivalTime;
 	
-	public GpuVmSimple (final Vm sourceVm, String type) {
+	public GpuVmSimple (final Vm sourceVm, final VGpu vgpu, String type) {
 		super (sourceVm);
+		setVGpu(vgpu);
 		setType (type);
 	}
 	
-	public GpuVmSimple (final double mipsCapacity, final long numberOfPes, String type) {
+	public GpuVmSimple (final double mipsCapacity, final long numberOfPes, final VGpu vgpu,
+			String type) {
 		super (mipsCapacity, numberOfPes);
+		setVGpu(vgpu);
 		setType (type);
 	}
 	
 	public GpuVmSimple (final double mipsCapacity, final long numberOfPes, 
-			final GpuCloudletScheduler cloudletScheduler, String type) {
+			final GpuCloudletScheduler cloudletScheduler, final VGpu vgpu, String type) {
         super (mipsCapacity, numberOfPes, cloudletScheduler);
         setCloudletScheduler (cloudletScheduler);
+        setVGpu(vgpu);
         setType (type);
 	
 	}
 	
 	public GpuVmSimple (final long id, final double mipsCapacity, final long numberOfPes, 
-			String type) {
+			final VGpu vgpu, String type) {
         super (id,  mipsCapacity, numberOfPes);
+        setVGpu(vgpu);
         setType (type);
 	}
 
 	public GpuVmSimple (final long id, final long mipsCapacity, final long numberOfPes,
-			String type) {
+			final VGpu vgpu, String type) {
 		super (id, mipsCapacity, numberOfPes);
+		setVGpu(vgpu);
         setType (type);
 	}
 
