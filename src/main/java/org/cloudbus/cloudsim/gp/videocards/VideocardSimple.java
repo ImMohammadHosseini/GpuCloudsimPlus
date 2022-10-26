@@ -545,5 +545,10 @@ public class VideocardSimple implements Videocard {
 	public void setBandwidthPercentForMigration (double bandwidthPercentForMigration) {
 		this.bandwidthPercentForMigration = bandwidthPercentForMigration;
 	}
+	
+	@Override
+	public boolean hasGpuHost () {
+		return getHost() != null;
+	}
 }
 

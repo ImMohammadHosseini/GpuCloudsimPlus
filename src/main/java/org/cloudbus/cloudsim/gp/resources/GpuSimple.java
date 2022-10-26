@@ -190,7 +190,7 @@ public class GpuSimple implements Gpu {
 		if(requireNonNull(gpuCoreList).isEmpty()){
             throw new IllegalArgumentException("The CORE list for a Gpu cannot be empty");
         }
-	    checkSimulationIsRunningAndAttemptedToChangeGpu("List of PE");
+	    checkSimulationIsRunningAndAttemptedToChangeGpu("List of Core");
 
 		this.gpuCoreList = gpuCoreList;
 		

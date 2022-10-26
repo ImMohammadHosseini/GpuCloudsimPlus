@@ -55,7 +55,7 @@ public interface Videocard {
 	
 	//void videocardProcess ();
 	
-	
+	boolean hasGpuHost ();
 	
 	
 	
