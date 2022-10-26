@@ -49,6 +49,7 @@ public class GpuHostSimple extends HostSimple implements GpuHost {
     	
         super(ramProvisioner.getCapacity(), bwProvisioner.getCapacity(), storage, peList);
         videocard = new VideocardSimple (gpuList, vgpuAllocationPolicyfinal);
+        videocard.setHost(this);
     }
 
     public GpuHostSimple (final long ram, final long bw, final long storage, final List<Pe> peList,
@@ -60,13 +61,15 @@ public class GpuHostSimple extends HostSimple implements GpuHost {
     		final List<Pe> peList, final List<Gpu> gpuList) {
         super(ram, bw, storage, peList);
         videocard = new VideocardSimple (gpuList);
+        videocard.setHost(this);
     }
 
     public GpuHostSimple (final long ram, final long bw, final long storage,
     		final List<Pe> peList, final List<Gpu> gpuList, boolean activate, 
     		final VGpuAllocationPolicy vgpuAllocationPolicyfinal) {
         super(ram, bw, storage, peList, activate);
-        videocard = new VideocardSimple (gpuList, vgpuAllocationPolicyfinal);     
+        videocard = new VideocardSimple (gpuList, vgpuAllocationPolicyfinal);
+        videocard.setHost(this);
     }
 
 
@@ -118,4 +121,14 @@ public class GpuHostSimple extends HostSimple implements GpuHost {
 		return videocard;
 	}
 	
+	@Override
+	public boolean hasVideocard () {
+		return getVideocard() != null;
+	}
+	
+	@Override
+	public GpuHost setVideocard (Videocard videocard) {
+		this.videocard = videocard;
+		return this;
+	}
 }

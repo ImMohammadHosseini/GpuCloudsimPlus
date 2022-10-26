@@ -22,6 +22,10 @@ public interface GpuHost extends Host {
     
     Videocard getVideocard ();
     
+    boolean hasVideocard ();
+    
+    GpuHost setVideocard (Videocard videocard);
+    
     @Override
     <T extends Vm> List<T> getVmList ();
 }

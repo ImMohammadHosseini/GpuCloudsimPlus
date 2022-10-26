@@ -528,6 +528,14 @@ public class VideocardSimple implements Videocard {
 		return host;
 	}
 	
+	@Override
+	public Videocard setHost (GpuHost host) {
+		this.host = host;
+    	if (!host.hasVideocard())
+    		host.setVideocard(this);
+    	return this;
+	}
+	
 	@Override public Videocard setPcieBwProvisioner (VideocardBwProvisioner pcieBwProvisioner) {
 		this.pcieBwProvisioner = pcieBwProvisioner;
 		return this;

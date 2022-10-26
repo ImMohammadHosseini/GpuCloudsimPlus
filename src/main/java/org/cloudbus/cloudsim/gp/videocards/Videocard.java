@@ -104,6 +104,8 @@ public interface Videocard {
     //Videocard disableMigrations ();
         
     GpuHost getHost ();
+    
+    Videocard setHost (GpuHost host);
 
     Simulation getSimulation ();
     

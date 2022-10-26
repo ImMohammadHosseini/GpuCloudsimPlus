@@ -89,6 +89,7 @@ public class VideocardNull implements Videocard {
 	@Override public void gpusProcessActivation (boolean activate) { /**/ }
 	@Override public void gpuProcessActivation (Gpu gpu, boolean activate) { /**/ }
 	@Override public GpuHost getHost () { return GpuHost.NULL;}
+	@Override public Videocard setHost (GpuHost host) { return this;}
 	@Override public Simulation getSimulation () { return Simulation.NULL; }
 }
 
