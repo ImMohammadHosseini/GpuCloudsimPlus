@@ -9,7 +9,6 @@ import static java.util.stream.Collectors.toList;
 import org.cloudbus.cloudsim.resources.Ram;
 import org.cloudbus.cloudsim.util.TimeUtil;
 import org.cloudbus.cloudsim.core.Simulation;
-import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.util.BytesConversion;
