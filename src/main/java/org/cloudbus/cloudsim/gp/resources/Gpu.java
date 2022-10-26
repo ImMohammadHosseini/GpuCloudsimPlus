@@ -6,7 +6,7 @@ import java.util.*;
 
 import org.cloudbus.cloudsim.resources.ResourceManageable;
 import org.cloudbus.cloudsim.core.ChangeableId;
-
+import org.cloudbus.cloudsim.core.Simulation;
 import org.gpucloudsimplus.listeners.GpuUpdatesVgpusProcessingEventInfo;
 import org.gpucloudsimplus.listeners.GpuEventInfo;
 import org.cloudsimplus.listeners.EventListener;
@@ -188,6 +188,8 @@ GpuResourceStatsComputer<GpuResourceStats> {
     void processActivation (boolean activate);
     
     Gpu setLazySuitabilityEvaluation (boolean lazySuitabilityEvaluation);
+    
+    Gpu setSimulation (Simulation simulation);
     
     //Simulation getSimulation ();
     

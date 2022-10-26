@@ -197,7 +197,7 @@ public class VideocardSimple implements Videocard {
             if(gpu.getId() < 0) {
                 gpu.setId(++lastGpuId);
             }
-            gpu.setVideocard(this);
+            gpu.setSimulation(getSimulation()).setVideocard(this);
             gpu.setActive(((GpuSimple)gpu).isActivateOnVideocardStartup());
         }
     }
@@ -210,7 +210,7 @@ public class VideocardSimple implements Videocard {
 
 	@Override
 	public Simulation getSimulation () {
-		return host.getSimulation();
+		return simulation;
 	}
 	
 	private double clock() {

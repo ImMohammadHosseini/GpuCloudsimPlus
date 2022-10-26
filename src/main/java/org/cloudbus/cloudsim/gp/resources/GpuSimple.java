@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 import org.cloudbus.cloudsim.resources.Ram;
 import org.cloudbus.cloudsim.util.TimeUtil;
 import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.util.BytesConversion;
@@ -82,6 +83,8 @@ public class GpuSimple implements Gpu {
     private int failedCoresNumber;
     private boolean lazySuitabilityEvaluation;
 	
+	private Simulation simulation;
+
     public GpuSimple(final List<GpuCore> coreList) {
         this(coreList, true);
     }
@@ -113,7 +116,8 @@ public class GpuSimple implements Gpu {
 			final List<GpuCore> coreList, final boolean activate) {
 		//this.setId(id);
 		this.setType(type);
-		
+        this.setSimulation(Simulation.NULL);
+
 		this.idleShutdownDeadline = DEF_IDLE_SHUTDOWN_DEADLINE;
         this.lazySuitabilityEvaluation = true;
 
@@ -932,7 +936,7 @@ public class GpuSimple implements Gpu {
 
     @Override
     public Simulation getSimulation() {
-        return videocard.getSimulation();
+        return simulation;
     }
 
     @Override
@@ -1231,5 +1235,10 @@ public class GpuSimple implements Gpu {
         return utilization > 1 && utilization < 1.01 ? 1 : utilization;
     }
 	
+	@Override
+	public Gpu setSimulation (Simulation simulation) {
+		this.simulation = simulation;
+		return this;
+	}
 	
 }

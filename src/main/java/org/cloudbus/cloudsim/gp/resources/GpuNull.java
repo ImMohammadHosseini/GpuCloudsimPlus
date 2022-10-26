@@ -154,4 +154,5 @@ final class GpuNull implements Gpu {
 	@Override public double getGpuPercentRequested () { return 0.0; }
 	@Override public double getGpuMipsUtilization () { return 0.0; }
 	@Override public void processActivation (boolean activate) { /**/ }
+	@Override public Gpu setSimulation (Simulation simulation) { return this; }
 }
