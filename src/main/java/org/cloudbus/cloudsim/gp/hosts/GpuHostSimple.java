@@ -131,6 +131,11 @@ public class GpuHostSimple extends HostSimple implements GpuHost {
 		this.videocard = videocard;
 		if (!videocard.hasGpuHost())
 			videocard.setHost(this);
+		setUpVideocardSimulation ();
 		return this;
+	}
+	
+	protected void setUpVideocardSimulation () {
+		this.videocard.setSimulation (this.getSimulation());
 	}
 }

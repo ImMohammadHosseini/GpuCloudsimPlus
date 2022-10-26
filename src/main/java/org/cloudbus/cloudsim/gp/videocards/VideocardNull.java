@@ -93,5 +93,6 @@ public class VideocardNull implements Videocard {
 	@Override public Simulation getSimulation () { return Simulation.NULL; }
 	
 	@Override public boolean hasGpuHost () { return false; }
+	@Override public Videocard setSimulation (Simulation simulation) { return this; }
 }
 

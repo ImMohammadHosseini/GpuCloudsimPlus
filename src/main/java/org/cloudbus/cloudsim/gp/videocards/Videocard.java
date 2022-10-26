@@ -57,6 +57,7 @@ public interface Videocard {
 	
 	boolean hasGpuHost ();
 	
+	Videocard setSimulation (Simulation simulation);
 	
 	
 	Videocard setVGpuAllocationPolicy (VGpuAllocationPolicy vgpuAllocationPolicy);

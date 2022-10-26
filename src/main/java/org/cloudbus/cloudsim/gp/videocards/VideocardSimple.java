@@ -29,7 +29,7 @@ public class VideocardSimple implements Videocard {
 	//private long id;
 	//private String type;
 	private GpuHost host;
-	//private Simulation simulation;
+	private Simulation simulation;
 	
 	private List<? extends Gpu> gpuList;
 	
@@ -62,9 +62,10 @@ public class VideocardSimple implements Videocard {
 	public VideocardSimple (final List<? extends Gpu> gpuList,
 	        final VGpuAllocationPolicy vgpuAllocationPolicy) {
 		
-		setGpuList(gpuList);
-        setLastProcessTime(0.0);
-        setSchedulingInterval(0);
+		this.setGpuList(gpuList);
+        this.setLastProcessTime(0.0);
+        this.setSchedulingInterval(0);
+        this.setSimulation(Simulation.NULL);
         //setPowerModel(new PowerModelDatacenterSimple(this));
         
         this.onGpuAvailableListeners = new ArrayList<>();
@@ -75,7 +76,7 @@ public class VideocardSimple implements Videocard {
 
         //this.lastMigrationMap = Collections.emptyMap();
         this.migrationsEnabled = false;
-        setVGpuAllocationPolicy(vgpuAllocationPolicy);
+        this.setVGpuAllocationPolicy(vgpuAllocationPolicy);
 	}
 	
 	@Override
@@ -550,5 +551,12 @@ public class VideocardSimple implements Videocard {
 	public boolean hasGpuHost () {
 		return getHost() != null;
 	}
+	
+	@Override
+	public Videocard setSimulation (Simulation simulation) {
+		this.simulation = simulation;
+		return this;
+	}
+
 }
 
