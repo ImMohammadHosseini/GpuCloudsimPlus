@@ -1,18 +1,38 @@
 package org.cloudbus.cloudsim.gp.hosts;
 
 import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudbus.cloudsim.resources.Pe;
+import org.cloudbus.cloudsim.vms.VmGroup;
+import org.cloudbus.cloudsim.resources.*;
+import org.cloudbus.cloudsim.util.TimeUtil;
+import org.cloudbus.cloudsim.core.*;
+import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.hosts.HostSimple;
+import org.cloudbus.cloudsim.resources.Bandwidth;
+import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.util.BytesConversion;
 import org.cloudbus.cloudsim.hosts.HostSuitability;
-import org.cloudbus.cloudsim.resources.HarddriveStorage;
+import org.cloudbus.cloudsim.vms.HostResourceStats;
+import org.cloudbus.cloudsim.datacenters.Datacenter;
+import org.cloudbus.cloudsim.vms.VmStateHistoryEntry;
+import org.cloudbus.cloudsim.schedulers.vm.VmScheduler;
+import org.cloudbus.cloudsim.provisioners.PeProvisioner;
+import org.cloudbus.cloudsim.hosts.HostStateHistoryEntry;
+import org.cloudbus.cloudsim.power.models.PowerModelHost;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
+import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerSpaceShared;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
+
+import org.cloudsimplus.listeners.EventListener;
+import org.cloudsimplus.listeners.HostEventInfo;
+import org.cloudsimplus.listeners.HostUpdatesVmsProcessingEventInfo;
 
 import org.cloudbus.cloudsim.gp.vms.GpuVm;
 import org.cloudbus.cloudsim.gp.resources.Gpu;
+import org.cloudbus.cloudsim.gp.vms.GpuVmSimple;
 import org.cloudbus.cloudsim.gp.videocards.Videocard;
+import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenter;
 import org.cloudbus.cloudsim.gp.videocards.VideocardSimple;
+import org.cloudbus.cloudsim.gp.schedulers.gpuvm.GpuVmScheduler;
 import org.cloudbus.cloudsim.gp.datacenters.GpuDatacenterSimple;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicy;
 import org.cloudbus.cloudsim.gp.allocationpolicies.VGpuAllocationPolicySimple;
@@ -67,7 +87,7 @@ public class GpuHostSimple implements GpuHost {
 
     private final Set<Vm> vmsMigratingOut;
 
-    private Datacenter datacenter;
+    private GpuDatacenter datacenter;
 
     private final Set<EventListener<HostUpdatesVmsProcessingEventInfo>> onUpdateProcessingListeners;
     private final List<EventListener<HostEventInfo>> onStartupListeners;
@@ -124,9 +144,9 @@ public class GpuHostSimple implements GpuHost {
     public GpuHostSimple (final long ram, final long bw, final long storage,
     		final List<Pe> peList, final Videocard videocard, boolean activate, 
     		final VGpuAllocationPolicy vgpuAllocationPolicyfinal) {
-        this(ram, bw, storage, peList, activate);
+        this(ram, bw, new HarddriveStorage(storage), peList, activate);
         setVideocard (videocard);
-        
+        this.videocard.setVGpuAllocationPolicy(vgpuAllocationPolicyfinal);
     }
 
     private GpuHostSimple(final long ram, final long bw, final HarddriveStorage storage,
@@ -147,7 +167,7 @@ public class GpuHostSimple implements GpuHost {
      	this.setPeList(peList);
      	this.setFailed(false);
      	this.shutdownTime = -1;
-       	this.setDatacenter(Datacenter.NULL);
+       	this.setDatacenter(GpuDatacenter.NULL);
 
      	this.onUpdateProcessingListeners = new HashSet<>();
       	this.onStartupListeners = new ArrayList<>();
@@ -250,12 +270,12 @@ public class GpuHostSimple implements GpuHost {
 		this.videocard.setSimulation (this.getSimulation());
 	}
 	
-	@Override
+	/*@Override
     public void processActivation(final boolean activate) {
         super.processActivation(activate);
         videocard.gpusProcessActivation(activate);
         
-    }
+    }*/
 	
     @SuppressWarnings("ForLoopReplaceableByForEach")
     @Override
@@ -422,7 +442,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public final Host setActive(final boolean activate) {
+    public final GpuHost setActive(final boolean activate) {
         if(!activate) {
             activateOnDatacenterStartup = false;
         }
@@ -468,9 +488,11 @@ public class GpuHostSimple implements GpuHost {
         }
 
         this.active = activate;
-        ((DatacenterSimple) datacenter).updateActiveHostsNumber(this);
+        ((GpuDatacenterSimple) datacenter).updateActiveGpuHostsNumber(this);
         activationChangeInProgress = false;
         notifyStartupOrShutdown(activate, wasActive);
+        
+        videocard.gpusProcessActivation(activate);
     }
 
     private void notifyStartupOrShutdown(final boolean activate, final boolean wasActive) {
@@ -548,7 +570,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Host addOnStartupListener(final EventListener<HostEventInfo> listener) {
+    public GpuHost addOnStartupListener(final EventListener<HostEventInfo> listener) {
         if(EventListener.NULL.equals(listener)){
             return this;
         }
@@ -563,7 +585,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Host addOnShutdownListener(final EventListener<HostEventInfo> listener) {
+    public GpuHost addOnShutdownListener(final EventListener<HostEventInfo> listener) {
         if(EventListener.NULL.equals(listener)){
             return this;
         }
@@ -645,10 +667,10 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public final Host setRamProvisioner(final ResourceProvisioner ramProvisioner) {
+    public final GpuHost setRamProvisioner(final ResourceProvisioner ramProvisioner) {
         checkSimulationIsRunningAndAttemptedToChangeHost("RAM");
         this.ramProvisioner = requireNonNull(ramProvisioner);
-        this.ramProvisioner.setResources(ram, vm -> ((VmSimple)vm).getRam());
+        this.ramProvisioner.setResources(ram, vm -> ((GpuVmSimple)vm).getRam());
         return this;
     }
 
@@ -665,10 +687,10 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public final Host setBwProvisioner(final ResourceProvisioner bwProvisioner) {
+    public final GpuHost setBwProvisioner(final ResourceProvisioner bwProvisioner) {
         checkSimulationIsRunningAndAttemptedToChangeHost("BW");
         this.bwProvisioner = requireNonNull(bwProvisioner);
-        this.bwProvisioner.setResources(bw, vm -> ((VmSimple)vm).getBw());
+        this.bwProvisioner.setResources(bw, vm -> ((GpuVmSimple)vm).getBw());
         return this;
     }
 
@@ -678,7 +700,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public final Host setVmScheduler(final VmScheduler vmScheduler) {
+    public final GpuHost setVmScheduler(final VmScheduler vmScheduler) {
         this.vmScheduler = requireNonNull(vmScheduler);
         vmScheduler.setHost(this);
         return this;
@@ -695,7 +717,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Host setStartTime(final double startTime) {
+    public GpuHost setStartTime(final double startTime) {
         if(startTime < 0){
             throw new IllegalArgumentException("Host start time cannot be negative");
         }
@@ -753,7 +775,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Host setIdleShutdownDeadline(final double deadline) {
+    public GpuHost setIdleShutdownDeadline(final double deadline) {
         this.idleShutdownDeadline = deadline;
         return this;
     }
@@ -894,7 +916,7 @@ public class GpuHostSimple implements GpuHost {
             return false;
         }
 
-        ((VmSimple)vm).updateMigrationStartListeners(this);
+        ((GpuVmSimple)vm).updateMigrationStartListeners(this);
 
         updateProcessing(simulation.clock());
         vm.getHost().updateProcessing(simulation.clock());
@@ -925,13 +947,13 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Datacenter getDatacenter() {
+    public GpuDatacenter getDatacenter() {
         return datacenter;
     }
 
     @Override
     public final void setDatacenter(final Datacenter datacenter) {
-        if(!Datacenter.NULL.equals(this.datacenter)) {
+        if(!GpuDatacenter.NULL.equals(this.datacenter)) {
             checkSimulationIsRunningAndAttemptedToChangeHost("Datacenter");
         }
 
@@ -941,7 +963,7 @@ public class GpuHostSimple implements GpuHost {
     @Override
     public String toString() {
         final String dc =
-                datacenter == null || Datacenter.NULL.equals(datacenter) ? "" :
+                datacenter == null || GpuDatacenter.NULL.equals(datacenter) ? "" :
                 String.format("/DC %d", datacenter.getId());
         return String.format("Host %d%s", getId(), dc);
     }
@@ -952,7 +974,8 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Host addOnUpdateProcessingListener(final EventListener<HostUpdatesVmsProcessingEventInfo> listener) {
+    public GpuHost addOnUpdateProcessingListener(
+    		final EventListener<HostUpdatesVmsProcessingEventInfo> listener) {
         if(EventListener.NULL.equals(listener)){
             return this;
         }
@@ -1008,7 +1031,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public final Host setSimulation(final Simulation simulation) {
+    public final GpuHost setSimulation(final Simulation simulation) {
         this.simulation = simulation;
         return this;
     }
@@ -1128,7 +1151,7 @@ public class GpuHostSimple implements GpuHost {
             return;
         }
 
-        this.cpuUtilizationStats = new HostResourceStats(this, Host::getCpuPercentUtilization);
+        this.cpuUtilizationStats = new HostResourceStats(this, GpuHost::getCpuPercentUtilization);
         if(vmList.isEmpty()){
             final String host = this.getId() > -1 ? this.toString() : "Host";
             LOGGER.info("Automatically enabling computation of utilization statistics for VMs on {} could not be performed because it doesn't have VMs yet. You need to enable it for each VM created.", host);
@@ -1147,7 +1170,7 @@ public class GpuHostSimple implements GpuHost {
             "powerModel cannot be null. You could provide a " +
             PowerModelHost.class.getSimpleName() + ".NULL instead.");
 
-        if(powerModel.getHost() != null && powerModel.getHost() != Host.NULL && !this.equals(powerModel.getHost())){
+        if(powerModel.getHost() != null && powerModel.getHost() != GpuHost.NULL && !this.equals(powerModel.getHost())){
             throw new IllegalStateException("The given PowerModel is already assigned to another Host. Each Host must have its own PowerModel instance.");
         }
 
@@ -1257,7 +1280,7 @@ public class GpuHostSimple implements GpuHost {
     }
 
     @Override
-    public Host setLazySuitabilityEvaluation(final boolean lazySuitabilityEvaluation) {
+    public GpuHost setLazySuitabilityEvaluation(final boolean lazySuitabilityEvaluation) {
         this.lazySuitabilityEvaluation = lazySuitabilityEvaluation;
         return this;
     }
