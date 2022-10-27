@@ -10,7 +10,7 @@ import org.cloudbus.cloudsim.hosts.HostSimple;
 import org.cloudbus.cloudsim.resources.Bandwidth;
 import org.cloudbus.cloudsim.schedulers.MipsShare;
 import org.cloudbus.cloudsim.util.BytesConversion;
-import org.cloudbus.cloudsim.hosts.HostSuitability;
+//import org.cloudbus.cloudsim.hosts.HostSuitability;
 import org.cloudbus.cloudsim.vms.HostResourceStats;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.vms.VmStateHistoryEntry;
@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 //  extends HostSimple 
-public class GpuHostSimple implements GpuHost {
+public class GpuHostSimple extends HostSimple  implements GpuHost {
 	
 	private static long defaultRamCapacity = (long) BytesConversion.gigaToMega(10);
     private static long defaultBwCapacity = 1000;
@@ -137,22 +137,24 @@ public class GpuHostSimple implements GpuHost {
 
     public GpuHostSimple ( final long ram, final long bw, final HarddriveStorage storage, 
     		final List<Pe> peList, final Videocard videocard) {
-        this(ram, bw, storage, peList, true);
+    	super(ram, bw, storage, peList);
+        //this(ram, bw, storage, peList, true);
         setVideocard (videocard);
     }
 
     public GpuHostSimple (final long ram, final long bw, final long storage,
     		final List<Pe> peList, final Videocard videocard, boolean activate, 
     		final VGpuAllocationPolicy vgpuAllocationPolicyfinal) {
-        this(ram, bw, new HarddriveStorage(storage), peList, activate);
+    	super(ram, bw, storage, peList, activate);
+        //this(ram, bw, new HarddriveStorage(storage), peList, activate);
         setVideocard (videocard);
         this.videocard.setVGpuAllocationPolicy(vgpuAllocationPolicyfinal);
     }
 
-    private GpuHostSimple(final long ram, final long bw, final HarddriveStorage storage,
-            final List<Pe> peList, final boolean activate) {
-    	
-    	this.setId(-1);
+    //private GpuHostSimple(final long ram, final long bw, final HarddriveStorage storage,
+    //        final List<Pe> peList, final boolean activate) {
+    //	super(ram, bw, storage, peList, activate);
+    	/*this.setId(-1);
     	this.setSimulation(Simulation.NULL);
     	this.idleShutdownDeadline = DEF_IDLE_SHUTDOWN_DEADLINE;
     	this.lazySuitabilityEvaluation = true;
@@ -181,8 +183,8 @@ public class GpuHostSimple implements GpuHost {
       	this.vmsMigratingOut = new HashSet<>();
       	this.powerModel = PowerModelHost.NULL;
       	this.stateHistory = new LinkedList<>();
-       	this.activateOnDatacenterStartup = activate;
-	}
+       	this.activateOnDatacenterStartup = activate;*/
+	//}
 
     public static long getDefaultRamCapacity() {
         return defaultRamCapacity;
@@ -311,7 +313,7 @@ public class GpuHostSimple implements GpuHost {
         onUpdateProcessingListeners.forEach(l -> l.update(HostUpdatesVmsProcessingEventInfo.of(l,this, nextSimulationTime)));
     }
 
-    @Override
+    /*@Override
     public HostSuitability createVm(final Vm vm) {
         final HostSuitability suitability = createVmInternal(vm);
         if(suitability.fully()) {
@@ -322,14 +324,20 @@ public class GpuHostSimple implements GpuHost {
         }
 
         return suitability;
-    }
+    }*/
 
-    @Override
+    /*@Override
     public HostSuitability createTemporaryVm(final Vm vm) {
         return createVmInternal(vm);
-    }
+    }*/
 
-    private HostSuitability createVmInternal(final Vm vm) {
+    /*@Override
+    public HostSuitability getSuitabilityFor(final Vm vm) {
+    	//return super.getSuitabilityFor(vm);
+        return isSuitableForVm(vm, false, false);
+    }*/
+
+    /*private HostSuitability createVmInternal(final Vm vm) {
         if(vm instanceof VmGroup){
             return new HostSuitability("Just internal VMs inside a VmGroup can be created, not the VmGroup itself.");
         }
@@ -340,9 +348,9 @@ public class GpuHostSimple implements GpuHost {
         }
 
         return suitability;
-    }
+    }*/
 
-    private HostSuitability allocateResourcesForVm(final Vm vm, final boolean inMigration){
+    /*private HostSuitability allocateResourcesForVm(final Vm vm, final boolean inMigration){
         final HostSuitability suitability = isSuitableForVm(vm, inMigration, true);
         if(!suitability.fully()) {
             return suitability;
@@ -355,7 +363,7 @@ public class GpuHostSimple implements GpuHost {
         allocateResourcesForVm(vm);
 
         return suitability;
-    }
+    }*/
 
     private void allocateResourcesForVm(final Vm vm) {
         ramProvisioner.allocateResourceForVm(vm, vm.getCurrentRequestedRam());
@@ -399,7 +407,7 @@ public class GpuHostSimple implements GpuHost {
         return getSuitabilityFor(vm).fully();
     }
 
-    private HostSuitability isSuitableForVm(final Vm vm, final boolean inMigration, final boolean showFailureLog) {
+    /*private HostSuitability isSuitableForVm(final Vm vm, final boolean inMigration, final boolean showFailureLog) {
         final var suitability = new HostSuitability();
 
         suitability.setForStorage(disk.isAmountAvailable(vm.getStorage()));
@@ -424,12 +432,7 @@ public class GpuHostSimple implements GpuHost {
         }
 
         return suitability.setForPes(vmScheduler.isSuitableForVm(vm));
-    }
-
-    @Override
-    public HostSuitability getSuitabilityFor(final Vm vm) {
-        return isSuitableForVm(vm, false, false);
-    }
+    }*/
 
     @Override
     public boolean isActive() {
@@ -441,7 +444,7 @@ public class GpuHostSimple implements GpuHost {
         return this.firstStartTime > -1;
     }
 
-    @Override
+    /*@Override
     public final GpuHost setActive(final boolean activate) {
         if(!activate) {
             activateOnDatacenterStartup = false;
@@ -463,7 +466,7 @@ public class GpuHostSimple implements GpuHost {
         }
 
         /*If the simulation is not running and there is a startup delay,
-        * when the datacenter is started up, it will request such a Host activation. */
+        * when the datacenter is started up, it will request such a Host activation. 
         if(!simulation.isRunning()){
             return this;
         }
@@ -475,7 +478,7 @@ public class GpuHostSimple implements GpuHost {
         activationChangeInProgress = true;
 
         return this;
-    }
+    }*/
 
     public void processActivation(final boolean activate) {
         final boolean wasActive = this.active;
@@ -656,23 +659,23 @@ public class GpuHostSimple implements GpuHost {
         return id;
     }
 
-    @Override
+    /*@Override
     public final void setId(long id) {
         this.id = id;
-    }
+    }*/
 
     @Override
     public ResourceProvisioner getRamProvisioner() {
         return ramProvisioner;
     }
 
-    @Override
+    /*@Override
     public final GpuHost setRamProvisioner(final ResourceProvisioner ramProvisioner) {
         checkSimulationIsRunningAndAttemptedToChangeHost("RAM");
         this.ramProvisioner = requireNonNull(ramProvisioner);
         this.ramProvisioner.setResources(ram, vm -> ((GpuVmSimple)vm).getRam());
         return this;
-    }
+    }*/
 
     private void checkSimulationIsRunningAndAttemptedToChangeHost(final String resourceName) {
         if(simulation.isRunning()){
@@ -686,25 +689,25 @@ public class GpuHostSimple implements GpuHost {
         return bwProvisioner;
     }
 
-    @Override
+    /*@Override
     public final GpuHost setBwProvisioner(final ResourceProvisioner bwProvisioner) {
         checkSimulationIsRunningAndAttemptedToChangeHost("BW");
         this.bwProvisioner = requireNonNull(bwProvisioner);
         this.bwProvisioner.setResources(bw, vm -> ((GpuVmSimple)vm).getBw());
         return this;
-    }
+    }*/
 
     @Override
     public VmScheduler getVmScheduler() {
         return vmScheduler;
     }
 
-    @Override
+    /*@Override
     public final GpuHost setVmScheduler(final VmScheduler vmScheduler) {
         this.vmScheduler = requireNonNull(vmScheduler);
         vmScheduler.setHost(this);
         return this;
-    }
+    }*/
 
     @Override
     public double getStartTime() {
@@ -836,7 +839,7 @@ public class GpuHostSimple implements GpuHost {
         return failed;
     }
 
-    @Override
+    /*@Override
     public final boolean setFailed(final boolean failed) {
         this.failed = failed;
         final Pe.Status newStatus = failed ? Pe.Status.FAILED : Pe.Status.FREE;
@@ -845,7 +848,7 @@ public class GpuHostSimple implements GpuHost {
         /*Just changes the active state when the Host is set to active.
         * In other situations, the active status must remain as it was.
         * For example, if the host was inactive and now it's set to failed,
-        * it must remain inactive.*/
+        * it must remain inactive.
         if(failed && this.active){
             this.active = false;
         }
@@ -855,11 +858,11 @@ public class GpuHostSimple implements GpuHost {
 
     public final void setPeStatus(final List<Pe> peList, final Pe.Status newStatus){
         /*For performance reasons, stores the number of free and failed PEs
-        instead of iterating over the PE list every time to find out.*/
+        instead of iterating over the PE list every time to find out.
         for (final Pe pe : peList) {
             updatePeStatus(pe, newStatus);
         }
-    }
+    }*/
 
     private void updatePeStatus(final Pe pe, final Pe.Status newStatus) {
         if(pe.getStatus() != newStatus) {
@@ -901,13 +904,13 @@ public class GpuHostSimple implements GpuHost {
         return !(vmsMigratingIn.isEmpty() && vmsMigratingOut.isEmpty());
     }
 
-    @Override
+    /*@Override
     public boolean addMigratingInVm(final Vm vm) {
         /* TODO: Instead of keeping a list of VMs which are migrating into a Host,
         *  which requires searching in such a list every time a VM is requested to be migrated
         *  to that Host (to check if it isn't migrating to that same host already),
         *  we can add a migratingHost attribute to Vm, so that the worst time complexity
-        *  will change from O(N) to a constant time O(1). */
+        *  will change from O(N) to a constant time O(1). 
         if (vmsMigratingIn.contains(vm)) {
             return false;
         }
@@ -922,7 +925,7 @@ public class GpuHostSimple implements GpuHost {
         vm.getHost().updateProcessing(simulation.clock());
 
         return true;
-    }
+    }*/
 
     @Override
     public void removeMigratingInVm(final Vm vm) {
@@ -951,14 +954,14 @@ public class GpuHostSimple implements GpuHost {
         return datacenter;
     }
 
-    @Override
+    /*@Override
     public final void setDatacenter(final Datacenter datacenter) {
         if(!GpuDatacenter.NULL.equals(this.datacenter)) {
             checkSimulationIsRunningAndAttemptedToChangeHost("Datacenter");
         }
 
-        this.datacenter = datacenter;
-    }
+        this.datacenter = (GpuDatacenter)datacenter;
+    }*/
 
     @Override
     public String toString() {
@@ -1030,11 +1033,11 @@ public class GpuHostSimple implements GpuHost {
         return lastBusyTime;
     }
 
-    @Override
+    /*@Override
     public final GpuHost setSimulation(final Simulation simulation) {
         this.simulation = simulation;
         return this;
-    }
+    }*/
 
     @Override
     public int compareTo(final Host other) {
@@ -1049,7 +1052,7 @@ public class GpuHostSimple implements GpuHost {
     public boolean equals(final Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        final HostSimple that = (HostSimple) obj;
+        final GpuHostSimple that = (GpuHostSimple) obj;
         return this.getId() == that.getId() && this.simulation.equals(that.simulation);
     }
 
@@ -1151,7 +1154,7 @@ public class GpuHostSimple implements GpuHost {
             return;
         }
 
-        this.cpuUtilizationStats = new HostResourceStats(this, GpuHost::getCpuPercentUtilization);
+        this.cpuUtilizationStats = new HostResourceStats(this, Host::getCpuPercentUtilization);
         if(vmList.isEmpty()){
             final String host = this.getId() > -1 ? this.toString() : "Host";
             LOGGER.info("Automatically enabling computation of utilization statistics for VMs on {} could not be performed because it doesn't have VMs yet. You need to enable it for each VM created.", host);
@@ -1164,7 +1167,7 @@ public class GpuHostSimple implements GpuHost {
         return powerModel;
     }
 
-    @Override
+    /*@Override
     public final void setPowerModel(final PowerModelHost powerModel) {
         requireNonNull(powerModel,
             "powerModel cannot be null. You could provide a " +
@@ -1176,7 +1179,7 @@ public class GpuHostSimple implements GpuHost {
 
         this.powerModel = powerModel;
         powerModel.setHost(this);
-    }
+    }*/
 
     @Override
     public void enableStateHistory() {

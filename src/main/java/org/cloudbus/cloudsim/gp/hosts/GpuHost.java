@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public interface GpuHost extends Host {
 	
-	Logger LOGGER = LoggerFactory.getLogger(GpuHost.class.getSimpleName());
+	//Logger LOGGER = LoggerFactory.getLogger(GpuHost.class.getSimpleName());
 	
 	double DEF_IDLE_SHUTDOWN_DEADLINE = -1;
 
